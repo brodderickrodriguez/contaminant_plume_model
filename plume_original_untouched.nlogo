@@ -5,22 +5,22 @@
 ;;cause the UAVs to fly around the center of the plume and map it
 
 globals[
-  coverage-all ;;all the measurements over the last "coverage-data-decay" ticks
-  coverage-std ;;standard deviation of coverageA
+  coverageA ;;all the measurements over the last "coverage-data-decay" ticks
+  coverage ;;standard deviation of coverageA
 ]
 turtles-own [
   flockmates ;;other UAVs in vision range
   nearest-neighbor
   best-neighbor ;;neighbor w/ highest reading
-  coverage ;;most recent reading
+  turtlei ;;most recent reading
 ]
 patches-own[
-  plume-density ;;plume concentration at a given patch
+  plume ;;plume concentration at a given patch
   plumeposx ;;plume position
   plumeposy
 ]
 
-to setup
+to setup 
   clear-all
   crt population ;;spawn UAVs
     [ set color orange
@@ -28,37 +28,36 @@ to setup
       set shape "airplane"
       setxy max-pxcor max-pycor ]
   reset-ticks
-  ask patches [setup-patches]
-  set coverage-all [] ;;initializes as an array
+  ask patches [setup-patches] 
+  set coverageA [] ;;initializes as an array
 end
-
+  
 to setup-patches ;;spawn plume
   set plumeposx 0
   set plumeposy 0
-  set plume-density 100 - (((distancexy plumeposx plumeposy) / (( plume-spread / 2)))) ;;plume spread: based on distance from center
-  if plume-density < 0 ;;sets negative concentrations to 0 as negative concentrations are unrealistic
-  [set plume-density 0]
-  set pcolor scale-color green plume-density 1 100
+  set plume 100 - (((distancexy plumeposx plumeposy) / (( plume-spread / 2)))) ;;plume spread: based on distance from center
+  if plume < 0 ;;sets negative concentrations to 0 as negative concentrations are unrealistic
+  [set plume 0]
+  set pcolor scale-color green plume 1 100
 end
 
 to go
   ask turtles [ flock ]
   ask turtles [ get-reading ]
   calc-coverage
-  show ticks
-  ask turtles [ fd 0.5 ]
+  repeat 1 [ ask turtles [ fd 0.5] display ] ;;UAV movement
   tick
 end
 
 to get-reading
-  set coverage-all lput plume-density coverage-all ;;puts measurement on coverage array
-  set coverage plume-density ;;stores most recent measurement as a turtle var
+  set coverageA lput plume coverageA ;;puts measurement on coverage array
+  set turtlei plume ;;stores most recent measurement as a turtle var
 end
 
 to calc-coverage
   if ticks > coverage-data-decay
-  [repeat population[ set coverage-all butfirst coverage-all ]] ;;recycles coverageA
-  set coverage-std standard-deviation coverage-all
+  [repeat population[ set coverageA butfirst coverageA ]] ;;recycles coverageA
+  set coverage standard-deviation coverageA
 end
 
 to flock  ;;if a UAV has a higher "turtlei" than 0, cohere toward UAV with highest "turtlei"
@@ -79,7 +78,7 @@ to find-flockmates  ;; turtle procedure
 end
 
 to find-best-neighbor ;; turtle procedure
-  set best-neighbor max-one-of flockmates [ coverage ]
+  set best-neighbor max-one-of flockmates [ turtlei ]
 end
 
 to find-nearest-neighbor ;; turtle procedure
@@ -95,7 +94,7 @@ end
 ;;; ALIGN
 
 to align  ;; turtle procedure
-  if coverage < [coverage] of best-neighbor[
+  if turtlei < [turtlei] of best-neighbor[
   turn-towards average-flockmate-heading max-align-turn]
 end
 
@@ -113,7 +112,7 @@ end
 ;;; COHERE
 
 to cohere  ;; turtle procedure]
-  if coverage < [coverage] of best-neighbor
+  if turtlei < [turtlei] of best-neighbor
   [turn-towards average-heading-towards-flockmates max-cohere-turn]
 end
 
@@ -158,10 +157,10 @@ end
 GRAPHICS-WINDOW
 250
 10
-863
-624
--1
--1
+865
+646
+60
+60
 5.0
 1
 10
@@ -223,10 +222,10 @@ SLIDER
 84
 population
 population
-2
-300
-2.0
-1
+1.0
+300.0
+15
+1.0
 1
 NIL
 HORIZONTAL
@@ -240,7 +239,7 @@ max-align-turn
 max-align-turn
 0.0
 20.0
-0.0
+0
 0.25
 1
 degrees
@@ -330,7 +329,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-60.0
+60
 1
 1
 NIL
@@ -352,44 +351,42 @@ true
 false
 "" ";;set-plot-y-range 0 .5\n;;set-plot-x-range ticks - 100 ticks + 1"
 PENS
-"default" 1.0 0 -16777216 true "" "plot coverage-std"
+"default" 1.0 0 -16777216 true "" "plot coverage"
 
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+The objective of our contaminant plume scenario was to simulate the mapping of a contaminant plume by a UAV swarm. In this scenario, the ground controller can control the maximum coherence turn of the UAVs. A higher maximum coherence turn results in a tighter grouping for the swarm, while a lower value results in a more dispersed swarm. Figure 4a demonstrates a sub-optimal maximum coherence value, while Figure 4b demonstrates an improved value. Figure 4c shows a graph of the standard deviation of the entire swarm's sensor measurements, representing how well distributed the measurements are. Ground controllers would be provided with an up-to-date version of the graph, giving them feedback and allowing them to find optimal parameters.
 
-## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+## HOW TO CITE
 
-## HOW TO USE IT
+This model is describe in the paper:
 
-(how to use the model, including a description of each of the items in the Interface tab)
+A. G. Madey and G. R. Madey, "Design and Evaluation of UAV Swarm Command and Control Strategies," In Proceedings of the 2013 Symposium on Agent Directed Simulation (ADS '13/SpringSim 2013). Society for Computer Simulation International, San Diego, CA, 2013.
 
-## THINGS TO NOTICE
+Approximately 40% of this program is barrowed from Uri Wilensky's Netlogo flocking progam. The Netlogo flocking program is based on Reynold's 1987 BOIDS program.
 
-(suggested things for the user to notice while running the model)
+If you mention NetLogo in a publication, we ask that you include these citations for the model itself and for the NetLogo software:
 
-## THINGS TO TRY
+* Wilensky, U. (1998).  NetLogo Flocking model.  http://ccl.northwestern.edu/netlogo/models/Flocking.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+## COPYRIGHT AND LICENSE
 
-## EXTENDING THE MODEL
+New code in this program Copyright 2013 Alexander Madey
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+Copyright 1998 Uri Wilensky.
 
-## NETLOGO FEATURES
+![CC BY-NC-SA 3.0](http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png)
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
 
-## RELATED MODELS
+Commercial licenses are also available. To inquire about commercial licenses, please contact Uri Wilensky at uri@northwestern.edu.
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+This model was created as part of the project: CONNECTED MATHEMATICS: MAKING SENSE OF COMPLEX PHENOMENA THROUGH BUILDING OBJECT-BASED PARALLEL MODELS (OBPML).  The project gratefully acknowledges the support of the National Science Foundation (Applications of Advanced Technologies Program) -- grant numbers RED #9552950 and REC #9632612.
 
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+This model was converted to NetLogo as part of the projects: PARTICIPATORY SIMULATIONS: NETWORK-BASED DESIGN FOR SYSTEMS LEARNING IN CLASSROOMS and/or INTEGRATED SIMULATION AND MODELING ENVIRONMENT. The project gratefully acknowledges the support of the National Science Foundation (REPP & ROLE programs) -- grant numbers REC #9814682 and REC-0126227. Converted from StarLogoT to NetLogo, 2002.
 @#$#@#$#@
 default
 true
@@ -583,22 +580,6 @@ Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
 
-sheep
-false
-15
-Circle -1 true true 203 65 88
-Circle -1 true true 70 65 162
-Circle -1 true true 150 105 120
-Polygon -7500403 true false 218 120 240 165 255 165 278 120
-Circle -7500403 true false 214 72 67
-Rectangle -1 true true 164 223 179 298
-Polygon -1 true true 45 285 30 285 30 240 15 195 45 210
-Circle -1 true true 3 83 150
-Rectangle -1 true true 65 221 80 296
-Polygon -1 true true 195 285 210 285 210 240 240 210 195 210
-Polygon -7500403 true false 276 85 285 105 302 99 294 83
-Polygon -7500403 true false 219 85 210 105 193 99 201 83
-
 square
 false
 0
@@ -683,35 +664,33 @@ Line -7500403 true 40 84 269 221
 Line -7500403 true 40 216 269 79
 Line -7500403 true 84 40 221 269
 
-wolf
-false
-0
-Polygon -16777216 true false 253 133 245 131 245 133
-Polygon -7500403 true true 2 194 13 197 30 191 38 193 38 205 20 226 20 257 27 265 38 266 40 260 31 253 31 230 60 206 68 198 75 209 66 228 65 243 82 261 84 268 100 267 103 261 77 239 79 231 100 207 98 196 119 201 143 202 160 195 166 210 172 213 173 238 167 251 160 248 154 265 169 264 178 247 186 240 198 260 200 271 217 271 219 262 207 258 195 230 192 198 210 184 227 164 242 144 259 145 284 151 277 141 293 140 299 134 297 127 273 119 270 105
-Polygon -7500403 true true -1 195 14 180 36 166 40 153 53 140 82 131 134 133 159 126 188 115 227 108 236 102 238 98 268 86 269 92 281 87 269 103 269 113
-
 x
 false
 0
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
+
 @#$#@#$#@
-NetLogo 6.0.4
+NetLogo 5.0.3
 @#$#@#$#@
+set population 200
+setup
+repeat 200 [ go ]
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
 default
 0.0
--0.2 0 0.0 1.0
+-0.2 0 1.0 0.0
 0.0 1 1.0 0.0
-0.2 0 0.0 1.0
+0.2 0 1.0 0.0
 link direction
 true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
+
 @#$#@#$#@
 0
 @#$#@#$#@
