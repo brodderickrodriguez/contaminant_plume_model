@@ -7,6 +7,7 @@
 globals[
   coverage-all ;;all the measurements over the last "coverage-data-decay" ticks
   coverage-std ;;standard deviation of coverageA
+  coverage-mean
 ]
 turtles-own [
   flockmates ;;other UAVs in vision range
@@ -59,6 +60,7 @@ to calc-coverage
   if ticks > coverage-data-decay
   [repeat population[ set coverage-all butfirst coverage-all ]] ;;recycles coverageA
   set coverage-std standard-deviation coverage-all
+  set coverage-mean mean coverage-all
 end
 
 to flock  ;;if a UAV has a higher "turtlei" than 0, cohere toward UAV with highest "turtlei"
