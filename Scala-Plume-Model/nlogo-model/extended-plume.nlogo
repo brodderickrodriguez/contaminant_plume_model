@@ -46,7 +46,7 @@ to setup
   clear-all
   reset-ticks
   show plume-scala:report-numbers 1
-  import-drawing "plume-bg.png"
+  import-drawing "resources/plume-bg.png"
   define-constants
   set all-coverage []
 
