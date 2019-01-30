@@ -1,10 +1,10 @@
-extensions [ plume-model ]
+extensions [ plume-scala ]
 
 to setup
   reset-ticks
   clear-all
 
-  let t plume-model:fni 1
+  let t plume-scala:fni 1
   show t
 
   ;let a plume-model:fni 1
