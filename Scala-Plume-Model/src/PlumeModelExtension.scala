@@ -6,7 +6,7 @@ import org.nlogo.core.Syntax  // implicits
 
 class PlumeModelExtension extends api.DefaultClassManager {
     def load(manager: api.PrimitiveManager) {
-        manager.addPrimitive("first-n-integers", IntegerList)
+        manager.addPrimitive("fni", IntegerList)
     }
 }
 

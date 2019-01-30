@@ -4,7 +4,7 @@ to setup
   reset-ticks
   clear-all
 
-  let a plume-model:first-n-integers 1
+  let a plume-model:fni 1
   show a
 end
 @#$#@#$#@

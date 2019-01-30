@@ -1,13 +1,14 @@
 enablePlugins(org.nlogo.build.NetLogoExtension)
 
-name := "plume-scala"
+name := "plume-model"
 version := "0.1"
 scalaVersion := "2.12.0"
 
-netLogoExtName      := "plume-scala"
+netLogoExtName      := "plume-model"
 netLogoClassManager := "PlumeModelExtension"
 netLogoZipSources   := false
 
+publishMavenStyle in ThisBuild := false
 scalaSource in Compile := baseDirectory.value / "src"
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xfatal-warnings", "-encoding", "us-ascii")
 netLogoVersion := "6.0.4"
