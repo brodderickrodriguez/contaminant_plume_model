@@ -14,4 +14,3 @@ scalaSource in Compile := baseDirectory.value / "src"
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xfatal-warnings", "-encoding", "us-ascii")
 netLogoTarget := org.nlogo.build.NetLogoExtension.directoryTarget(baseDirectory.value)
 netLogoVersion := "6.0.4"
-
