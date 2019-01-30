@@ -1,5 +1,5 @@
 
-N=plume-scala
+N=plume-model
 
 rm -r -f target
 rm -f model/$N/$N.jar
