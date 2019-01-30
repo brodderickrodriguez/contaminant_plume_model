@@ -1,4 +1,4 @@
-# Scala-Plume-Model 
+# Plume-Model/Scala-Plume-Model 
 
 ## Runing 
 The model is ready to be run. 
