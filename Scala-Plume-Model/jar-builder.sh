@@ -12,4 +12,4 @@ B=model/$N/
 
 cp $A $B
 
-echo "gen terminating"
+echo "build-jar terminating"
