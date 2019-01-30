@@ -4,8 +4,11 @@ to setup
   reset-ticks
   clear-all
 
-  let a plume-model:fni 1
-  show a
+  let t plume-model:fni 1
+  show t
+
+  ;let a plume-model:fni 1
+  ;show a
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
