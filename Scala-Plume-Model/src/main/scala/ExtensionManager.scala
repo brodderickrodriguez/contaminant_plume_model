@@ -5,6 +5,7 @@ import org.nlogo.core.AgentKind
 
 class ExtensionManager extends api.DefaultClassManager {
     def load(manager: api.PrimitiveManager) {
-       // manager.addPrimitive("first-n-integers", IntegerList)
+      // manager.addPrimitive("first-integers", IntegerList)
     }
 }
+
