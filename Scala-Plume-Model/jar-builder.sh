@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-N=plume-scala   # extension name
-N_V=6.0.4       # NetLogo version
+E_N=plume-scala   # extension name
+E_D=nlogo-model   # extension directory
+N_D=/Applications/NetLogo\ $N_V/NetLogo\ $N_V.app # NetLogo path
+N_V=6.0.4         # NetLogo version
 
 clear
 echo "starting jar-builder..."
@@ -10,17 +12,17 @@ killall NetLogo $N_V    # 'killall' is essentially force quit
 
 echo "removing old compiled files..."
 rm -r -f target
-rm -f nlogo-model/$N/$N.jar
+rm -f $E_D/$E_N/$E_N.jar
 rm -f *.jar
 
 echo "creating .jar..."
 sbt clean compile package
 
-echo "moving .jar to $N extension directory..."
-mkdir nlogo-model/$N
-mv $N.jar nlogo-model/$N
+echo "moving .jar to $E_N extension directory..."
+mkdir $E_D/$E_N
+mv $E_N.jar $E_D/$E_N
 
 echo "launching NetLogo..."
-open -a /Applications/NetLogo\ $N_V/NetLogo\ $N_V.app ./nlogo-model/extended-plume.nlogo
+open -a $N_D $E_D/extended-plume.nlogo
 
 echo "build-jar terminating"
