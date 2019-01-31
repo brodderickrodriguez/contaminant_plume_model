@@ -4,12 +4,48 @@ import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.{ListType, NumberType}
 
 import org.nlogo.{ agent, api, core, nvm }
+import org.nlogo.api.Argument
 import core.Syntax._
 import api.ScalaConversions._  // implicits
 import org.nlogo.core.AgentKind
 
 
-
+class CalculateCoverage extends Reporter {
+    
+    override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(NumberType), ret = ListType)
+    
+    
+    
+    override def report(args: Array[Argument], context: Context): AnyRef = {
+    
+        
+        val x = context.world.allStoredValues.toArray
+        
+        context.world.
+        
+        context.world.setObserverVariableByName("population", 5.toLogoObject)
+        
+        val p = context.world.getPatch(100)
+        
+        
+//        p.setVariable(1, 15.toLogoObject)
+        
+        x.toLogoList
+    }
+    
+//    override def perform(args: Array[Argument], context: Context): Unit = {
+//        val world = context.getAgent.world.asInstanceOf[agent.World]
+//
+//        val ticks = world.ticks
+//
+//
+//        context.world.allStoredValues
+//
+//
+//
+//    } // perform()
+    
+}
 
 
 

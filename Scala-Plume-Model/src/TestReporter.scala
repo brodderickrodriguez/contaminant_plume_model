@@ -10,14 +10,8 @@ class TestReporter extends Reporter {
     
     
     def report(args: Array[Argument], context: Context): AnyRef = {
-        val n = try args(0).getIntValue
-        catch {
-            case e: LogoException =>
-                throw new ExtensionException(e.getMessage)
-        }
-  
-        
-        
+//        val n = try args(0).getIntValue
+
         (0 until 89).toLogoList
     }
 }

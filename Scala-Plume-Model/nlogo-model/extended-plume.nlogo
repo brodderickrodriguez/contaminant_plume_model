@@ -1,11 +1,36 @@
+; extended-plume.nlogo
+; Author: Brodderick Rodriguez
+; Created: Dec 18 2018
+;
+; Simulation of a contaminant plume and UAV behaviors which
+; cause the UAVs to map the contaminant plume
+; Extended by implementing searching algorithms outlined in:
+; Multi-Agent Control Algorithms for Chemical Cloud Detection and Mapping Using Unmanned Air Vehicles,
+; by Michael Kovacinal, Daniel Palmer, Guang Yang, Ravi Vaidyanathan
+; with additional environmental modifications
+;
+; Acknowledgements
+; Copyright 1998 Uri Wilensky.
+; See Info tab for full copyright and license.
+; Approximately X% of this program is barrowed from Uri Wilensky's Netlogo flocking progam
+; The Netlogo flocking program is based on Reynold's 1987 BOIDS program
+; Alex Madey March 2013
+
 extensions [ plume-scala ]
+
+globals [ TIME coverage-all coverage-std coverage-mean accumulative-coverage ]
+
 
 to setup
   reset-ticks
   clear-all
 
+  set coverage-all []
 
-  plume-scala:calc-coverage 10
+  import-drawing "./resources/plume-bg.png"
+
+
+  show plume-scala:calc-coverage 1
 
   show plume-scala:is-prime 7
 
@@ -18,7 +43,7 @@ end
 GRAPHICS-WINDOW
 261
 11
-1224
+1249
 525
 -1
 -1
@@ -33,7 +58,7 @@ GRAPHICS-WINDOW
 1
 1
 0
-190
+195
 0
 100
 0
@@ -68,7 +93,7 @@ population
 population
 0
 100
-9.0
+0.0
 1
 1
 UAVs / swarm

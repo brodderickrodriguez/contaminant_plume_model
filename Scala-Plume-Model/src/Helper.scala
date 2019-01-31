@@ -2,7 +2,6 @@ import org.nlogo.api._
 
 
 object Helper {
-
     
     def getInput(args: Array[Argument], i: Int): Argument = {
         val a = try args(i)
@@ -11,6 +10,5 @@ object Helper {
         }
         a
     } // getInput()
-    
     
 } // Helper()
