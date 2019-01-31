@@ -21,7 +21,6 @@ class CalculateCoverage extends Reporter {
         
         val x = context.world.allStoredValues.toArray
         
-        context.world.
         
         context.world.setObserverVariableByName("population", 5.toLogoObject)
         
