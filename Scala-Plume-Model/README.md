@@ -2,5 +2,12 @@
 
 ## Runing 
 The model is ready to be run. 
+
 Run the NetLogo model located in ./nlogo-model.
-If you wish to make changes to the Scala portion of the model, do so and then run the `jar-builder` script. 
+
+## Building
+Link both the NetLogo.jar library and the ./lib/netlogo-extension-plugin-3.2.jar to your class path.
+
+Build using `bash ./jar-builder.sh`
+
+
