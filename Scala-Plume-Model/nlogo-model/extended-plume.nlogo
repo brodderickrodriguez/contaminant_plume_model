@@ -32,9 +32,11 @@ to setup
 
   show plume-scala:calc-coverage 1
 
-  show plume-scala:is-prime 7
+  show population
 
-  show plume-scala:pythagorean 2 2
+  ;show plume-scala:is-prime 7
+
+  ;show plume-scala:pythagorean 2 2
 
   ;let a plume-model:fni 1
   ;show a
@@ -93,7 +95,7 @@ population
 population
 0
 100
-0.0
+5.0
 1
 1
 UAVs / swarm
