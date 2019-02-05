@@ -26,4 +26,4 @@ echo "launching NetLogo..."
 # open -a $N_D $E_D/extended-plume.nlogo
 open -a /Applications/NetLogo\ $N_V/NetLogo\ $N_V.app ./$E_D/extended-plume.nlogo
 
-echo "build-jar terminating"
+echo "jar-builder done"

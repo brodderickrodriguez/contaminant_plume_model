@@ -9,5 +9,7 @@ class PlumeClassManager extends DefaultClassManager {
         // from Math.scala
         manager.addPrimitive("is-prime", new IsPrime)
         manager.addPrimitive("pythagorean", new Pythagorean)
+        
+        manager.addPrimitive("find-flockmates", new FindFlockmates)
     }
 }

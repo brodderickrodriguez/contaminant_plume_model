@@ -21,25 +21,56 @@ extensions [ plume-scala ]
 globals [ TIME coverage-all coverage-std coverage-mean accumulative-coverage ]
 
 
+breed [ UAVs UAV ]
+
+UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading  ]
+
+
 to setup
   reset-ticks
   clear-all
-
   set coverage-all []
-
   import-drawing "./resources/plume-bg.png"
 
-
-  show plume-scala:calc-coverage 1
-
-  show population
-
+  ;show plume-scala:calc-coverage 1
+  ;show population
   ;show plume-scala:is-prime 7
-
   ;show plume-scala:pythagorean 2 2
-
   ;let a plume-model:fni 1
   ;show a
+
+
+  setup-UAVs
+end
+
+
+to setup-UAVs
+
+  create-UAVs population [
+    set size 7 ; 3
+    setxy random-xcor random-ycor
+    set shape "airplane"
+  ]
+
+  ask UAVs with [ who = 0] [
+    setxy (world-width * 0.75) (world-height * 0.75)
+    set heading 0
+    set color 105
+
+    print ""
+    find-flockmates
+    ask flockmates [ print who]
+
+    print ""
+    plume-scala:find-flockmates
+    show flockmates
+
+  ]
+end
+
+
+to find-flockmates
+  set flockmates other UAVs in-radius UAV-vision
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -56,8 +87,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-1
-1
+0
+0
 1
 0
 195
@@ -99,6 +130,21 @@ population
 1
 1
 UAVs / swarm
+HORIZONTAL
+
+SLIDER
+34
+135
+206
+168
+UAV-vision
+UAV-vision
+0
+100
+41.0
+1
+1
+NIL
 HORIZONTAL
 
 @#$#@#$#@
