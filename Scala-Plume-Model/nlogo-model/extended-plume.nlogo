@@ -62,8 +62,8 @@ to setup-UAVs
     ask flockmates [ print who]
 
     print ""
-    plume-scala:find-flockmates
-    show flockmates
+    plume-scala:find-flockmates UAV-vision
+    ;show flockmates
 
   ]
 end

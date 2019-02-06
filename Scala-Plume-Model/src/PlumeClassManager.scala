@@ -10,6 +10,9 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("is-prime", new IsPrime)
         manager.addPrimitive("pythagorean", new Pythagorean)
         
+        
+        // from BOIDs.scala
         manager.addPrimitive("find-flockmates", new FindFlockmates)
-    }
-}
+        
+    } // load()
+} // PlumeClassManager

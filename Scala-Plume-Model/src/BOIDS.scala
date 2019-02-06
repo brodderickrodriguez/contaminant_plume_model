@@ -10,25 +10,44 @@ import org.nlogo.core.AgentKind
 import org.nlogo.window.GUIWorkspace
 
 
+import scala.collection.mutable.ListBuffer
+
 
 trait BOIDs
 
 
 class FindFlockmates extends Command with BOIDs {
     
-    override def getSyntax: Syntax = commandSyntax(right = List())
+    override def getSyntax: Syntax = commandSyntax(right = List(NumberType))
     
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        
+    
         val uav = Helper.ContextHelper.getAgent(context)
+        val vision = Helper.getInput(args, 0).getDoubleValue
         
-        Helper.BreedHelper.setBreedVariable(uav, "flockmates", "hope")
+        val turtles = context.world.turtles.asInstanceOf[org.nlogo.api.AgentSet]
+        var uavs = ListBuffer[org.nlogo.agent.Agent]()
+        var uavsInVision = ListBuffer[org.nlogo.agent.Agent]()
         
-        val c = Helper.BreedHelper.getTurtleVariable(uav, "color").asInstanceOf[Double]
+        for (turtle <- turtles) {
+            val a = turtle.asInstanceOf[org.nlogo.agent.Agent]
+            if (Helper.TurtleHelper.getTurtleVariable(a, "breed") == "UAVS")
+                uavs.append(a)
+        }
         
-        Helper.BreedHelper.setTurtleVariable(uav, "color", c / 2)
         
-    }
+        for (uav <- uavs) {
+        
+        }
+        
+        
+        
+        
+        Helper.BreedHelper.setBreedVariable(uav, "flockmates", List(uavsInVision))
+//        require(0>1, vision)
+        
+
+    } // perform()
 
 } // FindFlockmates

@@ -15,3 +15,20 @@ class TestReporter extends Reporter {
         (0 until 89).toLogoList
     }
 }
+
+
+/*
+
+
+        val uav = Helper.ContextHelper.getAgent(context)
+        
+        
+        Helper.BreedHelper.setBreedVariable(uav, "flockmates", "hope")
+        
+        val c = Helper.BreedHelper.getTurtleVariable(uav, "color").asInstanceOf[Double]
+        
+        Helper.BreedHelper.setTurtleVariable(uav, "color", c / 2)
+        
+
+
+ */
