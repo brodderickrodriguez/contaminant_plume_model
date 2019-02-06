@@ -61,8 +61,10 @@ to setup-UAVs
     find-flockmates
     ask flockmates [ print who]
 
-    print ""
+    set coverage-all 10
+    print coverage-all
     plume-scala:find-flockmates UAV-vision
+    print coverage-all
     ;show flockmates
 
   ]

@@ -22,31 +22,36 @@ class FindFlockmates extends Command with BOIDs {
     
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-    
+        
+        var cov = Helper.ContextHelper.getObserverVariable(context, "coverage-all").asInstanceOf[Double]
+        
+        cov *= 10
+        
+        Helper.ContextHelper.setObserverVariable(context, "coverage-all", cov)
+        
+        
+        val param = Helper.ContextHelper.getObserverVariable(context, "population").asInstanceOf[Double]
+        
+        require(0>1, param)
+        
+
+        
+        
         val uav = Helper.ContextHelper.getAgent(context)
-        val vision = Helper.getInput(args, 0).getDoubleValue
+        var heading = Helper.TurtleHelper.getTurtleVariable(uav, "heading").asInstanceOf[Double]
         
-        val turtles = context.world.turtles.asInstanceOf[org.nlogo.api.AgentSet]
-        var uavs = ListBuffer[org.nlogo.agent.Agent]()
-        var uavsInVision = ListBuffer[org.nlogo.agent.Agent]()
+        heading += 10
         
-        for (turtle <- turtles) {
-            val a = turtle.asInstanceOf[org.nlogo.agent.Agent]
-            if (Helper.TurtleHelper.getTurtleVariable(a, "breed") == "UAVS")
-                uavs.append(a)
-        }
+        Helper.TurtleHelper.setTurtleVariable(uav, "heading", heading)
         
-        
-        for (uav <- uavs) {
-        
-        }
+        Helper.BreedHelper.setBreedVariable(uav, "flockmates", List("test"))
+
         
         
         
         
-        Helper.BreedHelper.setBreedVariable(uav, "flockmates", List(uavsInVision))
-//        require(0>1, vision)
-        
+//        require(0>1, "tst popup")
+    
 
     } // perform()
 
