@@ -52,8 +52,8 @@ object Helper {
           * @return
           */
         def getObserverVariable(context: Context, variableName: String): AnyRef = {
-            val covIdx = context.world.observerOwnsIndexOf(variableName.toUpperCase)
-            context.world.observer.getVariable(covIdx)
+            val i = context.world.observerOwnsIndexOf(variableName.toUpperCase)
+            context.world.observer.getVariable(i)
         } // getObserverVariable()
         
         /**
