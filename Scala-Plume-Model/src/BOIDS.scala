@@ -18,7 +18,7 @@ trait BOIDs
 
 class FindFlockmates extends Command with BOIDs {
     
-    override def getSyntax: Syntax = commandSyntax(right = List(NumberType))
+    override def getSyntax: Syntax = commandSyntax(right = List())
     
     
     override def perform(args: Array[Argument], context: Context): Unit = {
@@ -32,7 +32,14 @@ class FindFlockmates extends Command with BOIDs {
         
         val param = Helper.ContextHelper.getObserverVariable(context, "population").asInstanceOf[Double]
         
-        require(0>1, param)
+        
+        
+        val np = param * 2
+        
+        
+        Helper.ContextHelper.setObserverVariable(context, "population", np)
+        
+      //  require(0>1, param)
         
 
         

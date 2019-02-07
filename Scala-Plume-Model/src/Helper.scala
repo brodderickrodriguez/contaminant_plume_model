@@ -6,6 +6,7 @@ import org.nlogo.api._
 import org.nlogo.api.ScalaConversions._
 
 
+
 /**
   * A singleton interface to set/set inputs from the nlogo file
   *
@@ -65,7 +66,8 @@ object Helper {
           */
         def setObserverVariable(context: Context, variableName: String, newValue: Any): Unit = {
             // both approaches below seem to work. Not sure which is better
-            // context.world.observer.setVariable(covIdx, cov.toLogoObject)
+            // val i = context.world.observerOwnsIndexOf(variableName.toUpperCase)
+            // context.world.observer.setVariable(i, newValue.toLogoObject)
             context.world.setObserverVariableByName(variableName.toUpperCase, newValue.toLogoObject)
         } // setObserverVariable()
     } // ContextHelper

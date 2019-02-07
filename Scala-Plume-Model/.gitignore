@@ -1,3 +1,4 @@
 target/
 .idea/
 .bundledFiles
+*.tmp.nlogo

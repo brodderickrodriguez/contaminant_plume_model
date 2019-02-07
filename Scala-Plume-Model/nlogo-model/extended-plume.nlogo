@@ -63,7 +63,7 @@ to setup-UAVs
 
     set coverage-all 10
     print coverage-all
-    plume-scala:find-flockmates UAV-vision
+    plume-scala:find-flockmates
     print coverage-all
     ;show flockmates
 
@@ -128,7 +128,7 @@ population
 population
 0
 100
-5.0
+4.0
 1
 1
 UAVs / swarm
@@ -143,7 +143,7 @@ UAV-vision
 UAV-vision
 0
 100
-41.0
+0.0
 1
 1
 NIL
