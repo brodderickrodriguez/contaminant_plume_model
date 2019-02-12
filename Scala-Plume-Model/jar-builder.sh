@@ -24,6 +24,7 @@ mv $E_N.jar $E_D/$E_N
 
 echo "launching NetLogo..."
 # open -a $N_D $E_D/extended-plume.nlogo
-open -a /Applications/NetLogo\ $N_V/NetLogo\ $N_V.app ./$E_D/extended-plume.nlogo
+# open -a /Applications/NetLogo\ $N_V/NetLogo\ $N_V.app ./$E_D/extended-plume.nlogo
+open -a /Applications/NetLogo\ $N_V/NetLogo\ $N_V.app ./$E_D/tests_plume_scala.nlogo
 
 echo "jar-builder done"

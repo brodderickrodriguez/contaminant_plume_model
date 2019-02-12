@@ -82,6 +82,11 @@ end
 to find-flockmates
   set flockmates other UAVs in-radius UAV-vision
 end
+
+
+to find-best-neighbor
+  set best-neighbor max-one-of flockmates [ coverage ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 261

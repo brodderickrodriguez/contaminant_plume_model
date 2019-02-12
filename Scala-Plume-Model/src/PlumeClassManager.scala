@@ -11,6 +11,7 @@ class PlumeClassManager extends DefaultClassManager {
         
         
         manager.addPrimitive("find-flockmates", new spm.boids.FindFlockmates)
+        manager.addPrimitive("find-best-neighbor", new spm.boids.FindBestNeighbor)
         
     } // load()
 } // PlumeClassManager

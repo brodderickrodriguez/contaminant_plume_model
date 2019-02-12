@@ -14,25 +14,58 @@ UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading  ]
 
 
 to setup
-  print "starting tests"
+  print "\nstarting tests"
   clear-all
   reset-ticks
 
+  setup-uav-tests
 
-  test-flockmates
+  test-best-neighbor
+
+;  test-flockmates
 
 end
 
 
-
-
-to test-flockmates
-  create-UAVs population [ setxy random-xcor random-ycor ]
+to setup-uav-tests
+  create-UAVs population [ setxy random-xcor random-ycor set plume-reading random 100]
 
   ask UAVs with [ who = 0] [
-    setxy (world-width * 0.75) (world-height * 0.75)
+    setxy 50 50
     set heading 0
+  ]
+end
 
+
+; ===============================================================
+to test-best-neighbor
+  ask UAVs with [ who = 0] [
+    plume-scala:find-flockmates
+
+    plume-scala:find-best-neighbor
+    show best-neighbor
+    let x best-neighbor
+
+    find-best-neighbor
+    let y best-neighbor
+    ifelse x = y
+    [print "test-best-neighbor PASS"]
+    [print "test-best-neighbor FAIL"
+      print x; [plume-reading] of x
+      print y; [plume-reading] of y
+    ]
+  ]
+end
+
+to find-best-neighbor ;; turtle procedure
+  set best-neighbor max-one-of flockmates [ plume-reading ]
+end
+; ===============================================================
+
+
+; ===============================================================
+to test-flockmates
+  ask UAVs with [ who = 0] [
     plume-scala:find-flockmates
     let x flockmates
 
@@ -46,6 +79,7 @@ end
 to find-flockmates
   set flockmates other UAVs in-radius UAV-vision
 end
+; ===============================================================
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -64,10 +98,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+0
+32
+0
+32
 0
 0
 1
@@ -92,30 +126,30 @@ NIL
 1
 
 SLIDER
-31
-121
-203
-154
+15
+99
+187
+132
 population
 population
 0
 100
-50.0
+4.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-30
-160
-202
-193
+14
+138
+186
+171
 UAV-vision
 UAV-vision
 0
 100
-50.0
+20.0
 1
 1
 NIL
