@@ -50,23 +50,32 @@ to setup-UAVs
     set size 7 ; 3
     setxy random-xcor random-ycor
     set shape "airplane"
+    ;print who
   ]
 
   ask UAVs with [ who = 0] [
+    ;print who
     setxy (world-width * 0.75) (world-height * 0.75)
     set heading 0
     set color 105
 
-    print ""
-    find-flockmates
-    ask flockmates [ print who]
 
-    set coverage-all 10
-    print coverage-all
+
     plume-scala:find-flockmates
-    print coverage-all
-    ;show flockmates
 
+
+
+
+    let x flockmates
+
+    find-flockmates
+    let y flockmates
+
+    ifelse x = y [
+
+      ask flockmates [show who]
+
+    ][print "does not compute"]
   ]
 end
 
@@ -135,15 +144,15 @@ UAVs / swarm
 HORIZONTAL
 
 SLIDER
-34
-135
-206
-168
+18
+110
+190
+143
 UAV-vision
 UAV-vision
 0
 100
-0.0
+100.0
 1
 1
 NIL

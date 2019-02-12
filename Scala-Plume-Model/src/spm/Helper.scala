@@ -1,10 +1,11 @@
+package spm
+
 // Brodderick Rodriguez
 // Auburn University - CSSE
 // 05 Feb. 2019
 
-import org.nlogo.api._
 import org.nlogo.api.ScalaConversions._
-
+import org.nlogo.api._
 
 
 /**
@@ -45,6 +46,16 @@ object Helper {
           */
         def getAgent(context: Context): org.nlogo.agent.Agent = context.getAgent.asInstanceOf[org.nlogo.agent.Agent]
         
+        
+        def getTurtle(context: Context): org.nlogo.agent.Turtle = getAgent(context).asInstanceOf[org.nlogo.agent.Turtle]
+        
+        
+        def getGlobals(context: Context): Array[AnyRef] = context.world.observer.variables
+        
+        
+        def getWorld(context: Context): org.nlogo.agent.World = context.world.asInstanceOf[org.nlogo.agent.World]
+        
+        
         /**
           * Can be used to get both global variables and GUI (model) parameters
           * @param context the org.nlogo.api.Context argument found in the
@@ -76,10 +87,12 @@ object Helper {
       * _TurtleHelper is inherited by both TurtleHelper and BreedHelper since both will want to have the
       * ability to set Turtle attributes
       */
+    //TODO: make agent helper and turtle helper separate
+    // TODO: add a distance function. need to convert to other agent type
     trait _TurtleHelper {
         /**
           * Used to set a Turtle variable. This cannot be used to set a Breed's variable.
-          * @param a the org.nlogo.agent.Agent we want to access
+          * @param a the org.nlogo.agent.Ag we want to access
           * @param variableName the name of the variable we wish to set
           * @param newValue the value we wish to assign
           */
@@ -88,12 +101,15 @@ object Helper {
     
         /**
           * Used to get a Turtle variable. This cannot be used to get a Breed's variable.
-          * @param a the org.nlogo.agent.Agent we want to access
+          * @param a the org.nlogo.agent.Turtle we want to access
           * @param variableName the name of the variable we wish to retrieve
           * @return the value stored in the Turtle's variable
           */
         def getTurtleVariable(a: org.nlogo.agent.Agent, variableName: String): AnyRef =
             a.getTurtleOrLinkVariable(variableName.toUpperCase)
+        
+        
+        def getTurtleCoors(a: org.nlogo.agent.Turtle): (Double, Double) = (a.xcor(), a.ycor())
     } // _TurtleHelper
     
     

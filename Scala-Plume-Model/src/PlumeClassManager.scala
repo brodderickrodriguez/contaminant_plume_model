@@ -6,13 +6,11 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("calc-coverage",  new CalculateCoverage)
         
         
-        // from Math.scala
-        manager.addPrimitive("is-prime", new IsPrime)
-        manager.addPrimitive("pythagorean", new Pythagorean)
+        manager.addPrimitive("is-prime", new spm.IsPrime)
+        manager.addPrimitive("pythagorean", new spm.Pythagorean)
         
         
-        // from BOIDs.scala
-        manager.addPrimitive("find-flockmates", new FindFlockmates)
+        manager.addPrimitive("find-flockmates", new spm.boids.FindFlockmates)
         
     } // load()
 } // PlumeClassManager
