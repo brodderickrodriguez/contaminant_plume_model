@@ -1,7 +1,6 @@
 package spm.boids
 
 import org.nlogo.core.Syntax
-import org.nlogo.core
 import org.nlogo.core.Syntax._
 import org.nlogo.api._
 import org.nlogo.api.ScalaConversions._
@@ -15,7 +14,7 @@ class FindFlockmates extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val flockmates = new AgentSetBuilder(core.AgentKind.Turtle)
+        val flockmates = new AgentSetBuilder(org.nlogo.core.AgentKind.Turtle)
         val uavVision = Helper.ContextHelper.getObserverVariable(context, "uav-vision").asInstanceOf[Double]
         
         val thisUav = Helper.ContextHelper.getTurtle(context)

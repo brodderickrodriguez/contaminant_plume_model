@@ -1,20 +1,8 @@
-; extended-plume.nlogo
+; tests_plume_scala.nlogo
 ; Author: Brodderick Rodriguez
 ; Created: Dec 18 2018
 ;
-; Simulation of a contaminant plume and UAV behaviors which
-; cause the UAVs to map the contaminant plume
-; Extended by implementing searching algorithms outlined in:
-; Multi-Agent Control Algorithms for Chemical Cloud Detection and Mapping Using Unmanned Air Vehicles,
-; by Michael Kovacinal, Daniel Palmer, Guang Yang, Ravi Vaidyanathan
-; with additional environmental modifications
-;
-; Acknowledgements
-; Copyright 1998 Uri Wilensky.
-; See Info tab for full copyright and license.
-; Approximately X% of this program is barrowed from Uri Wilensky's Netlogo flocking progam
-; The Netlogo flocking program is based on Reynold's 1987 BOIDS program
-; Alex Madey March 2013
+
 
 extensions [ plume-scala ]
 
@@ -26,84 +14,60 @@ UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading  ]
 
 
 to setup
-  reset-ticks
+  print "starting tests"
   clear-all
-  set coverage-all []
-  import-drawing "./resources/plume-bg.png"
-
-  ;show plume-scala:calc-coverage 1
-  ;show population
-  ;show plume-scala:is-prime 7
-  ;show plume-scala:pythagorean 2 2
-  ;let a plume-model:fni 1
-  ;show a
+  reset-ticks
 
 
-  setup-UAVs
+  test-flockmates
+
 end
 
 
-to setup-UAVs
 
-  create-UAVs population [
-    set size 7 ; 3
-    setxy random-xcor random-ycor
-    set shape "airplane"
-    ;print who
-  ]
+
+to test-flockmates
+  create-UAVs population [ setxy random-xcor random-ycor ]
 
   ask UAVs with [ who = 0] [
-    ;print who
     setxy (world-width * 0.75) (world-height * 0.75)
     set heading 0
-    set color 105
-
-
 
     plume-scala:find-flockmates
-
-
-
-
     let x flockmates
 
     find-flockmates
     let y flockmates
 
-    ifelse x = y [
-
-      ask flockmates [show who]
-
-    ][print "does not compute"]
+    ifelse x = y [print "test-flockmates PASS"][print "test-flockmates FAIL"]
   ]
 end
-
 
 to find-flockmates
   set flockmates other UAVs in-radius UAV-vision
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-261
-11
-1249
-525
+210
+10
+647
+448
 -1
 -1
-5.0
+13.0
 1
 10
 1
 1
 1
 0
-0
-0
 1
-0
-195
-0
-100
+1
+1
+-16
+16
+-16
+16
 0
 0
 1
@@ -111,10 +75,10 @@ ticks
 30.0
 
 BUTTON
-17
-21
-83
-54
+28
+40
+94
+73
 NIL
 setup
 NIL
@@ -128,30 +92,30 @@ NIL
 1
 
 SLIDER
-17
-63
-228
-96
+31
+121
+203
+154
 population
 population
 0
 100
-4.0
+50.0
 1
 1
-UAVs / swarm
+NIL
 HORIZONTAL
 
 SLIDER
-18
-110
-190
-143
+30
+160
+202
+193
 UAV-vision
 UAV-vision
 0
 100
-100.0
+50.0
 1
 1
 NIL
