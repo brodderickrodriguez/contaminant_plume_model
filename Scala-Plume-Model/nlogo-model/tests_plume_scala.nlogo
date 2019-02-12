@@ -20,10 +20,24 @@ to setup
 
   setup-uav-tests
 
-  test-best-neighbor
-
+  test-nearest-neighbor
+;  test-best-neighbor
 ;  test-flockmates
 
+end
+
+
+to go
+ ask UAVs [
+
+    if [who] of self != 0 [
+       fd 1
+   set heading random 360
+    ]
+
+  ]
+
+  test-nearest-neighbor
 end
 
 
@@ -35,6 +49,31 @@ to setup-uav-tests
     set heading 0
   ]
 end
+
+; ===============================================================
+to test-nearest-neighbor
+  ask UAVs with [ who = 0] [
+    plume-scala:find-flockmates
+
+    plume-scala:find-nearest-neighbor
+    let x nearest-neighbor
+
+    find-nearest-neighbor
+    let y nearest-neighbor
+    ifelse x = y
+    [];[print "test-nearest-neighbor PASS"]
+    [print "test-nearest-neighbor FAIL"
+      print x; [plume-reading] of x
+      print y; [plume-reading] of y
+    ]
+  ]
+end
+
+to find-nearest-neighbor ;; turtle procedure
+  set nearest-neighbor min-one-of flockmates [ distance myself ]
+end
+; ===============================================================
+
 
 
 ; ===============================================================
@@ -134,7 +173,7 @@ population
 population
 0
 100
-4.0
+7.0
 1
 1
 NIL
@@ -149,11 +188,28 @@ UAV-vision
 UAV-vision
 0
 100
-20.0
+100.0
 1
 1
 NIL
 HORIZONTAL
+
+BUTTON
+110
+42
+173
+75
+NIL
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

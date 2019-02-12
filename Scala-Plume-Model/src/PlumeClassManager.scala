@@ -10,8 +10,10 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("pythagorean", new spm.Pythagorean)
         
         
+        // spm.boids
         manager.addPrimitive("find-flockmates", new spm.boids.FindFlockmates)
         manager.addPrimitive("find-best-neighbor", new spm.boids.FindBestNeighbor)
+        manager.addPrimitive("find-nearest-neighbor", new spm.boids.FindNearestNeighbor)
         
     } // load()
 } // PlumeClassManager
