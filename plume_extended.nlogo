@@ -12,11 +12,11 @@
 ; Acknowledgements
 ; Copyright 1998 Uri Wilensky.
 ; See Info tab for full copyright and license.
-; Approximately X% of this program is barrowed from Uri Wilensky's Netlogo flocking progam
+; Some of this program is barrowed from Uri Wilensky's Netlogo flocking progam
 ; The Netlogo flocking program is based on Reynold's 1987 BOIDS program
 ; Alex Madey March 2013
 
-globals [ TIME all-coverage std-coverage mean-coverage accumulative-coverage
+globals [ coverage-all coverage-std coverage-mean accumulative-coverage
           search-strategy-flock search-strategy-random search-strategy-symmetric ]
 
 breed [ contaminant-plumes contaminant-plume ]
@@ -41,9 +41,9 @@ end
 to setup
   clear-all
   reset-ticks
-  import-drawing "_arch/plume_bg.png"
+;  import-drawing "_arch/plume_bg.png"
   define-constants
-  set all-coverage []
+  set coverage-all []
 
   setup-contaminant-plumes
   setup-UAVs
@@ -52,7 +52,6 @@ to setup
   if global-search-strategy = search-strategy-flock [ setup-search-strategy-flock ]
   if global-search-strategy = search-strategy-random [ setup-search-strategy-random ]
   if global-search-strategy = search-strategy-symmetric [ setup-search-strategy-symmetric ]
-
 end
 
 to go
@@ -61,13 +60,12 @@ to go
   update-swarms
   calc-coverage
   tick
-  set TIME ticks
 end
 
 to calc-coverage
-  if ticks > coverage-data-decay [ repeat population [ set all-coverage butfirst all-coverage ] ]
-  set std-coverage standard-deviation all-coverage
-  set mean-coverage mean all-coverage
+  if ticks > coverage-data-decay [ repeat population [ set coverage-all butfirst coverage-all ] ]
+  set coverage-std standard-deviation coverage-all
+  set coverage-mean mean coverage-all
   ask UAVs [ set accumulative-coverage accumulative-coverage + plume-reading ]
 end
 
@@ -150,7 +148,7 @@ end
 
 to get-reading
   ; puts measurement on coverage array
-  set all-coverage lput plume-reading all-coverage
+  set coverage-all lput plume-reading coverage-all
   ; stores most recent measurement
   set plume-reading plume-density
 end
@@ -197,10 +195,6 @@ to setup-swarms
 end
 
 to update-swarms
-  update-swarm-detection-times
-end
-
-to update-swarm-detection-times
   ask swarms [
     if mean-detection-time = 0 [
       let temp-first-detection-time first-detection-time
@@ -250,15 +244,15 @@ to setup-search-strategy-random
 end
 
 to update-search-strategy-random
-  ask UAVs [
-    ; if duration to go straight in is over
-    if ticks > random-search-time [
-      set random-search-time ticks + random random-search-max-heading-time
-      set random-search-heading random 360
-    ] ; if ticks > random-time-for-heading
-    ; ease the UAV into the turn
-    if heading != random-search-heading and UAV-inside-world-bounds-threashold [ turn-towards random-search-heading random-search-max-turn ]
-  ] ; ask UAVs
+;  ask UAVs [
+;    ; if duration to go straight in is over
+;    if ticks > random-search-time [
+;      set random-search-time ticks + random random-search-max-heading-time
+;      set random-search-heading random 360
+;    ] ; if ticks > random-time-for-heading
+;    ; ease the UAV into the turn
+;    if heading != random-search-heading and UAV-inside-world-bounds-threashold [ turn-towards random-search-heading random-search-max-turn ]
+;  ] ; ask UAVs
 end
 
 ; -----------------------------------------------------------------------
@@ -329,8 +323,6 @@ end
 
 to find-best-neighbor
   set best-neighbor max-one-of flockmates [ plume-reading ]
-  ;if plume-reading > 0 [ set best-neighbor self ]
-  ;if [ plume-reading ] of best-neighbor < plume-reading [ set best-neighbor self ]
 end
 
 to find-nearest-neighbor
@@ -488,7 +480,7 @@ number-plumes
 number-plumes
 0
 5
-1.0
+0.0
 1
 1
 NIL
@@ -592,7 +584,7 @@ PLOT
 351
 1567
 625
-std all-coverage
+coverage-std
 Ticks
 standard deviation
 0.0
@@ -603,14 +595,14 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot std-coverage"
+"default" 1.0 0 -16777216 true "" "plot coverage-std"
 
 PLOT
 1575
 352
 1875
 623
-mean all-coverage
+coverage-mean
 ticks
 UAV coverage
 0.0
@@ -621,7 +613,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot mean-coverage"
+"default" 1.0 0 -16777216 true "" "plot coverage-mean"
 
 SLIDER
 506
@@ -661,7 +653,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-0
+1
 
 SLIDER
 266
