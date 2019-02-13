@@ -16,6 +16,8 @@
 ; The Netlogo flocking program is based on Reynold's 1987 BOIDS program
 ; Alex Madey March 2013
 
+extensions [ plume-scala ]
+
 globals [ search-strategy-flock search-strategy-random search-strategy-symmetric
           coverage-all coverage-std coverage-mean ]
 
@@ -40,7 +42,7 @@ end
 to setup
   clear-all
   reset-ticks
-;  import-drawing "_arch/plume_bg.png"
+;  import-drawing "./resources/plume-bg.png"
   define-constants
   set coverage-all []
 
@@ -63,7 +65,6 @@ to calc-coverage
   if ticks > coverage-data-decay [ repeat population [ set coverage-all butfirst coverage-all ] ]
   set coverage-std standard-deviation coverage-all
   set coverage-mean mean coverage-all
-  ask UAVs [ set accumulative-coverage accumulative-coverage + plume-reading ]
 end
 
 
@@ -251,19 +252,20 @@ to setup-search-strategy-symmetric
   if is-prime nu [ set nu nu + 1 ]
   let x 0
   let y 0
-  let configuration get-optimal-subregion-dimensions nu
+  let configuration plume-scala:get-optimal-subregion-dimensions
   let region-width ceiling (world-width / (item 0 configuration))
   let region-height ceiling (world-height / (item 1 configuration))
 
   while [ x < world-width ] [
     while [ y < world-height ] [
-;      let current-UAV one-of UAVs with [ UAV-region = 0 ]
-;      ask current-UAV [
-;        set UAV-region (list x y (x + region-width) (y + region-height))
-;        ;setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
-      let col (random 5 ) + 100
+      let current-UAV one-of UAVs with [ UAV-region = 0 ]
+      ask current-UAV [
+        set UAV-region (list x y (x + region-width) (y + region-height))
+;        setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
+
+        let col [color] of self - 10
         ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor col ]
-;      ]
+      ]
       set y y + region-height
     ] ; while [ y < world-height ]
     set y 0
@@ -272,38 +274,21 @@ to setup-search-strategy-symmetric
 
 end
 
-to-report get-optimal-subregion-dimensions [ n ]
-  let optimal (list 1 1 n)
-  let y 1
-  while [ y <= (n / 2) ] [
-    if n mod y = 0 [
-      let x n / y
-      let cost abs(x - y)
-      if cost < item 2 optimal [ set optimal (list x y cost) ]
-    ] ; if UAVs mod h = 0
-    set y y + 1
-  ] ; while [ y < (n / 2) ]
-  report optimal
-end
 
 to update-search-strategy-symmetric
-
   ifelse turtle-inside-bounds symmetric-search-region-threshold UAV-region
   [
     perform-random-behavior
     pd
   ] ; if
   [
-
-            let centerx ((item 2 UAV-region) + (item 0 UAV-region)) / 2
-        let centery ((item 3 UAV-region) + (item 1 UAV-region)) / 2
-        let ptx centerx - (centerx / 4) + (random (centerx / 2))
-        let pty centery - (centery / 4) + (random (centery / 2))
-        set desired-heading get-heading-towards-point ptx pty
+    let centerx ((item 2 UAV-region) + (item 0 UAV-region)) / 2
+    let centery ((item 3 UAV-region) + (item 1 UAV-region)) / 2
+    let ptx centerx - (centerx / 4) + (random (centerx / 2))
+    let pty centery - (centery / 4) + (random (centery / 2))
+    set desired-heading get-heading-towards-point ptx pty
     pu
   ] ; else
-
-
 end
 
 
@@ -426,7 +411,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.26
+0.32
 0.01
 1
 percent
@@ -441,7 +426,7 @@ population
 population
 2
 100
-16.0
+40.0
 1
 1
 UAVs per swarm
@@ -503,7 +488,7 @@ wind-heading
 wind-heading
 0
 360
-83.0
+0.0
 1
 1
 degrees
@@ -536,7 +521,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-188.0
+53.5
 0.5
 1
 patches
@@ -566,7 +551,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-1.0
+0.0
 1
 1
 NIL
@@ -617,7 +602,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-8.0
+18.0
 1
 1
 NIL
@@ -632,7 +617,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-3.55
+5.0
 0.05
 1
 degrees
@@ -657,7 +642,7 @@ minimum-separation
 minimum-separation
 0
 5
-1.25
+1.75
 0.25
 1
 patches
@@ -672,7 +657,7 @@ max-align-turn
 max-align-turn
 0
 20
-2.25
+1.5
 0.25
 1
 degrees
@@ -687,7 +672,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-7.0
+6.9
 0.1
 1
 degrees
@@ -722,7 +707,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-11.5
+7.5
 0.25
 1
 degrees
@@ -735,9 +720,9 @@ SLIDER
 474
 world-edge-threshold
 world-edge-threshold
-0
+1
 25
-13.0
+4.0
 0.5
 1
 NIL
@@ -752,7 +737,7 @@ max-world-edge-turn
 max-world-edge-turn
 1
 20
-4.5
+9.5
 0.5
 1
 NIL
@@ -822,7 +807,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-1.0
+1.7
 0.1
 1
 NIL

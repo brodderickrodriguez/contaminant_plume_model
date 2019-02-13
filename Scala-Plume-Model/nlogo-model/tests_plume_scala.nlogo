@@ -26,6 +26,10 @@ to setup
   setup-testing-vars
   setup-uav-tests
 
+  let x plume-scala:get-optimal-subregion-dimensions
+
+  print x
+
 end
 
 to setup-testing-vars
