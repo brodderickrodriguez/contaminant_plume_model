@@ -1,4 +1,4 @@
-package spm
+package spm.helper
 
 // Brodderick Rodriguez
 // Auburn University - CSSE

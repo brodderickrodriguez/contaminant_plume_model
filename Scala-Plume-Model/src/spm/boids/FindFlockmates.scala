@@ -5,8 +5,7 @@ import org.nlogo.core.Syntax._
 import org.nlogo.api._
 import org.nlogo.api.ScalaConversions._
 import org.nlogo.agent.AgentSetBuilder
-
-import spm.{Helper, MathHelper}
+import spm.helper.{Helper, MathHelper}
 
 
 class FindFlockmates extends Command {

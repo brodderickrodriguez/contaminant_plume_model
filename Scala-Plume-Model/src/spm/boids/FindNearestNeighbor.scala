@@ -1,10 +1,14 @@
 package spm.boids
 
+// Brodderick Rodriguez
+// Auburn University - CSSE
+// 12 Feb. 2019
+
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import org.nlogo.api._
 import org.nlogo.api.ScalaConversions._
-import spm.{Helper, MathHelper}
+import spm.helper.{Helper, MathHelper}
 
 
 class FindNearestNeighbor extends Command  {

@@ -1,11 +1,14 @@
 package spm.boids
 
+// Brodderick Rodriguez
+// Auburn University - CSSE
+// 12 Feb. 2019
+
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import org.nlogo.api._
 import org.nlogo.api.ScalaConversions._
-
-import spm.Helper
+import spm.helper.Helper
 
 class FindBestNeighbor extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())

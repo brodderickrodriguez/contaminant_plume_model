@@ -1,13 +1,17 @@
 import org.nlogo.api._
 
+// Brodderick Rodriguez
+// Auburn University - CSSE
+// 05 Feb. 2019
+
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager) {
-        manager.addPrimitive("report-numbers", new TestReporter)
-        manager.addPrimitive("calc-coverage",  new CalculateCoverage)
+//        manager.addPrimitive("report-numbers", new TestReporter)
+//        manager.addPrimitive("calc-coverage",  new CalculateCoverage)
         
         
-        manager.addPrimitive("is-prime", new spm.IsPrime)
-        manager.addPrimitive("pythagorean", new spm.Pythagorean)
+//        manager.addPrimitive("is-prime", new spm.IsPrime)
+//        manager.addPrimitive("pythagorean", new spm.Pythagorean)
         
         
         // spm.boids

@@ -29,10 +29,6 @@ to setup
   setup-testing-vars
   setup-uav-tests
 
- ; test-nearest-neighbor
-;  test-best-neighbor
-;  test-flockmates
-
 end
 
 to setup-testing-vars
@@ -50,10 +46,10 @@ to go
 
   ask UAVs [ if [who] of self != 0 [ fd 1  set heading random 360 ] ]
 
-  ;let tf test-nearest-neighbor
-  ;let tf test-flockmates
 
-  let tf test-best-neighbor
+;  let tf test-flockmates
+;  let tf test-best-neighbor
+  let tf test-nearest-neighbor
 
   if not tf [ stop ]
 end
@@ -73,17 +69,14 @@ to-report test-nearest-neighbor
 
     find-nearest-neighbor
     let y nearest-neighbor
+
     ifelse x = y
-    [];[print "test-nearest-neighbor PASS"]
-    [print "test-nearest-neighbor FAIL"
-;      print [xcor + ycor] of x
-;      print [xcor + ycor] of y
-;      print [who] of x
-;      print [who] of y
-
+    [
+;      print "test-nearest-neighbor PASS"
+    ]
+    [
+      print "test-nearest-neighbor FAIL"
       set tf false
-
-;      print "flocks"
 
       ask x [
         print who
@@ -92,7 +85,7 @@ to-report test-nearest-neighbor
         print nnd
         print distance myself
         print ""
-      ]
+      ] ; ask x
 
        ask y [
         print who
@@ -101,11 +94,9 @@ to-report test-nearest-neighbor
         print nnd
         print distance myself
         print ""
-      ]
-
-
-    ]
-  ]
+      ] ; ask y
+    ] ; else
+  ] ; ask UAVs with
 
   report tf
 end
@@ -234,7 +225,7 @@ population
 population
 0
 100
-13.0
+38.0
 1
 1
 NIL
@@ -249,7 +240,7 @@ UAV-vision
 UAV-vision
 1
 100
-39.0
+13.0
 1
 1
 NIL

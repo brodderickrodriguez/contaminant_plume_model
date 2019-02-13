@@ -3,7 +3,7 @@ import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.{ListType, NumberType, commandSyntax}
-import spm.Helper
+import spm.helper.Helper
 
 
 class TestReporter extends Reporter {
