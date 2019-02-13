@@ -6,11 +6,19 @@
 
 extensions [ plume-scala ]
 
-globals [ TIME coverage-all coverage-std coverage-mean accumulative-coverage ]
+globals [ TIME coverage-all coverage-std coverage-mean accumulative-coverage
+
+
+
+; testing vars
+
+  SCALA-NOBODY
+
+]
 
 breed [ UAVs UAV ]
 
-UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading  ]
+UAVs-own [ flockmates best-neighbor nearest-neighbor nnd plume-reading  ]
 
 
 to setup
@@ -18,41 +26,46 @@ to setup
   clear-all
   reset-ticks
 
+  setup-testing-vars
   setup-uav-tests
 
-  test-nearest-neighbor
+ ; test-nearest-neighbor
 ;  test-best-neighbor
 ;  test-flockmates
 
 end
 
-
-to go
- ask UAVs [
-
-    if [who] of self != 0 [
-       fd 1
-   set heading random 360
-    ]
-
-  ]
-
-  test-nearest-neighbor
+to setup-testing-vars
+  set SCALA-NOBODY 128
 end
-
 
 to setup-uav-tests
-  create-UAVs population [ setxy random-xcor random-ycor set plume-reading random 100]
-
-  ask UAVs with [ who = 0] [
-    setxy 50 50
-    set heading 0
-  ]
+  create-UAVs population [ setxy random-xcor random-ycor set plume-reading random-float 100]
+  ask UAVs with [ who = 0] [ setxy 50 50  set heading 0 ]
 end
 
+
+to go
+  tick
+
+  ask UAVs [ if [who] of self != 0 [ fd 1  set heading random 360 ] ]
+
+  ;let tf test-nearest-neighbor
+  ;let tf test-flockmates
+
+  let tf test-best-neighbor
+
+  if not tf [ stop ]
+end
+
+
+
+
 ; ===============================================================
-to test-nearest-neighbor
+to-report test-nearest-neighbor
+  let tf true
   ask UAVs with [ who = 0] [
+
     plume-scala:find-flockmates
 
     plume-scala:find-nearest-neighbor
@@ -63,10 +76,38 @@ to test-nearest-neighbor
     ifelse x = y
     [];[print "test-nearest-neighbor PASS"]
     [print "test-nearest-neighbor FAIL"
-      print x; [plume-reading] of x
-      print y; [plume-reading] of y
+;      print [xcor + ycor] of x
+;      print [xcor + ycor] of y
+;      print [who] of x
+;      print [who] of y
+
+      set tf false
+
+;      print "flocks"
+
+      ask x [
+        print who
+;        print xcor
+;        print ycor
+        print nnd
+        print distance myself
+        print ""
+      ]
+
+       ask y [
+        print who
+;        print xcor
+;        print ycor
+        print nnd
+        print distance myself
+        print ""
+      ]
+
+
     ]
   ]
+
+  report tf
 end
 
 to find-nearest-neighbor ;; turtle procedure
@@ -77,23 +118,34 @@ end
 
 
 ; ===============================================================
-to test-best-neighbor
+to-report test-best-neighbor
+  let tf true
   ask UAVs with [ who = 0] [
     plume-scala:find-flockmates
 
     plume-scala:find-best-neighbor
-    show best-neighbor
     let x best-neighbor
 
     find-best-neighbor
     let y best-neighbor
+
     ifelse x = y
-    [print "test-best-neighbor PASS"]
-    [print "test-best-neighbor FAIL"
-      print x; [plume-reading] of x
-      print y; [plume-reading] of y
+    [
+      ;print "test-best-neighbor PASS"
     ]
-  ]
+    [
+      if x != SCALA-NOBODY [
+        print "test-best-neighbor FAIL"
+        print x
+        print y
+;        print [breed] of x ;[plume-reading] of x
+;        print [breed] of y ;[plume-reading] of y
+        set tf false
+      ] ; if x != 128
+    ] ; else
+  ] ; ask
+
+  report tf
 end
 
 to find-best-neighbor ;; turtle procedure
@@ -103,7 +155,8 @@ end
 
 
 ; ===============================================================
-to test-flockmates
+to-report test-flockmates
+  let tf true
   ask UAVs with [ who = 0] [
     plume-scala:find-flockmates
     let x flockmates
@@ -111,8 +164,16 @@ to test-flockmates
     find-flockmates
     let y flockmates
 
-    ifelse x = y [print "test-flockmates PASS"][print "test-flockmates FAIL"]
+    ifelse x = y [
+      ;print "test-flockmates PASS"
+    ][
+      print x
+      print y
+      set tf false
+    ]
   ]
+
+  report tf
 end
 
 to find-flockmates
@@ -173,7 +234,7 @@ population
 population
 0
 100
-7.0
+13.0
 1
 1
 NIL
@@ -186,9 +247,9 @@ SLIDER
 171
 UAV-vision
 UAV-vision
-0
+1
 100
-100.0
+39.0
 1
 1
 NIL
@@ -201,7 +262,7 @@ BUTTON
 75
 NIL
 go
-NIL
+T
 1
 T
 OBSERVER

@@ -14,9 +14,12 @@ class FindBestNeighbor extends Command {
         val thisUav = Helper.ContextHelper.getTurtle(context)
         val flockmates = Helper.BreedHelper.getBreedVariable(thisUav, "flockmates").asInstanceOf[org.nlogo.agent.AgentSet]
         
-        if (flockmates.count == 0) return
+        if (flockmates.count == 0) {
+            Helper.BreedHelper.setBreedVariable(thisUav, "best-neighbor", NobodyType)
+            return
+        }
         
-        var bestNeighbor = flockmates.randomOne(flockmates.count, 0)
+        var bestNeighbor = flockmates.randomOne(flockmates.count, scala.util.Random.nextInt(flockmates.count))
         var bestPlumeReading: Double = -1.0
     
         val it = flockmates.iterator
