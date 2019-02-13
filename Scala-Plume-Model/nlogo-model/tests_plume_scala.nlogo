@@ -8,6 +8,7 @@ extensions [ plume-scala ]
 
 globals [ TIME coverage-all coverage-std coverage-mean accumulative-coverage
 
+
 ; testing vars
   SCALA-NOBODY
 ]
