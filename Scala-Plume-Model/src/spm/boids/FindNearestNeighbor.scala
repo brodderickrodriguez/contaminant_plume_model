@@ -20,7 +20,10 @@ class FindNearestNeighbor extends Command  {
         val thisUavCoor = Helper.TurtleHelper.getTurtleCoors(thisUav)
         val flockmates = Helper.BreedHelper.getBreedVariable(thisUav, "flockmates").asInstanceOf[org.nlogo.agent.AgentSet]
     
-        if (flockmates.count == 0) return
+        if (flockmates.count == 0) {
+            Helper.BreedHelper.setBreedVariable(thisUav, "nearest-neighbor", NobodyType)
+            return
+        }
     
         var nearestNeighbor = flockmates.randomOne(flockmates.count, 0).asInstanceOf[org.nlogo.agent.Turtle]
         val nearestNeighborCor = Helper.TurtleHelper.getTurtleCoors(nearestNeighbor)
@@ -30,9 +33,8 @@ class FindNearestNeighbor extends Command  {
         while (it.hasNext) {
             val fm = it.next().asInstanceOf[org.nlogo.agent.Turtle]
             val fmCoor = Helper.TurtleHelper.getTurtleCoors(fm)
-            
             val dist = MathHelper.euclideanDistance(thisUavCoor, fmCoor)
-            Helper.BreedHelper.setBreedVariable(fm, "nnd", dist.toLogoObject)
+            
             if (dist <= nearestNeighborDistance) {
                 nearestNeighbor = fm
                 nearestNeighborDistance = dist

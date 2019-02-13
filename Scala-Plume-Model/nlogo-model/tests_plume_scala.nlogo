@@ -18,7 +18,7 @@ globals [ TIME coverage-all coverage-std coverage-mean accumulative-coverage
 
 breed [ UAVs UAV ]
 
-UAVs-own [ flockmates best-neighbor nearest-neighbor nnd plume-reading  ]
+UAVs-own [ flockmates best-neighbor nearest-neighbor plume-reading  ]
 
 
 to setup
@@ -37,7 +37,7 @@ end
 
 to setup-uav-tests
   create-UAVs population [ setxy random-xcor random-ycor set plume-reading random-float 100]
-  ask UAVs with [ who = 0] [ setxy 50 50  set heading 0 ]
+  ask UAVs with [ who = 0] [ setxy 16 16  set heading 0 ]
 end
 
 
@@ -75,26 +75,23 @@ to-report test-nearest-neighbor
 ;      print "test-nearest-neighbor PASS"
     ]
     [
-      print "test-nearest-neighbor FAIL"
-      set tf false
+      if x != SCALA-NOBODY [
+       print "test-nearest-neighbor FAIL"
+       set tf false
 
-      ask x [
-        print who
-;        print xcor
-;        print ycor
-        print nnd
-        print distance myself
-        print ""
-      ] ; ask x
+       ask x [
+         print who
+         print distance myself
+         print ""
+       ] ; ask x
 
-       ask y [
-        print who
-;        print xcor
-;        print ycor
-        print nnd
-        print distance myself
-        print ""
-      ] ; ask y
+        ask y [
+         print who
+         print distance myself
+         print ""
+       ] ; ask y
+      ] ; if x != SCALA-NOBODY
+
     ] ; else
   ] ; ask UAVs with
 
@@ -186,8 +183,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-1
-1
+0
+0
 1
 0
 32
@@ -225,7 +222,7 @@ population
 population
 0
 100
-38.0
+4.0
 1
 1
 NIL
@@ -240,7 +237,7 @@ UAV-vision
 UAV-vision
 1
 100
-13.0
+10.0
 1
 1
 NIL
