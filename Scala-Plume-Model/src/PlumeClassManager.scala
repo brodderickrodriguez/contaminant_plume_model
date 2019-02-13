@@ -4,7 +4,7 @@
 
 import org.nlogo.api._
 import spm.boids._
-import spm.search_algorithms.symmetric_search.OptimalSubregionDimensions
+import spm.search_algorithms.symmetric_search.{OptimalSubregionDimensions, UAVRegionSetup}
 
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager) {
@@ -21,6 +21,7 @@ class PlumeClassManager extends DefaultClassManager {
         
         // spm.search_algorithms.symmetric_search
         manager.addPrimitive("get-optimal-subregion-dimensions", new OptimalSubregionDimensions)
+        manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
         
     } // load()
 } // PlumeClassManager

@@ -248,30 +248,56 @@ end
 ; -- search-strategy-symmetric procedures --
 ; -----------------------------------------------------------------------
 to setup-search-strategy-symmetric
-  let nu population
-  if is-prime nu [ set nu nu + 1 ]
-  let x 0
-  let y 0
+
   let configuration plume-scala:get-optimal-subregion-dimensions
-  let region-width ceiling (world-width / (item 0 configuration))
-  let region-height ceiling (world-height / (item 1 configuration))
 
-  while [ x < world-width ] [
-    while [ y < world-height ] [
-      let current-UAV one-of UAVs with [ UAV-region = 0 ]
-      ask current-UAV [
-        set UAV-region (list x y (x + region-width) (y + region-height))
-;        setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
+  plume-scala:setup-uav-subregions
 
-        let col [color] of self - 10
-        ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor col ]
-      ]
-      set y y + region-height
-    ] ; while [ y < world-height ]
-    set y 0
-    set x x + region-width
-  ] ; while [ x < world-width ]
 
+
+  ask UAVs [ print UAV-region ]
+
+;  let nu population
+;  if is-prime nu [ set nu nu + 1 ]
+;  let x 0
+;  let y 0
+;
+;  let region-width ceiling (world-width / (item 0 configuration))
+;  let region-height ceiling (world-height / (item 1 configuration))
+;
+;  while [ x < world-width ] [
+;    while [ y < world-height ] [
+;      let current-UAV one-of UAVs with [ UAV-region = 0 ]
+;      ask current-UAV [
+;        set UAV-region (list x y (x + region-width) (y + region-height))
+;;        setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
+;
+;        let col [color] of self - 10
+;        ;ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor col ]
+;      ]
+;      set y y + region-height
+;    ] ; while [ y < world-height ]
+;    set y 0
+;    set x x + region-width
+;  ] ; while [ x < world-width ]
+;
+;  print ""
+;  ask UAVs [ print UAV-region]
+
+
+  paint-subregions
+
+end
+
+to paint-subregions
+  ask UAVs [
+    let x1 (item 0 UAV-region)
+    let y1 (item 1 UAV-region)
+    let x2 (item 2 UAV-region)
+    let y2 (item 3 UAV-region)
+    let col [color] of self
+    ask patches with [pxcor >= x1 and pxcor < x2 and pycor >= y1 and pycor <= y2] [ set pcolor col]
+  ]
 end
 
 
@@ -426,7 +452,7 @@ population
 population
 2
 100
-40.0
+82.0
 1
 1
 UAVs per swarm
