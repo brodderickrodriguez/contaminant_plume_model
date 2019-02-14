@@ -24,6 +24,7 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("get-optimal-subregion-dimensions", new OptimalSubregionDimensions)
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
         
+        // smp.uav_behavior
         manager.addPrimitive("uav-inside-bounds", new CheckTurtleInsideBounds)
         manager.addPrimitive("uav-inside-world-bounds", new CheckUavInsideWorldBounds)
         
