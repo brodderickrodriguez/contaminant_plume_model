@@ -171,13 +171,10 @@ end
 
 to-report UAV-inside-world-bounds-threashold
   let world-region (list 0 0 world-width world-height)
-  report turtle-inside-bounds world-edge-threshold world-region
+  report plume-scala:uav-inside-bounds world-edge-threshold world-region
 end
 
-to-report turtle-inside-bounds [ threshhold region ]
-  report not ((xcor - threshhold < (item 0 region)) or (ycor - threshhold < (item 1 region)) or
-             (abs (xcor + threshhold) > (item 2 region)) or (abs (ycor + threshhold) > (item 3 region)))
-end
+
 
 
 ; --------------------------------------------------------------------------------
@@ -247,45 +244,41 @@ end
 ; -----------------------------------------------------------------------
 ; -- search-strategy-symmetric procedures --
 ; -----------------------------------------------------------------------
-to setup-search-strategy-symmetric
-
+to ssss
+  let nu population
+  if is-prime nu [ set nu nu + 1 ]
+  let x 0
+  let y 0
   let configuration plume-scala:get-optimal-subregion-dimensions
+  let region-width ceiling (world-width / (item 0 configuration))
+  let region-height ceiling (world-height / (item 1 configuration))
 
+  while [ x < world-width ] [
+    while [ y < world-height ] [
+      let current-UAV one-of UAVs with [ UAV-region = 0 ]
+      ask current-UAV [
+        set UAV-region (list x y (x + region-width) (y + region-height))
+;        setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
+
+        let col [color] of self - 10
+        ;ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor col ]
+      ]
+      set y y + region-height
+    ] ; while [ y < world-height ]
+    set y 0
+    set x x + region-width
+  ] ; while [ x < world-width ]
+
+  print ""
+  ask UAVs [ print UAV-region]
+end
+
+to setup-search-strategy-symmetric
   plume-scala:setup-uav-subregions
-
-
-
   ask UAVs [ print UAV-region ]
 
-;  let nu population
-;  if is-prime nu [ set nu nu + 1 ]
-;  let x 0
-;  let y 0
-;
-;  let region-width ceiling (world-width / (item 0 configuration))
-;  let region-height ceiling (world-height / (item 1 configuration))
-;
-;  while [ x < world-width ] [
-;    while [ y < world-height ] [
-;      let current-UAV one-of UAVs with [ UAV-region = 0 ]
-;      ask current-UAV [
-;        set UAV-region (list x y (x + region-width) (y + region-height))
-;;        setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
-;
-;        let col [color] of self - 10
-;        ;ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor col ]
-;      ]
-;      set y y + region-height
-;    ] ; while [ y < world-height ]
-;    set y 0
-;    set x x + region-width
-;  ] ; while [ x < world-width ]
-;
-;  print ""
-;  ask UAVs [ print UAV-region]
-
-
-  paint-subregions
+  ;ask UAVs [ set UAV-region 0 ] ssss
+;  paint-subregions
 
 end
 
@@ -302,7 +295,7 @@ end
 
 
 to update-search-strategy-symmetric
-  ifelse turtle-inside-bounds symmetric-search-region-threshold UAV-region
+  ifelse plume-scala:uav-inside-bounds symmetric-search-region-threshold UAV-region
   [
     perform-random-behavior
     pd
@@ -452,7 +445,7 @@ population
 population
 2
 100
-82.0
+8.0
 1
 1
 UAVs per swarm
@@ -748,7 +741,7 @@ world-edge-threshold
 world-edge-threshold
 1
 25
-4.0
+9.0
 0.5
 1
 NIL
