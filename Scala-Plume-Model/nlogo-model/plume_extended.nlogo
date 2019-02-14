@@ -223,7 +223,9 @@ end
 ; -- search-strategy-random procedures --
 ; -----------------------------------------------------------------------
 to update-search-strategy-random
-  ask UAVs [ perform-random-behavior ] ; ask UAVs
+;  ask UAVs [ perform-random-behavior ] ; ask UAVs
+
+  plume-scala:update-random-search
 end
 
 to perform-random-behavior
@@ -238,8 +240,6 @@ end
 ; -- search-strategy-symmetric procedures --
 ; -----------------------------------------------------------------------
 to ssss
-  let nu population
-  if is-prime nu [ set nu nu + 1 ]
   let x 0
   let y 0
   let configuration plume-scala:get-optimal-subregion-dimensions
@@ -347,12 +347,6 @@ to-report average-heading-towards-flockmates
   ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
 end
 
-; HELPER PROCEDURES
-to-report is-prime [ n ]
-  let i 2
-  while [ i <= (n / 2)] [ if n mod i = 0 [ report False ] set i i + 1 ]
-  report True
-end
 
 to-report get-heading-towards-point [ x y ]
   report (atan (xcor - x) (ycor - y)) - 180
@@ -438,7 +432,7 @@ population
 population
 2
 100
-47.0
+100.0
 1
 1
 UAVs per swarm
@@ -533,7 +527,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-38.5
+48.0
 0.5
 1
 patches
@@ -563,7 +557,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-9.0
+10.0
 1
 1
 NIL
@@ -614,7 +608,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-41.0
+40.0
 1
 1
 NIL
@@ -629,7 +623,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-1.7
+4.0
 0.05
 1
 degrees
@@ -654,7 +648,7 @@ minimum-separation
 minimum-separation
 0
 5
-1.25
+0.5
 0.25
 1
 patches
@@ -669,7 +663,7 @@ max-align-turn
 max-align-turn
 0
 20
-0.25
+1.25
 0.25
 1
 degrees
@@ -684,7 +678,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-5.2
+5.9
 0.1
 1
 degrees
@@ -719,7 +713,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-6.5
+3.75
 0.25
 1
 degrees
@@ -734,7 +728,7 @@ world-edge-threshold
 world-edge-threshold
 1
 25
-14.0
+8.0
 0.5
 1
 NIL
@@ -749,7 +743,7 @@ max-world-edge-turn
 max-world-edge-turn
 1
 20
-3.0
+11.0
 0.5
 1
 NIL
@@ -804,7 +798,7 @@ symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-7.1
+10.2
 0.1
 1
 degrees
@@ -819,7 +813,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-13.1
+6.5
 0.1
 1
 NIL

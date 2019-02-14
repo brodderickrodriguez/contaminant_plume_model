@@ -56,6 +56,9 @@ object Helper {
         def getWorld(context: Context): org.nlogo.agent.World = context.world.asInstanceOf[org.nlogo.agent.World]
         
         
+        def getTicks(context: Context): Double = getWorld(context).ticks
+        
+        
         /**
           * Can be used to get both global variables and GUI (model) parameters
           * @param context the org.nlogo.api.Context argument found in the
