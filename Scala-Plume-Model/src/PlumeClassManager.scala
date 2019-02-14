@@ -5,7 +5,7 @@
 import org.nlogo.api._
 import spm.boids._
 import spm.search_algorithms.symmetric_search.{OptimalSubregionDimensions, UAVRegionSetup}
-import spm.uav_behavior.CheckTurtleInsideBounds
+import spm.uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds}
 
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager) {
@@ -25,6 +25,7 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
         
         manager.addPrimitive("uav-inside-bounds", new CheckTurtleInsideBounds)
+        manager.addPrimitive("uav-inside-world-bounds", new CheckUavInsideWorldBounds)
         
     } // load()
 } // PlumeClassManager

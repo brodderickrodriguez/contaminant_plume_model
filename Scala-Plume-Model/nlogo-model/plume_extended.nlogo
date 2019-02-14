@@ -48,6 +48,7 @@ to setup
 
   setup-contaminant-plumes
   setup-UAVs
+
   setup-swarms
 
   if global-search-strategy = search-strategy-symmetric [ setup-search-strategy-symmetric ]
@@ -158,7 +159,7 @@ to get-reading
 end
 
 to turn-UAV
-  ifelse UAV-inside-world-bounds-threashold [
+  ifelse plume-scala:uav-inside-world-bounds [
     turn-towards desired-heading random-search-max-turn
   ] ; if inside bounds
   [
@@ -169,10 +170,7 @@ to turn-UAV
   ] ; else not inside bounds
 end
 
-to-report UAV-inside-world-bounds-threashold
-  let world-region (list 0 0 world-width world-height)
-  report plume-scala:uav-inside-bounds world-edge-threshold world-region
-end
+
 
 
 
@@ -234,7 +232,7 @@ to update-search-strategy-random
 end
 
 to perform-random-behavior
-  if UAV-inside-world-bounds-threashold and ticks > random-search-time [
+  if plume-scala:uav-inside-world-bounds and ticks > random-search-time [
     set random-search-time ticks + random random-search-max-heading-time
     set desired-heading random 360
   ]
@@ -430,7 +428,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.32
+0.0
 0.01
 1
 percent
@@ -445,7 +443,7 @@ population
 population
 2
 100
-8.0
+47.0
 1
 1
 UAVs per swarm
@@ -540,7 +538,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-53.5
+38.5
 0.5
 1
 patches
@@ -555,7 +553,7 @@ plume-decay-rate
 plume-decay-rate
 0
 0.0001
-1.0E-4
+0.0
 0.00000000001
 1
 p/t
@@ -570,7 +568,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-0.0
+9.0
 1
 1
 NIL
@@ -621,7 +619,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-18.0
+41.0
 1
 1
 NIL
@@ -636,7 +634,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-5.0
+1.7
 0.05
 1
 degrees
@@ -650,7 +648,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-2
+1
 
 SLIDER
 266
@@ -661,7 +659,7 @@ minimum-separation
 minimum-separation
 0
 5
-1.75
+1.25
 0.25
 1
 patches
@@ -676,7 +674,7 @@ max-align-turn
 max-align-turn
 0
 20
-1.5
+0.25
 0.25
 1
 degrees
@@ -691,7 +689,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-6.9
+5.2
 0.1
 1
 degrees
@@ -726,7 +724,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-7.5
+6.5
 0.25
 1
 degrees
@@ -741,7 +739,7 @@ world-edge-threshold
 world-edge-threshold
 1
 25
-9.0
+14.0
 0.5
 1
 NIL
@@ -756,7 +754,7 @@ max-world-edge-turn
 max-world-edge-turn
 1
 20
-9.5
+3.0
 0.5
 1
 NIL
@@ -811,7 +809,7 @@ symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-20.0
+7.1
 0.1
 1
 degrees
@@ -826,7 +824,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-1.7
+13.1
 0.1
 1
 NIL
