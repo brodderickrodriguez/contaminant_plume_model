@@ -141,10 +141,10 @@ end
 
 to update-UAVs
   ask UAVs [
-    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]
-    if global-search-strategy = search-strategy-random [ update-search-strategy-random ]
-    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric ]
-    turn-UAV
+    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock turn-UAV 0]
+    if global-search-strategy = search-strategy-random [ update-search-strategy-random turn-UAV random-search-max-turn ]
+    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric turn-UAV symmetric-search-max-turn ]
+
     get-reading
     fd 0.5
   ]
@@ -158,9 +158,9 @@ to get-reading
   set plume-reading plume-density
 end
 
-to turn-UAV
+to turn-UAV [ allowed-turn ]
   ifelse plume-scala:uav-inside-world-bounds [
-    turn-towards desired-heading random-search-max-turn
+    turn-towards desired-heading allowed-turn
   ] ; if inside bounds
   [
     let ptx (world-width / 4) + (random (world-width / 2))
@@ -223,9 +223,10 @@ end
 ; -- search-strategy-random procedures --
 ; -----------------------------------------------------------------------
 to update-search-strategy-random
-;  ask UAVs [ perform-random-behavior ] ; ask UAVs
 
-  plume-scala:update-random-search
+  ask UAVs [ perform-random-behavior ] ; ask UAVs
+
+;  plume-scala:update-random-search
 end
 
 to perform-random-behavior
@@ -417,7 +418,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.0
+0.18
 0.01
 1
 percent
@@ -432,7 +433,7 @@ population
 population
 2
 100
-100.0
+23.0
 1
 1
 UAVs per swarm
@@ -464,7 +465,7 @@ number-plumes
 number-plumes
 0
 5
-0.0
+1.0
 1
 1
 NIL
@@ -527,7 +528,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-48.0
+196.0
 0.5
 1
 patches
@@ -743,7 +744,7 @@ max-world-edge-turn
 max-world-edge-turn
 1
 20
-11.0
+9.5
 0.5
 1
 NIL

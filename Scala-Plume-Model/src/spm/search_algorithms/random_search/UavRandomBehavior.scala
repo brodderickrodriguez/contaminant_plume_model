@@ -17,12 +17,14 @@ object UavRandomBehavior {
         val ticks = Helper.ContextHelper.getTicks(context)
         
         if (CheckBoundsUav.uavInsideWorld(context, uav) && ticks > randomSearchTime) {
-            val randomSearchMaxHeadingTime = Helper.ContextHelper.getObserverVariable(context, "random-search-max-heading-time").asInstanceOf[Double]
-            val newHeadingTime = Random.nextInt(randomSearchMaxHeadingTime.intValue)
-            val newHeading = Random.nextInt(720)
+            val maxHeadingTime = Helper.ContextHelper.getObserverVariable(context, "random-search-max-heading-time").asInstanceOf[Double]
+            val newSearchTime = Random.nextInt(maxHeadingTime.intValue)
+            val newHeading = Random.nextInt(360)
             
-            Helper.BreedHelper.setBreedVariable(uav, "random-search-time", newHeadingTime.toLogoObject)
-            Helper.BreedHelper.setBreedVariable(uav, "desired-heading", newHeading.toLogoObject)
+//            Helper.TurtleHelper.setTurtleVariable(uav, "random-search-time", newSearchTime.toLogoObject)
+//            Helper.TurtleHelper.setTurtleVariable(uav, "desired-heading", newHeading.toLogoObject)
+        
         } // if
     } // behave()
 } // UavRandomBehavior()
+
