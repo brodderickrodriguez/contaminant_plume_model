@@ -42,7 +42,7 @@ end
 to setup
   clear-all
   reset-ticks
-;  import-drawing "./resources/plume-bg.png"
+  import-drawing "./resources/plume-bg.png"
   define-constants
   set coverage-all []
 
@@ -125,7 +125,8 @@ to setup-UAVs
   create-UAVs population [
     set my-swarm nobody
     set size 3
-    ;set shape "airplane"
+    set shape "airplane"
+    set color blue
     set detection-time 0
     set-random-initial-coor
     ;pd
@@ -433,7 +434,7 @@ population
 population
 2
 100
-23.0
+12.0
 1
 1
 UAVs per swarm
@@ -465,7 +466,7 @@ number-plumes
 number-plumes
 0
 5
-1.0
+2.0
 1
 1
 NIL
@@ -495,7 +496,7 @@ wind-heading
 wind-heading
 0
 360
-0.0
+52.0
 1
 1
 degrees
@@ -528,7 +529,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-196.0
+39.5
 0.5
 1
 patches
@@ -638,7 +639,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-1
+0
 
 SLIDER
 266
@@ -649,7 +650,7 @@ minimum-separation
 minimum-separation
 0
 5
-0.5
+3.75
 0.25
 1
 patches
@@ -679,7 +680,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-5.9
+2.9
 0.1
 1
 degrees
