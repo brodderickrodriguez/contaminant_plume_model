@@ -33,7 +33,6 @@ object Helper {
         a
     } // getInput()
     
-    
     /**
       * ContextHelper should handle getting/setting context, observer, world variables/objects
       */
@@ -92,7 +91,7 @@ object Helper {
       */
     //TODO: make agent helper and turtle helper separate
     // TODO: add a distance function. need to convert to other agent type
-    trait _TurtleHelper {
+    object TurtleHelper {
         /**
           * Used to set a Turtle variable. This cannot be used to set a Breed's variable.
           * @param a the org.nlogo.agent.Ag we want to access
@@ -113,17 +112,14 @@ object Helper {
         
         
         def getTurtleCoors(a: org.nlogo.agent.Turtle): (Double, Double) = (a.xcor(), a.ycor())
-    } // _TurtleHelper
+    } // TurtleHelper
     
-    
-    // TODO: revise--set up like this to get "class inheritance" out of objects.
-    object TurtleHelper extends _TurtleHelper { }
     
     /**
       * BreedHelper has the ability to set both Turtle and Breed variables. Breed variables are those declared in
       * breeds-own [...] in a .nlogo file.
       */
-    object BreedHelper extends _TurtleHelper {
+    object BreedHelper {
         /**
           * Used to set a Breed's variable
           * @param a the org.nlogo.agent.Agent we want to access

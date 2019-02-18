@@ -23,3 +23,14 @@ class UpdateRandomSearch extends Command {
         } // while
     } // perform()
 } // UpdateRandomSearch
+
+
+
+class UpdateRandomSearchSingleUAV extends Command {
+    override def getSyntax: Syntax = commandSyntax(right = List())
+    
+    override def perform(args: Array[Argument], context: Context): Unit = {
+        val uav = Helper.ContextHelper.getAgent(context).asInstanceOf[org.nlogo.agent.Turtle]
+        spm.search_algorithms.random_search.UavRandomBehavior.behave(context, uav)
+    } // perform()
+} // UpdateRandomSearch

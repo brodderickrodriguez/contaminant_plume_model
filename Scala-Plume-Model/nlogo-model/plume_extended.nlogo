@@ -42,7 +42,7 @@ end
 to setup
   clear-all
   reset-ticks
-  import-drawing "./resources/plume-bg.png"
+;  import-drawing "./resources/plume-bg.png"
   define-constants
   set coverage-all []
 
@@ -126,10 +126,10 @@ to setup-UAVs
     set my-swarm nobody
     set size 3
     set shape "airplane"
-    set color blue
+;    set color blue
     set detection-time 0
     set-random-initial-coor
-    ;pd
+
   ]
 end
 
@@ -142,8 +142,8 @@ end
 
 to update-UAVs
   ask UAVs [
-    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock turn-UAV 0]
-    if global-search-strategy = search-strategy-random [ update-search-strategy-random turn-UAV random-search-max-turn ]
+    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock turn-UAV nobody ]
+    if global-search-strategy = search-strategy-random [ plume-scala:update-random-search turn-UAV random-search-max-turn ]
     if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric turn-UAV symmetric-search-max-turn ]
 
     get-reading
@@ -166,8 +166,9 @@ to turn-UAV [ allowed-turn ]
   [
     let ptx (world-width / 4) + (random (world-width / 2))
     let pty (world-height / 4) + (random (world-height / 2))
-    let new-heading get-heading-towards-point ptx pty
-    turn-towards new-heading max-world-edge-turn
+    set desired-heading get-heading-towards-point ptx pty
+    turn-towards desired-heading max-world-edge-turn
+
   ] ; else not inside bounds
 end
 
@@ -220,22 +221,8 @@ to update-search-strategy-flock
   ] ; if any? flockmates
 end
 
-; -----------------------------------------------------------------------
-; -- search-strategy-random procedures --
-; -----------------------------------------------------------------------
-to update-search-strategy-random
 
-  ask UAVs [ perform-random-behavior ] ; ask UAVs
 
-;  plume-scala:update-random-search
-end
-
-to perform-random-behavior
-  if plume-scala:uav-inside-world-bounds and ticks > random-search-time [
-    set random-search-time ticks + random random-search-max-heading-time
-    set desired-heading random 360
-  ]
-end
 
 
 ; -----------------------------------------------------------------------
@@ -269,10 +256,11 @@ to ssss
 end
 
 to setup-search-strategy-symmetric
-  plume-scala:setup-uav-subregions
+;  plume-scala:setup-uav-subregions
   ask UAVs [ print UAV-region ]
 
-  ;ask UAVs [ set UAV-region 0 ] ssss
+  ask UAVs [ set UAV-region 0 ]
+  ssss
 ;  paint-subregions
 
 end
@@ -290,10 +278,14 @@ end
 
 
 to update-search-strategy-symmetric
+
+  pen-down
   ifelse plume-scala:uav-inside-bounds symmetric-search-region-threshold UAV-region
   [
-    perform-random-behavior
     pd
+    plume-scala:update-random-search-single-uav
+
+    print "hi"
   ] ; if
   [
     let centerx ((item 2 UAV-region) + (item 0 UAV-region)) / 2
@@ -301,7 +293,7 @@ to update-search-strategy-symmetric
     let ptx centerx - (centerx / 4) + (random (centerx / 2))
     let pty centery - (centery / 4) + (random (centery / 2))
     set desired-heading get-heading-towards-point ptx pty
-    pu
+
   ] ; else
 end
 
@@ -419,7 +411,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.18
+0.0
 0.01
 1
 percent
@@ -434,7 +426,7 @@ population
 population
 2
 100
-12.0
+22.0
 1
 1
 UAVs per swarm
@@ -466,7 +458,7 @@ number-plumes
 number-plumes
 0
 5
-2.0
+0.0
 1
 1
 NIL
@@ -496,7 +488,7 @@ wind-heading
 wind-heading
 0
 360
-52.0
+0.0
 1
 1
 degrees
@@ -529,7 +521,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-39.5
+31.0
 0.5
 1
 patches
@@ -559,7 +551,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-10.0
+11.0
 1
 1
 NIL
@@ -610,7 +602,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-40.0
+36.0
 1
 1
 NIL
@@ -625,7 +617,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-4.0
+3.1
 0.05
 1
 degrees
@@ -639,7 +631,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-0
+2
 
 SLIDER
 266
@@ -650,7 +642,7 @@ minimum-separation
 minimum-separation
 0
 5
-3.75
+1.0
 0.25
 1
 patches
@@ -665,7 +657,7 @@ max-align-turn
 max-align-turn
 0
 20
-1.25
+1.75
 0.25
 1
 degrees
@@ -680,7 +672,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-2.9
+3.3
 0.1
 1
 degrees
@@ -715,7 +707,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-3.75
+3.0
 0.25
 1
 degrees
@@ -730,7 +722,7 @@ world-edge-threshold
 world-edge-threshold
 1
 25
-8.0
+7.0
 0.5
 1
 NIL
@@ -745,7 +737,7 @@ max-world-edge-turn
 max-world-edge-turn
 1
 20
-9.5
+8.5
 0.5
 1
 NIL
@@ -793,14 +785,14 @@ UAV Behavior & Search Strategy
 
 SLIDER
 761
-565
+564
 1011
-598
+597
 symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-10.2
+6.6
 0.1
 1
 degrees
@@ -815,7 +807,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-6.5
+9.4
 0.1
 1
 NIL

@@ -7,7 +7,7 @@ package spm.search_algorithms.random_search
 import scala.util.Random
 import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
-import spm.helper.Helper
+import spm.helper.{Helper, MathHelper}
 import spm.uav_behavior.CheckBoundsUav
 
 
@@ -17,14 +17,15 @@ object UavRandomBehavior {
         val ticks = Helper.ContextHelper.getTicks(context)
         
         if (CheckBoundsUav.uavInsideWorld(context, uav) && ticks > randomSearchTime) {
-            val maxHeadingTime = Helper.ContextHelper.getObserverVariable(context, "random-search-max-heading-time").asInstanceOf[Double]
-            val newSearchTime = Random.nextInt(maxHeadingTime.intValue)
-            val newHeading = Random.nextInt(360)
+            val randomSearchMaxHeadingTime = Helper.ContextHelper.getObserverVariable(context, "random-search-max-heading-time").asInstanceOf[Double]
+            val newSearchTime = Random.nextInt(randomSearchMaxHeadingTime.toInt) + ticks
+            val newHeading = Random.nextInt(360) * MathHelper.random1()
             
-//            Helper.TurtleHelper.setTurtleVariable(uav, "random-search-time", newSearchTime.toLogoObject)
-//            Helper.TurtleHelper.setTurtleVariable(uav, "desired-heading", newHeading.toLogoObject)
-        
+            Helper.BreedHelper.setBreedVariable(uav, "random-search-time", newSearchTime.toLogoObject)
+            Helper.BreedHelper.setBreedVariable(uav, "desired-heading", newHeading.toLogoObject)
         } // if
     } // behave()
 } // UavRandomBehavior()
+
+
 

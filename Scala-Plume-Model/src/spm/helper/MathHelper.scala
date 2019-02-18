@@ -5,6 +5,8 @@ package spm.helper
 // Auburn University - CSSE
 // 05 Feb. 2019
 
+import scala.util.Random
+
 
 object MathHelper {
     def euclideanDistance(a: (Double, Double), b: (Double, Double)): Double = {
@@ -17,6 +19,8 @@ object MathHelper {
         for (i <- 2 until n / 2) if (n % i == 0) return false
         true
     } // isPrime()
+    
+    def random1(): Int = if (Random.nextInt(2) == 0) -1 else 1
 } // MathHelper
 
 

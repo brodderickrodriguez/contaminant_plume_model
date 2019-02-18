@@ -16,14 +16,20 @@ class OptimalSubregionDimensions extends Reporter {
     
     def report(args: Array[Argument], context: Context): AnyRef = {
         val population = Helper.ContextHelper.getObserverVariable(context, "population").asInstanceOf[Double].toInt
-        var optimal = (0, 0, Int.MaxValue)
-        
-        for (y <- Range(1, (population / 2) + 1) if population % y == 0) {
-            val x = population / y
-            val cost = Math.abs(x - y)
-            if (cost < optimal._3) optimal = (x, y, cost)
-        }
-        
+        val optimal = _OptimalSubregionDimensions.get(population)
         optimal.productIterator.toArray.toLogoList
     } // perform()
 } // OptimalSubregionDimensions
+
+
+object _OptimalSubregionDimensions {
+    def get(n: Int): (Int, Int, Int) = {
+        var optimal = (0, 0, Int.MaxValue)
+        for (y <- Range(1, (n / 2) + 1) if n % y == 0) {
+            val x = n / y
+            val cost = Math.abs(x - y)
+            if (cost < optimal._3) optimal = (x, y, cost)
+        }
+        optimal
+    } // get()
+} // _OptimalSubregionDimensions
