@@ -38,7 +38,7 @@ object CheckBoundsUav {
     // TODO: fix this crap logic
     def uavInside(uav: org.nlogo.agent.Turtle, threshold: Double, region: List[Double]): Boolean = {
         val (uavX, uavY) = Helper.TurtleHelper.getTurtleCoors(uav)
-        val a = uavX - threshold < region(0)
+        val a = uavX - threshold < region.head
         val b = uavY - threshold < region(1)
         val c = Math.abs(uavX + threshold) > region(2)
         val d = Math.abs(uavY + threshold) > region(3)

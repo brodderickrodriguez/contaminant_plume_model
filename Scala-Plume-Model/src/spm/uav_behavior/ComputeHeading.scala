@@ -4,7 +4,7 @@ package spm.uav_behavior
 // Auburn University - CSSE
 // 18 Feb. 2019
 
-import org.nlogo.api.{Argument, Command, Context}
+import org.nlogo.api.{Argument, Context}
 import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 import org.nlogo.core.Syntax

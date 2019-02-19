@@ -51,6 +51,8 @@ to setup
   setup-swarms
 
   if global-search-strategy = search-strategy-symmetric [ plume-scala:setup-uav-subregions plume-scala:paint-subregions ]
+
+;  plume-scala:turn-uav 0
 end
 
 to go
@@ -335,7 +337,7 @@ population
 population
 2
 100
-10.0
+9.0
 1
 1
 UAVs per swarm
@@ -460,7 +462,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-26.0
+0.0
 1
 1
 NIL
@@ -511,7 +513,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-50.0
+34.0
 1
 1
 NIL
@@ -526,7 +528,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-3.3
+1.9
 0.05
 1
 degrees
@@ -540,7 +542,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-2
+1
 
 SLIDER
 266
@@ -551,7 +553,7 @@ minimum-separation
 minimum-separation
 0
 5
-1.25
+0.0
 0.25
 1
 patches
@@ -566,7 +568,7 @@ max-align-turn
 max-align-turn
 0
 20
-1.75
+0.0
 0.25
 1
 degrees
@@ -581,7 +583,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-5.0
+0.0
 0.1
 1
 degrees
@@ -616,7 +618,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-3.75
+0.0
 0.25
 1
 degrees
@@ -631,7 +633,7 @@ world-edge-threshold
 world-edge-threshold
 1
 25
-5.5
+13.5
 0.5
 1
 NIL
@@ -646,7 +648,7 @@ max-world-edge-turn
 max-world-edge-turn
 1
 20
-15.0
+8.0
 0.5
 1
 NIL
@@ -701,7 +703,7 @@ symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-14.0
+0.0
 0.1
 1
 degrees

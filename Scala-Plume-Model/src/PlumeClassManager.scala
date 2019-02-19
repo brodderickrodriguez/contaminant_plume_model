@@ -3,12 +3,14 @@
 // 05 Feb. 2019
 
 import org.nlogo.api._
-import spm.boids._
-import spm.uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds}
-import spm.uav_behavior.ComputeHeading.GetHeadingTowardsPoint
-import spm.uav_behavior.TurnUav
-import spm.search_algorithms.random_search.{UavRandomSearchPaintSubregions, UpdateRandomSearch, UpdateRandomSearchIndividual}
-import spm.search_algorithms.symmetric_search.{UAVRegionSetup, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
+
+import spm._
+import boids.{FindFlockmates, FindBestNeighbor, FindNearestNeighbor}
+import uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds, ComputeHeading}
+import ComputeHeading.GetHeadingTowardsPoint.GetHeadingTowardsPointReporter
+import search_algorithms.{random_search, symmetric_search}
+import random_search.{UpdateRandomSearch, UpdateRandomSearchIndividual}
+import symmetric_search.{UAVRegionSetup, UavSymmetricSearchPaintSubregions, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
 
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager) {
@@ -27,10 +29,10 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("uav-inside-world-bounds", new CheckUavInsideWorldBounds)
         
         // smp.uav_behavior.ComputeHeading
-        manager.addPrimitive("compute-heading-towards-point", new GetHeadingTowardsPoint.GetHeadingTowardsPointReporter)
+        manager.addPrimitive("compute-heading-towards-point", new GetHeadingTowardsPointReporter)
         
         // smp.uav_behavior.TurnUav
-        manager.addPrimitive("turn-uav", new TurnUav)
+//        manager.addPrimitive("turn-uav", new uav_behavior.TurnUav)
         
         // spm.search_algorithms.random_search
         manager.addPrimitive("update-random-search", new UpdateRandomSearch)
@@ -38,7 +40,7 @@ class PlumeClassManager extends DefaultClassManager {
     
         // spm.search_algorithms.symmetric_search
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
-        manager.addPrimitive("paint-subregions", new UavRandomSearchPaintSubregions)
+        manager.addPrimitive("paint-subregions", new UavSymmetricSearchPaintSubregions)
         manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
         manager.addPrimitive("update-symmetric-search-single-uav", new UavUpdateSymmetricSearchIndividual)
     
