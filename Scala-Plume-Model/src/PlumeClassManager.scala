@@ -5,7 +5,9 @@
 import org.nlogo.api._
 import spm.boids._
 import spm.uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds}
-import spm.search_algorithms.random_search.{UpdateRandomSearch, UpdateRandomSearchSingleUAV}
+import spm.uav_behavior.ComputeHeading.GetHeadingTowardsPoint
+import spm.uav_behavior.TurnUav
+import spm.search_algorithms.random_search.{UavRandomSearchPaintSubregions, UpdateRandomSearch, UpdateRandomSearchIndividual}
 import spm.search_algorithms.symmetric_search.{UAVRegionSetup, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
 
 class PlumeClassManager extends DefaultClassManager {
@@ -20,16 +22,23 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("find-best-neighbor", new FindBestNeighbor)
         manager.addPrimitive("find-nearest-neighbor", new FindNearestNeighbor)
         
-        // smp.uav_behavior
+        // smp.uav_behavior.CheckBoundsUav
         manager.addPrimitive("uav-inside-bounds", new CheckTurtleInsideBounds)
         manager.addPrimitive("uav-inside-world-bounds", new CheckUavInsideWorldBounds)
         
+        // smp.uav_behavior.ComputeHeading
+        manager.addPrimitive("compute-heading-towards-point", new GetHeadingTowardsPoint.GetHeadingTowardsPointReporter)
+        
+        // smp.uav_behavior.TurnUav
+        manager.addPrimitive("turn-uav", new TurnUav)
+        
         // spm.search_algorithms.random_search
         manager.addPrimitive("update-random-search", new UpdateRandomSearch)
-        manager.addPrimitive("update-random-search-single-uav", new UpdateRandomSearchSingleUAV)
+        manager.addPrimitive("update-random-search-single-uav", new UpdateRandomSearchIndividual)
     
         // spm.search_algorithms.symmetric_search
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
+        manager.addPrimitive("paint-subregions", new UavRandomSearchPaintSubregions)
         manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
         manager.addPrimitive("update-symmetric-search-single-uav", new UavUpdateSymmetricSearchIndividual)
     

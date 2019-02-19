@@ -84,6 +84,7 @@ object Helper {
             context.world.setObserverVariableByName(variableName.toUpperCase, newValue.toLogoObject)
         } // setObserverVariable()
     } // ContextHelper
+
     
     /**
       * _TurtleHelper is inherited by both TurtleHelper and BreedHelper since both will want to have the
