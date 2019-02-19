@@ -4,13 +4,13 @@ package spm.search_algorithms.symmetric_search
 // Auburn University - CSSE
 // 05 Feb. 2019
 
+import org.nlogo.core.LogoList
 import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import spm.helper.Helper
 import spm.uav_behavior.CheckBoundsUav
-
 import scala.collection.mutable.ListBuffer
 
 object _UAVSubregionGenerator {
@@ -71,14 +71,12 @@ class UAVRegionSetup extends Command {
 object _UavUpdateSymmetricSearchIndividual {
     def behave(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
         val threshold = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-region-threshold").asInstanceOf[Double]
-//        val uav = Helper.ContextHelper.getTurtle(context)
-        val uavRegion = Helper.BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[Array[Double]]
-    
-        
+        val uavRegion = Helper.BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
+
         if (CheckBoundsUav.uavInside(uav, threshold, uavRegion)) {
-        
+
         } else {
-        
+
         }
         
     } // behave()
@@ -88,20 +86,26 @@ object _UavUpdateSymmetricSearchIndividual {
 
 
 
+class UavUpdateSymmetricSearchIndividual extends Command {
+    override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
+    
+    override def perform(args: Array[Argument], context: Context): Unit = {
+        val uav = Helper.ContextHelper.getTurtle(context)
+        _UavUpdateSymmetricSearchIndividual.behave(context, uav)
+    } // perform()
+} // UavUpdateSymmetricSearchIndividual
+
+
 
 class UavUpdateSymmetricSearch extends Command {
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val regions = _UAVSubregionGenerator.buildRegions(args, context)
         val it = Helper.ContextHelper.getWorld(context).getBreed("UAVS").iterator
         
         while (it.hasNext) {
-
-        
-        
-        
-        
+            val uav = it.next().asInstanceOf[org.nlogo.agent.Turtle]
+            _UavUpdateSymmetricSearchIndividual.behave(context, uav)
         } // while
         
     } // perform()

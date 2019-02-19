@@ -6,7 +6,7 @@ import org.nlogo.api._
 import spm.boids._
 import spm.uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds}
 import spm.search_algorithms.random_search.{UpdateRandomSearch, UpdateRandomSearchSingleUAV}
-import spm.search_algorithms.symmetric_search.{UAVRegionSetup, UavUpdateSymmetricSearch}
+import spm.search_algorithms.symmetric_search.{UAVRegionSetup, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
 
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager) {
@@ -31,6 +31,7 @@ class PlumeClassManager extends DefaultClassManager {
         // spm.search_algorithms.symmetric_search
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
         manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
+        manager.addPrimitive("update-symmetric-search-single-uav", new UavUpdateSymmetricSearchIndividual)
     
         
     } // load()

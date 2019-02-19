@@ -151,6 +151,11 @@ to update-UAVs
     if global-search-strategy = search-strategy-random [ plume-scala:update-random-search set turn-allowed random-search-max-turn ]
     if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric set turn-allowed symmetric-search-max-turn ]
 
+
+
+
+   ; plume-scala:update-symmetric-search
+
     turn-UAV turn-allowed
     get-reading
     fd 0.5
@@ -382,7 +387,7 @@ population
 population
 2
 100
-18.0
+10.0
 1
 1
 UAVs per swarm

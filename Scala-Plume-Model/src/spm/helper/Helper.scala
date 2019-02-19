@@ -29,7 +29,7 @@ object Helper {
         catch {
             case e1: LogoException => throw new ExtensionException(e1.getMessage)
             case e2: IndexOutOfBoundsException => throw new ArrayIndexOutOfBoundsException(e2.getMessage)
-        } // catch
+        }
         a
     } // getInput()
     
@@ -79,8 +79,8 @@ object Helper {
           */
         def setObserverVariable(context: Context, variableName: String, newValue: Any): Unit = {
             // both approaches below seem to work. Not sure which is better
-            // val i = context.world.observerOwnsIndexOf(variableName.toUpperCase)
-            // context.world.observer.setVariable(i, newValue.toLogoObject)
+                // val i = context.world.observerOwnsIndexOf(variableName.toUpperCase)
+                // context.world.observer.setVariable(i, newValue.toLogoObject)
             context.world.setObserverVariableByName(variableName.toUpperCase, newValue.toLogoObject)
         } // setObserverVariable()
     } // ContextHelper
