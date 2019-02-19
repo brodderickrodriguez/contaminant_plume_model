@@ -46,12 +46,14 @@ to setup
   define-constants
   set coverage-all []
 
+
+
+
   setup-contaminant-plumes
   setup-UAVs
-
   setup-swarms
 
-  if global-search-strategy = search-strategy-symmetric [ setup-search-strategy-symmetric ]
+  if global-search-strategy = search-strategy-symmetric [ plume-scala:setup-uav-subregions paint-subregions ]
 end
 
 to go
@@ -142,10 +144,14 @@ end
 
 to update-UAVs
   ask UAVs [
-    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock turn-UAV nobody ]
-    if global-search-strategy = search-strategy-random [ plume-scala:update-random-search turn-UAV random-search-max-turn ]
-    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric turn-UAV symmetric-search-max-turn ]
 
+    let turn-allowed 0
+
+    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock  ]
+    if global-search-strategy = search-strategy-random [ plume-scala:update-random-search set turn-allowed random-search-max-turn ]
+    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric set turn-allowed symmetric-search-max-turn ]
+
+    turn-UAV turn-allowed
     get-reading
     fd 0.5
   ]
@@ -167,7 +173,10 @@ to turn-UAV [ allowed-turn ]
     let ptx (world-width / 4) + (random (world-width / 2))
     let pty (world-height / 4) + (random (world-height / 2))
     set desired-heading get-heading-towards-point ptx pty
-    turn-towards desired-heading max-world-edge-turn
+
+    let r 1;random 2
+  ;  if r = 0 [set r -1]
+    turn-towards (desired-heading * r) max-world-edge-turn
 
   ] ; else not inside bounds
 end
@@ -206,12 +215,6 @@ to update-swarms
   ] ; ask swarms
 end
 
-; --------------------------------------------------------------------------------
-; -- search strategy procedures --
-; --------------------------------------------------------------------------------
-; -----------------------------------------------------------------------
-; -- search-strategy-flock procedures --
-; -----------------------------------------------------------------------
 to update-search-strategy-flock
   find-flockmates
   if any? flockmates [
@@ -222,76 +225,29 @@ to update-search-strategy-flock
 end
 
 
-
-
-
-; -----------------------------------------------------------------------
-; -- search-strategy-symmetric procedures --
-; -----------------------------------------------------------------------
-to ssss
-  let x 0
-  let y 0
-  let configuration plume-scala:get-optimal-subregion-dimensions
-  let region-width ceiling (world-width / (item 0 configuration))
-  let region-height ceiling (world-height / (item 1 configuration))
-
-  while [ x < world-width ] [
-    while [ y < world-height ] [
-      let current-UAV one-of UAVs with [ UAV-region = 0 ]
-      ask current-UAV [
-        set UAV-region (list x y (x + region-width) (y + region-height))
-;        setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
-
-        let col [color] of self - 10
-        ;ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor col ]
-      ]
-      set y y + region-height
-    ] ; while [ y < world-height ]
-    set y 0
-    set x x + region-width
-  ] ; while [ x < world-width ]
-
-  print ""
-  ask UAVs [ print UAV-region]
-end
-
-to setup-search-strategy-symmetric
-;  plume-scala:setup-uav-subregions
-  ask UAVs [ print UAV-region ]
-
-  ask UAVs [ set UAV-region 0 ]
-  ssss
-;  paint-subregions
-
-end
-
 to paint-subregions
   ask UAVs [
     let x1 (item 0 UAV-region)
     let y1 (item 1 UAV-region)
     let x2 (item 2 UAV-region)
     let y2 (item 3 UAV-region)
-    let col [color] of self
-    ask patches with [pxcor >= x1 and pxcor < x2 and pycor >= y1 and pycor <= y2] [ set pcolor col]
+    let col [color] of self + 4
+    ask patches with [pxcor >= x1 and pxcor <= x2 and pycor >= y1 and pycor <= y2] [ set pcolor col]
   ]
 end
 
 
 to update-search-strategy-symmetric
-
-  pen-down
   ifelse plume-scala:uav-inside-bounds symmetric-search-region-threshold UAV-region
   [
     pd
     plume-scala:update-random-search-single-uav
-
-    print "hi"
   ] ; if
   [
     let centerx ((item 2 UAV-region) + (item 0 UAV-region)) / 2
     let centery ((item 3 UAV-region) + (item 1 UAV-region)) / 2
-    let ptx centerx - (centerx / 4) + (random (centerx / 2))
-    let pty centery - (centery / 4) + (random (centery / 2))
+    let ptx centerx; - (centerx / 4) + (random (centerx / 2))
+    let pty centery; - (centery / 4) + (random (centery / 2))
     set desired-heading get-heading-towards-point ptx pty
 
   ] ; else
@@ -343,7 +299,7 @@ end
 
 
 to-report get-heading-towards-point [ x y ]
-  report (atan (xcor - x) (ycor - y)) - 180
+  report (atan  (xcor - x)  (ycor - y)) - 180
 end
 
 to turn-towards [ new-heading max-turn ]
@@ -426,7 +382,7 @@ population
 population
 2
 100
-22.0
+18.0
 1
 1
 UAVs per swarm
@@ -521,7 +477,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-31.0
+0.0
 0.5
 1
 patches
@@ -551,7 +507,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-11.0
+26.0
 1
 1
 NIL
@@ -602,7 +558,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-36.0
+50.0
 1
 1
 NIL
@@ -617,7 +573,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-3.1
+1.45
 0.05
 1
 degrees
@@ -631,7 +587,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-2
+1
 
 SLIDER
 266
@@ -642,7 +598,7 @@ minimum-separation
 minimum-separation
 0
 5
-1.0
+1.25
 0.25
 1
 patches
@@ -672,7 +628,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-3.3
+5.0
 0.1
 1
 degrees
@@ -707,7 +663,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-3.0
+3.75
 0.25
 1
 degrees
@@ -722,7 +678,7 @@ world-edge-threshold
 world-edge-threshold
 1
 25
-7.0
+10.0
 0.5
 1
 NIL
@@ -737,7 +693,7 @@ max-world-edge-turn
 max-world-edge-turn
 1
 20
-8.5
+15.0
 0.5
 1
 NIL
@@ -792,7 +748,7 @@ symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-6.6
+14.0
 0.1
 1
 degrees
@@ -807,7 +763,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-9.4
+3.5
 0.1
 1
 NIL

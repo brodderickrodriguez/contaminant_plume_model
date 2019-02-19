@@ -29,14 +29,14 @@ class CheckTurtleInsideBounds extends Reporter {
         val uav = Helper.ContextHelper.getAgent(context).asInstanceOf[org.nlogo.agent.Turtle]
         val threshold = Helper.getInput(args, 0).getDoubleValue
         val region = Helper.getInput(args, 1).getList.toArray.map(_.asInstanceOf[Double])
-        CheckBoundsUav.uavInside(context, uav, threshold, region).toLogoObject
+        CheckBoundsUav.uavInside(uav, threshold, region).toLogoObject
     } // perform()
 } // CheckTurtleInsideBounds
 
 
 object CheckBoundsUav {
     // TODO: fix this crap logic
-    def uavInside(context: Context, uav: org.nlogo.agent.Turtle, threshold: Double, region: Array[Double]): Boolean = {
+    def uavInside(uav: org.nlogo.agent.Turtle, threshold: Double, region: Array[Double]): Boolean = {
         val (uavX, uavY) = Helper.TurtleHelper.getTurtleCoors(uav)
         val a = uavX - threshold < region(0)
         val b = uavY - threshold < region(1)
@@ -51,6 +51,6 @@ object CheckBoundsUav {
     def uavInsideWorld(context: Context, uav: org.nlogo.agent.Turtle): Boolean = {
         val threshold = Helper.ContextHelper.getObserverVariable(context, "world-edge-threshold").asInstanceOf[Double]
         val worldRegion = Array(0.0, 0.0, context.world.worldWidth.toDouble, context.world.worldHeight.toDouble)
-        CheckBoundsUav.uavInside(context, uav, threshold, worldRegion)
+        CheckBoundsUav.uavInside(uav, threshold, worldRegion)
     } // uavInsideWorld()
 } // CheckBoundsUav()

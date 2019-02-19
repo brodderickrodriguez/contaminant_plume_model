@@ -7,11 +7,13 @@ package spm.search_algorithms.random_search
 import scala.util.Random
 import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
+import org.nlogo.core.Syntax
+import org.nlogo.core.Syntax.commandSyntax
 import spm.helper.{Helper, MathHelper}
 import spm.uav_behavior.CheckBoundsUav
 
 
-object UavRandomBehavior {
+object _UavRandomSearchBehavior {
     def behave(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
         val randomSearchTime = Helper.BreedHelper.getBreedVariable(uav, "random-search-time").asInstanceOf[Double]
         val ticks = Helper.ContextHelper.getTicks(context)
@@ -26,6 +28,33 @@ object UavRandomBehavior {
         } // if
     } // behave()
 } // UavRandomBehavior()
+
+
+
+class UpdateRandomSearch extends Command {
+    override def getSyntax: Syntax = commandSyntax(right = List())
+    
+    override def perform(args: Array[Argument], context: Context): Unit = {
+        val world = Helper.ContextHelper.getWorld(context)
+        val iter = world.getBreed("UAVS").iterator
+        
+        while (iter.hasNext) {
+            val uav = iter.next().asInstanceOf[org.nlogo.agent.Turtle]
+            spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
+        } // while
+    } // perform()
+} // UpdateRandomSearch
+
+
+
+class UpdateRandomSearchSingleUAV extends Command {
+    override def getSyntax: Syntax = commandSyntax(right = List())
+    
+    override def perform(args: Array[Argument], context: Context): Unit = {
+        val uav = Helper.ContextHelper.getAgent(context).asInstanceOf[org.nlogo.agent.Turtle]
+        spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
+    } // perform()
+} // UpdateRandomSearch
 
 
 
