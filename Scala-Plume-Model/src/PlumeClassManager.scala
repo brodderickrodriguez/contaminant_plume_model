@@ -3,21 +3,18 @@
 // 05 Feb. 2019
 
 import org.nlogo.api._
-<<<<<<< HEAD
 
 import spm._
 import boids.{FindFlockmates, FindBestNeighbor, FindNearestNeighbor}
 import uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds, ComputeHeading}
 import ComputeHeading.GetHeadingTowardsPoint.GetHeadingTowardsPointReporter
 import search_algorithms.{random_search, symmetric_search}
-import random_search.{UpdateRandomSearch, UpdateRandomSearchIndividual}
+import random_search.{UpdateRandomSearch}
 import symmetric_search.{UAVRegionSetup, UavSymmetricSearchPaintSubregions, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
-=======
 import spm.boids._
 import spm.uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds}
 import spm.search_algorithms.random_search.{UpdateRandomSearch, UpdateRandomSearchSingleUAV}
 import spm.search_algorithms.symmetric_search.{UAVRegionSetup, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
->>>>>>> parent of 66428c0... Migrated symmetric search to scala
 
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager) {
@@ -35,25 +32,22 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("uav-inside-bounds", new CheckTurtleInsideBounds)
         manager.addPrimitive("uav-inside-world-bounds", new CheckUavInsideWorldBounds)
         
-<<<<<<< HEAD
         // smp.uav_behavior.ComputeHeading
         manager.addPrimitive("compute-heading-towards-point", new GetHeadingTowardsPointReporter)
         
         // smp.uav_behavior.TurnUav
 //        manager.addPrimitive("turn-uav", new uav_behavior.TurnUav)
         
-=======
->>>>>>> parent of 66428c0... Migrated symmetric search to scala
+
         // spm.search_algorithms.random_search
         manager.addPrimitive("update-random-search", new UpdateRandomSearch)
         manager.addPrimitive("update-random-search-single-uav", new UpdateRandomSearchSingleUAV)
     
         // spm.search_algorithms.symmetric_search
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
-<<<<<<< HEAD
         manager.addPrimitive("paint-subregions", new UavSymmetricSearchPaintSubregions)
-=======
->>>>>>> parent of 66428c0... Migrated symmetric search to scala
+
+
         manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
         manager.addPrimitive("update-symmetric-search-single-uav", new UavUpdateSymmetricSearchIndividual)
     
