@@ -47,7 +47,7 @@ class UpdateRandomSearch extends Command {
 
 
 
-class UpdateRandomSearchIndividual extends Command {
+class UpdateRandomSearchSingleUAV extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())
     
     override def perform(args: Array[Argument], context: Context): Unit = {

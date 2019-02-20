@@ -1,5 +1,0 @@
-to set-random-initial-coor
-  setxy world-edge-threshold world-edge-threshold
-  if round random 2 = 1 [ set xcor world-width - world-edge-threshold ]
-  if round random 2 = 1 [ set ycor world-height - world-edge-threshold ]
-end

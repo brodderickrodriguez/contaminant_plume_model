@@ -10,11 +10,8 @@ import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import spm.helper.Helper
-import spm.search_algorithms.random_search._UavRandomSearchBehavior
-import spm.uav_behavior.{CheckBoundsUav, ComputeHeading}
-
+import spm.uav_behavior.CheckBoundsUav
 import scala.collection.mutable.ListBuffer
-
 
 object _UAVSubregionGenerator {
     object OptimalSubregionDimensionsCompute {
@@ -62,27 +59,31 @@ class UAVRegionSetup extends Command {
             val subregion = regions.head.toLogoList
             Helper.BreedHelper.setBreedVariable(uav, "UAV-region", subregion)
             regions.remove(0)
-        }
+        } // while
+        
     } // perform()
+    
 } // AssignUAVSubregions()
+
+
 
 
 object _UavUpdateSymmetricSearchIndividual {
     def behave(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
         val threshold = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-region-threshold").asInstanceOf[Double]
         val uavRegion = Helper.BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
-        
+
         if (CheckBoundsUav.uavInside(uav, threshold, uavRegion)) {
-            uav.penMode("down")
-            _UavRandomSearchBehavior.behave(context, uav)
+
         } else {
-            uav.penMode("up")
-            val (cx, cy): (Double, Double) = ((uavRegion(2) + uavRegion.head) / 2, (uavRegion(3) + uavRegion(1)) / 2)
-            val desiredHeading = ComputeHeading.GetHeadingTowardsPoint.get(uav, cx, cy)
-            Helper.BreedHelper.setBreedVariable(uav, "desired-heading", desiredHeading.toLogoObject)
+
         }
+        
     } // behave()
+    
 } // _UavUpdateSymmetricSearch
+
+
 
 
 class UavUpdateSymmetricSearchIndividual extends Command {
@@ -91,8 +92,9 @@ class UavUpdateSymmetricSearchIndividual extends Command {
     override def perform(args: Array[Argument], context: Context): Unit = {
         val uav = Helper.ContextHelper.getTurtle(context)
         _UavUpdateSymmetricSearchIndividual.behave(context, uav)
-    }
+    } // perform()
 } // UavUpdateSymmetricSearchIndividual
+
 
 
 class UavUpdateSymmetricSearch extends Command {
@@ -104,6 +106,18 @@ class UavUpdateSymmetricSearch extends Command {
         while (it.hasNext) {
             val uav = it.next().asInstanceOf[org.nlogo.agent.Turtle]
             _UavUpdateSymmetricSearchIndividual.behave(context, uav)
-        }
+        } // while
+        
     } // perform()
 } // UavUpdateSymmetricSearch
+
+
+
+
+
+
+
+
+
+
+

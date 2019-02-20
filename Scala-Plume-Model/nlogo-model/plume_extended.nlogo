@@ -46,13 +46,20 @@ to setup
   define-constants
   set coverage-all []
 
+
+
+
   setup-contaminant-plumes
   setup-UAVs
   setup-swarms
 
+<<<<<<< HEAD
   if global-search-strategy = search-strategy-symmetric [ plume-scala:setup-uav-subregions plume-scala:paint-subregions ]
 
 ;  plume-scala:turn-uav 0
+=======
+  if global-search-strategy = search-strategy-symmetric [ plume-scala:setup-uav-subregions paint-subregions ]
+>>>>>>> parent of 66428c0... Migrated symmetric search to scala
 end
 
 to go
@@ -129,10 +136,16 @@ to setup-UAVs
     set shape "airplane"
 ;    set color blue
     set detection-time 0
-    setxy random-xcor random-ycor
+    set-random-initial-coor
+
   ]
 end
 
+to set-random-initial-coor
+  setxy world-edge-threshold world-edge-threshold
+  if round random 2 = 1 [ set xcor world-width - world-edge-threshold ]
+  if round random 2 = 1 [ set ycor world-height - world-edge-threshold ]
+end
 
 
 to update-UAVs
@@ -141,8 +154,13 @@ to update-UAVs
     let turn-allowed 0
 
     if global-search-strategy = search-strategy-flock [ update-search-strategy-flock  ]
-    if global-search-strategy = search-strategy-random [ plume-scala:update-random-search-single-uav set turn-allowed random-search-max-turn ]
-    if global-search-strategy = search-strategy-symmetric [ plume-scala:update-symmetric-search-single-uav set turn-allowed symmetric-search-max-turn ]
+    if global-search-strategy = search-strategy-random [ plume-scala:update-random-search set turn-allowed random-search-max-turn ]
+    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric set turn-allowed symmetric-search-max-turn ]
+
+
+
+
+   ; plume-scala:update-symmetric-search
 
     turn-UAV turn-allowed
     get-reading
@@ -165,8 +183,12 @@ to turn-UAV [ allowed-turn ]
   [
     let ptx (world-width / 4) + (random (world-width / 2))
     let pty (world-height / 4) + (random (world-height / 2))
-    set desired-heading (plume-scala:compute-heading-towards-point ptx pty)
-    turn-towards desired-heading max-world-edge-turn
+    set desired-heading get-heading-towards-point ptx pty
+
+    let r 1;random 2
+  ;  if r = 0 [set r -1]
+    turn-towards (desired-heading * r) max-world-edge-turn
+
   ] ; else not inside bounds
 end
 
@@ -214,6 +236,35 @@ to update-search-strategy-flock
 end
 
 
+to paint-subregions
+  ask UAVs [
+    let x1 (item 0 UAV-region)
+    let y1 (item 1 UAV-region)
+    let x2 (item 2 UAV-region)
+    let y2 (item 3 UAV-region)
+    let col [color] of self + 4
+    ask patches with [pxcor >= x1 and pxcor <= x2 and pycor >= y1 and pycor <= y2] [ set pcolor col]
+  ]
+end
+
+
+to update-search-strategy-symmetric
+  ifelse plume-scala:uav-inside-bounds symmetric-search-region-threshold UAV-region
+  [
+    pd
+    plume-scala:update-random-search-single-uav
+  ] ; if
+  [
+    let centerx ((item 2 UAV-region) + (item 0 UAV-region)) / 2
+    let centery ((item 3 UAV-region) + (item 1 UAV-region)) / 2
+    let ptx centerx; - (centerx / 4) + (random (centerx / 2))
+    let pty centery; - (centery / 4) + (random (centery / 2))
+    set desired-heading get-heading-towards-point ptx pty
+
+  ] ; else
+end
+
+
 ; -----------------------------------------------------------------------
 ; -- original plume model procedures --
 ; -----------------------------------------------------------------------
@@ -255,6 +306,11 @@ to-report average-heading-towards-flockmates
   let x-component [ sin (towards myself + 180) ] of best-neighbor
   let y-component [ cos (towards myself + 180) ] of best-neighbor
   ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
+end
+
+
+to-report get-heading-towards-point [ x y ]
+  report (atan  (xcor - x)  (ycor - y)) - 180
 end
 
 to turn-towards [ new-heading max-turn ]
@@ -528,7 +584,11 @@ random-search-max-turn
 random-search-max-turn
 0
 5
+<<<<<<< HEAD
 1.9
+=======
+1.45
+>>>>>>> parent of 66428c0... Migrated symmetric search to scala
 0.05
 1
 degrees
@@ -633,7 +693,11 @@ world-edge-threshold
 world-edge-threshold
 1
 25
+<<<<<<< HEAD
 13.5
+=======
+10.0
+>>>>>>> parent of 66428c0... Migrated symmetric search to scala
 0.5
 1
 NIL
@@ -718,7 +782,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-0.0
+3.5
 0.1
 1
 NIL
