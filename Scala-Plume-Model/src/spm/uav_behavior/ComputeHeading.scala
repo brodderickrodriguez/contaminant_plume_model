@@ -11,13 +11,21 @@ import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import spm.helper.Helper
 
+
 object ComputeHeading {
     
     object GetHeadingTowardsPoint {
         def get(uav: org.nlogo.agent.Turtle, x: Double, y: Double): Double = {
             val (xcor, ycor) = Helper.TurtleHelper.getTurtleCoors(uav)
             val (dx, dy) = (xcor - x, ycor - y)
-            (math.atan2(dx, dy) - 180).toDegrees
+            if (dx == 0)
+                if (dy > 0) 180 else 360
+            else if (dy == 0)
+                if (dx > 0) 270 else 90
+            else
+                (StrictMath.toDegrees(StrictMath.atan2(dx, dy)) % 360) + 180
+    
+
         } // getHeadingTowardsPoint()
     
         class GetHeadingTowardsPointReporter extends Reporter {
@@ -28,6 +36,10 @@ object ComputeHeading {
                 val argy = Helper.getInput(args, 1).getDoubleValue
                 val uav = Helper.ContextHelper.getTurtle(context)
                 get(uav, argx, argy).toLogoObject
+    
+    
+              
+//                validDouble(StrictMath.toDegrees(StrictMath.atan2(1, 1)) + 360, context) % 360
             }
         } // getHeadingTowardsPointReporter
     } // getHeadingTowardsPoint

@@ -51,11 +51,7 @@ to setup
   setup-UAVs
   setup-swarms
 
-
-  if global-search-strategy = search-strategy-flock [ setup-search-strategy-flock ]
-  if global-search-strategy = search-strategy-random [ setup-search-strategy-random ]
   if global-search-strategy = search-strategy-symmetric [ setup-search-strategy-symmetric ]
-
 end
 
 to go
@@ -68,10 +64,9 @@ end
 
 to calc-coverage
   if ticks > coverage-data-decay [ repeat population [ set coverage-all butfirst coverage-all ] ]
-  set coverage-std standard-deviation coverage-all
+  ;set coverage-std standard-deviation coverage-all
   set coverage-mean mean coverage-all
 end
-
 
 ; --------------------------------------------------------------------------------
 ; -- start contaminant plume procedures --
@@ -136,16 +131,55 @@ to setup-UAVs
 end
 
 to update-UAVs
-  ask UAVs [
-    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]
-    if global-search-strategy = search-strategy-random [ update-search-strategy-random ]
-    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric ]
+;  if global-search-strategy = search-strategy-random [ update-search-strategy-random]
 
-    check-world-bounds
+  if global-search-strategy = search-strategy-random [
+    plume-scala:update-random-search
+    ask UAVs [ turn-UAV random-search-max-turn ]
+  ]
+
+  ask UAVs [
+    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]; turn-UAV 0 ]
+    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric turn-UAV symmetric-search-max-turn ]
+
+
     get-reading
     fd 0.5
   ]
 end
+
+
+to turn-UAV [ turn-allowed ]
+  ifelse plume-scala:uav-inside-world-bounds [
+    turn-towards desired-heading turn-allowed
+  ]
+  [
+    let ptx (world-width / 4) + (random (world-width / 2))
+    let pty (world-height / 4) + (random (world-height / 2))
+    set desired-heading plume-scala:compute-heading-towards-point ptx pty
+    turn-towards desired-heading max-world-edge-turn
+  ] ; if
+
+end
+
+
+
+
+
+
+
+
+
+to update-search-strategy-random
+  ask UAVs [
+    if ticks > random-search-time [
+      set random-search-time ticks + random random-search-max-heading-time
+      set desired-heading random 360
+    ] ; if ticks > random-time-for-heading
+    turn-UAV random-search-max-turn
+  ]
+end
+
 
 to get-reading
   ; puts measurement on coverage array
@@ -154,14 +188,9 @@ to get-reading
   set plume-reading plume-density
 end
 
-to check-world-bounds
-  if not UAV-inside-world-bounds-threashold [
-    let ptx (world-width / 4) + (random (world-width / 2))
-    let pty (world-height / 4) + (random (world-height / 2))
-    let new-heading get-heading-towards-point ptx pty
-    turn-towards new-heading max-world-edge-turn
-  ] ; if
-end
+
+
+
 
 to-report UAV-inside-world-bounds-threashold
   report turtle-inside-bounds world-edge-threshold (list 0 0 world-width world-height)
@@ -178,12 +207,7 @@ end
 ; -- swarm procedures --
 ; --------------------------------------------------------------------------------
 to setup-swarms
-  create-swarms 1 [
-    hide-turtle
-
-    set mean-detection-time 0
-    set first-detection-time 0
-  ] ; create-swarms
+  create-swarms 1 [ hide-turtle ]
 end
 
 to update-swarms
@@ -216,12 +240,6 @@ end
 ; --------------------------------------------------------------------------------
 ; -- search strategy procedures --
 ; --------------------------------------------------------------------------------
-; -----------------------------------------------------------------------
-; -- search-strategy-default procedures --
-; -----------------------------------------------------------------------
-to setup-search-strategy-flock
-end
-
 to update-search-strategy-flock
   find-flockmates
   if any? flockmates [
@@ -233,23 +251,8 @@ to update-search-strategy-flock
   ] ; if any? flockmates
 end
 
-; -----------------------------------------------------------------------
-; -- search-strategy-random procedures --
-; -----------------------------------------------------------------------
-to setup-search-strategy-random
-end
 
-to update-search-strategy-random
-  ask UAVs [
-    ; if duration to go straight in is over
-    if ticks > random-search-time [
-      set random-search-time ticks + random random-search-max-heading-time
-      set desired-heading random 360
-    ] ; if ticks > random-time-for-heading
-    ; ease the UAV into the turn
-    if heading != desired-heading and UAV-inside-world-bounds-threashold [ turn-towards desired-heading random-search-max-turn ]
-  ] ; ask UAVs
-end
+
 
 ; -----------------------------------------------------------------------
 ; -- search-strategy-symmetric procedures --
@@ -310,14 +313,6 @@ to update-search-strategy-symmetric
   ] ; if UAV-inside-world-bounds-threashold
 end
 
-; -----------------------------------------------------------------------
-; -- search-strategy-asymmetric procedures --
-; -----------------------------------------------------------------------
-to setup-search-strategy-asymmetric
-end
-
-to update-search-strategy-asymmetric
-end
 
 to find-flockmates
   set flockmates other UAVs in-radius UAV-vision
@@ -325,8 +320,6 @@ end
 
 to find-best-neighbor
   set best-neighbor max-one-of flockmates [ plume-reading ]
-  ;if plume-reading > 0 [ set best-neighbor self ]
-  ;if [ plume-reading ] of best-neighbor < plume-reading [ set best-neighbor self ]
 end
 
 to find-nearest-neighbor
@@ -368,9 +361,7 @@ to-report is-prime [ n ]
   report True
 end
 
-to-report get-heading-towards-point [ x y ]
-  report (atan (xcor - x) (ycor - y)) - 180
-end
+
 
 to-report pythagorean [ a b ]
   report sqrt (a ^ 2 + b ^ 2)
@@ -386,7 +377,33 @@ end
 
 to turn-at-most [ turn max-turn ]
   ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
+
+
 end
+
+
+
+
+
+
+
+
+
+to-report get-heading-towards-point [ x y ]
+
+  report (atan (xcor - x) (ycor - y)) - 180
+end
+
+
+
+;to check-world-bounds
+;  if not UAV-inside-world-bounds-threashold [
+;    let ptx (world-width / 4) + (random (world-width / 2))
+;    let pty (world-height / 4) + (random (world-height / 2))
+;    set desired-heading get-heading-towards-point ptx pty
+;    turn-towards desired-heading max-world-edge-turn
+;  ] ; if
+;end
 @#$#@#$#@
 GRAPHICS-WINDOW
 253
@@ -456,7 +473,7 @@ population
 population
 0
 100
-12.0
+13.0
 1
 1
 UAVs per swarm
@@ -551,7 +568,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-188.0
+0.0
 0.5
 1
 patches
@@ -581,7 +598,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-1.0
+0.0
 1
 1
 NIL
@@ -632,7 +649,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-10.0
+47.0
 1
 1
 NIL
@@ -647,7 +664,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-2.0
+3.5
 0.05
 1
 degrees
@@ -660,8 +677,8 @@ CHOOSER
 629
 global-search-strategy
 global-search-strategy
-"search-strategy-default" "search-strategy-random" "search-strategy-symmetric"
-2
+"search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
+1
 
 SLIDER
 266
@@ -672,7 +689,7 @@ minimum-separation
 minimum-separation
 0
 5
-5.0
+0.0
 0.25
 1
 patches
@@ -702,7 +719,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-4.5
+0.0
 0.1
 1
 degrees
@@ -737,7 +754,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-2.25
+0.0
 0.25
 1
 degrees
@@ -752,7 +769,7 @@ world-edge-threshold
 world-edge-threshold
 0
 25
-9.5
+25.0
 0.5
 1
 NIL
@@ -767,7 +784,7 @@ max-world-edge-turn
 max-world-edge-turn
 0
 20
-7.0
+20.0
 0.5
 1
 NIL
@@ -822,7 +839,7 @@ symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-20.0
+0.0
 0.1
 1
 degrees
@@ -837,7 +854,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-1.0
+0.0
 0.1
 1
 NIL

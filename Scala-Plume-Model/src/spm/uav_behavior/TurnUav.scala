@@ -22,9 +22,18 @@ import spm.search_algorithms.random_search._UavRandomSearchBehavior
 import scala.collection.mutable.ListBuffer
 
 
-class TurnUav extends Command {
+object TurnUav {
+    def go(): Unit = {
+    
+    }
+}
+
+
+class TurnUavReporter extends Command {
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(NumberType), ret = ListType)
     
     override def perform(args: Array[Argument], context: Context): Unit = {
+        val turnAllowed = Helper.getInput(args, 0).asInstanceOf[Double]
+        
     } // perform()
 } // UavUpdateSymmetricSearch

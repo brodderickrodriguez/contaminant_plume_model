@@ -1,6 +1,11 @@
 
 package spm.boids
 
+
+// Brodderick Rodriguez
+// Auburn University - CSSE
+// 19 Feb. 2019
+
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import org.nlogo.api._
