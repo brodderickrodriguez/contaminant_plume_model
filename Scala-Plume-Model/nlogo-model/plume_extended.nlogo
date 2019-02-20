@@ -12,7 +12,7 @@
 ; Acknowledgements
 ; Copyright 1998 Uri Wilensky.
 ; See Info tab for full copyright and license.
-; Some of this program is barrowed from Uri Wilensky's Netlogo flocking progam
+; Approximately X% of this program is barrowed from Uri Wilensky's Netlogo flocking progam
 ; The Netlogo flocking program is based on Reynold's 1987 BOIDS program
 ; Alex Madey March 2013
 
@@ -26,6 +26,7 @@ breed [ UAVs UAV ]
 breed [ swarms swarm ]
 
 patches-own [ plume-density ]
+
 contaminant-plumes-own [ plume-spead-radius plume-spread-patches ]
 
 swarms-own [ first-detection-time mean-detection-time ]
@@ -50,7 +51,11 @@ to setup
   setup-UAVs
   setup-swarms
 
-  if global-search-strategy = search-strategy-symmetric [ plume-scala:setup-uav-subregions plume-scala:paint-subregions ]
+
+  if global-search-strategy = search-strategy-flock [ setup-search-strategy-flock ]
+  if global-search-strategy = search-strategy-random [ setup-search-strategy-random ]
+  if global-search-strategy = search-strategy-symmetric [ setup-search-strategy-symmetric ]
+
 end
 
 to go
@@ -81,7 +86,7 @@ to setup-contaminant-plumes
   let plumey-range world-height / 2.0
 
   ; plume spread in patches
-  let psp (sqrt (world-width ^ 2 + world-height ^ 2)) * (plume-spread-radius / 2)
+  let psp (pythagorean world-width world-height) * plume-spread-radius / 2
 
   create-contaminant-plumes number-plumes [
     set shape "circle"
@@ -122,32 +127,25 @@ end
 ; --------------------------------------------------------------------------------
 to setup-UAVs
   create-UAVs population [
-    set my-swarm nobody
     set size 3
-    set shape "airplane"
-;    set color blue
+    ;set shape "airplane"
     set detection-time 0
     setxy random-xcor random-ycor
+    pd
   ]
 end
 
-
-
 to update-UAVs
   ask UAVs [
+    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]
+    if global-search-strategy = search-strategy-random [ update-search-strategy-random ]
+    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric ]
 
-    let turn-allowed 0
-
-    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock  ]
-    if global-search-strategy = search-strategy-random [ plume-scala:update-random-search-single-uav set turn-allowed random-search-max-turn ]
-    if global-search-strategy = search-strategy-symmetric [ plume-scala:update-symmetric-search-single-uav set turn-allowed symmetric-search-max-turn ]
-
-    turn-UAV turn-allowed
+    check-world-bounds
     get-reading
     fd 0.5
   ]
 end
-
 
 to get-reading
   ; puts measurement on coverage array
@@ -156,30 +154,43 @@ to get-reading
   set plume-reading plume-density
 end
 
-to turn-UAV [ allowed-turn ]
-  ifelse plume-scala:uav-inside-world-bounds [
-    turn-towards desired-heading allowed-turn
-  ] ; if inside bounds
-  [
+to check-world-bounds
+  if not UAV-inside-world-bounds-threashold [
     let ptx (world-width / 4) + (random (world-width / 2))
     let pty (world-height / 4) + (random (world-height / 2))
-    set desired-heading (plume-scala:compute-heading-towards-point ptx pty)
-    turn-towards desired-heading max-world-edge-turn
-  ] ; else not inside bounds
+    let new-heading get-heading-towards-point ptx pty
+    turn-towards new-heading max-world-edge-turn
+  ] ; if
 end
+
+to-report UAV-inside-world-bounds-threashold
+  report turtle-inside-bounds world-edge-threshold (list 0 0 world-width world-height)
+end
+
+to-report turtle-inside-bounds [ threshhold region ]
+  report not ((xcor - threshhold < (item 0 region)) or (ycor - threshhold < (item 1 region)) or
+             (abs (xcor + threshhold) > (item 2 region)) or (abs (ycor + threshhold) > (item 3 region)))
+end
+
+
 
 ; --------------------------------------------------------------------------------
 ; -- swarm procedures --
 ; --------------------------------------------------------------------------------
 to setup-swarms
   create-swarms 1 [
-    ht
+    hide-turtle
+
     set mean-detection-time 0
     set first-detection-time 0
   ] ; create-swarms
 end
 
 to update-swarms
+  update-swarm-detection-times
+end
+
+to update-swarm-detection-times
   ask swarms [
     if mean-detection-time = 0 [
       let temp-first-detection-time first-detection-time
@@ -202,25 +213,120 @@ to update-swarms
   ] ; ask swarms
 end
 
+; --------------------------------------------------------------------------------
+; -- search strategy procedures --
+; --------------------------------------------------------------------------------
+; -----------------------------------------------------------------------
+; -- search-strategy-default procedures --
+; -----------------------------------------------------------------------
+to setup-search-strategy-flock
+end
+
 to update-search-strategy-flock
   find-flockmates
   if any? flockmates [
     find-best-neighbor
     find-nearest-neighbor
-    ifelse distance nearest-neighbor < minimum-separation [ separate ] [ align cohere ]
+    ifelse distance nearest-neighbor < minimum-separation
+    [ separate ]
+    [ align cohere ]
   ] ; if any? flockmates
 end
 
+; -----------------------------------------------------------------------
+; -- search-strategy-random procedures --
+; -----------------------------------------------------------------------
+to setup-search-strategy-random
+end
+
+to update-search-strategy-random
+  ask UAVs [
+    ; if duration to go straight in is over
+    if ticks > random-search-time [
+      set random-search-time ticks + random random-search-max-heading-time
+      set desired-heading random 360
+    ] ; if ticks > random-time-for-heading
+    ; ease the UAV into the turn
+    if heading != desired-heading and UAV-inside-world-bounds-threashold [ turn-towards desired-heading random-search-max-turn ]
+  ] ; ask UAVs
+end
 
 ; -----------------------------------------------------------------------
-; -- original plume model procedures --
+; -- search-strategy-symmetric procedures --
 ; -----------------------------------------------------------------------
+to setup-search-strategy-symmetric
+  let nu population
+  if is-prime nu [ set nu nu + 1 ]
+  let x 0
+  let y 0
+  let configuration get-optimal-subregion-dimensions nu
+  let region-width ceiling (world-width / (item 0 configuration))
+  let region-height ceiling (world-height / (item 1 configuration))
+
+  while [ x < world-width ] [
+    while [ y < world-height ] [
+      let current-UAV one-of UAVs with [ UAV-region = 0 ]
+      ask current-UAV [
+        set desired-heading -1
+
+        set UAV-region (list x y (x + region-width) (y + region-height))
+        ;setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
+        ;ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor pcolor + [ color ] of myself ]
+      ]
+      set y y + region-height
+    ] ; while [ y < world-height ]
+    set y 0
+    set x x + region-width
+  ] ; while [ x < world-width ]
+
+end
+
+to-report get-optimal-subregion-dimensions [ n ]
+  let optimal (list 1 1 n)
+  let y 1
+  while [ y <= (n / 2) ] [
+    if n mod y = 0 [
+      let x n / y
+      let cost abs(x - y)
+      if cost < item 2 optimal [ set optimal (list x y cost) ]
+    ] ; if UAVs mod h = 0
+    set y y + 1
+  ] ; while [ y < (n / 2) ]
+  report optimal
+end
+
+to update-search-strategy-symmetric
+  if UAV-inside-world-bounds-threashold [
+    if not turtle-inside-bounds symmetric-search-region-threshold UAV-region [
+      ;if symmetric-search-heading = -1 [
+        let centerx ((item 2 UAV-region) + (item 0 UAV-region)) / 2
+        let centery ((item 3 UAV-region) + (item 1 UAV-region)) / 2
+        let ptx centerx - (centerx / 4) + (random (centerx / 2))
+        let pty centery - (centery / 4) + (random (centery / 2))
+        set desired-heading get-heading-towards-point ptx pty
+      ;] ; if symmetric-search-heading = -1
+      turn-towards desired-heading symmetric-search-max-turn
+    ]
+  ] ; if UAV-inside-world-bounds-threashold
+end
+
+; -----------------------------------------------------------------------
+; -- search-strategy-asymmetric procedures --
+; -----------------------------------------------------------------------
+to setup-search-strategy-asymmetric
+end
+
+to update-search-strategy-asymmetric
+end
+
 to find-flockmates
   set flockmates other UAVs in-radius UAV-vision
 end
 
 to find-best-neighbor
   set best-neighbor max-one-of flockmates [ plume-reading ]
+  ;if plume-reading > 0 [ set best-neighbor self ]
+  ;if [ plume-reading ] of best-neighbor < plume-reading [ set best-neighbor self ]
 end
 
 to find-nearest-neighbor
@@ -253,6 +359,21 @@ to-report average-heading-towards-flockmates
   let x-component [ sin (towards myself + 180) ] of best-neighbor
   let y-component [ cos (towards myself + 180) ] of best-neighbor
   ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
+end
+
+; HELPER PROCEDURES
+to-report is-prime [ n ]
+  let i 2
+  while [ i <= (n / 2)] [ if n mod i = 0 [ report False ] set i i + 1 ]
+  report True
+end
+
+to-report get-heading-towards-point [ x y ]
+  report (atan (xcor - x) (ycor - y)) - 180
+end
+
+to-report pythagorean [ a b ]
+  report sqrt (a ^ 2 + b ^ 2)
 end
 
 to turn-towards [ new-heading max-turn ]
@@ -313,9 +434,9 @@ NIL
 
 SLIDER
 17
-228
+231
 241
-261
+264
 plume-spread-radius
 plume-spread-radius
 0
@@ -333,9 +454,9 @@ SLIDER
 122
 population
 population
-2
+0
 100
-10.0
+12.0
 1
 1
 UAVs per swarm
@@ -360,9 +481,9 @@ NIL
 
 SLIDER
 17
-188
+191
 241
-221
+224
 number-plumes
 number-plumes
 0
@@ -375,9 +496,9 @@ HORIZONTAL
 
 SLIDER
 18
-304
+307
 241
-337
+340
 wind-speed
 wind-speed
 0
@@ -390,9 +511,9 @@ HORIZONTAL
 
 SLIDER
 17
-342
+345
 241
-375
+378
 wind-heading
 wind-heading
 0
@@ -430,7 +551,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-0.0
+188.0
 0.5
 1
 patches
@@ -438,9 +559,9 @@ HORIZONTAL
 
 SLIDER
 17
-267
+270
 244
-300
+303
 plume-decay-rate
 plume-decay-rate
 0
@@ -452,15 +573,15 @@ p/t
 HORIZONTAL
 
 SLIDER
-18
-403
-241
-436
+17
+410
+240
+443
 coverage-data-decay
 coverage-data-decay
 1
 60
-26.0
+1.0
 1
 1
 NIL
@@ -511,7 +632,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-50.0
+10.0
 1
 1
 NIL
@@ -526,20 +647,20 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-3.3
+2.0
 0.05
 1
 degrees
 HORIZONTAL
 
 CHOOSER
-18
-541
-249
-586
+19
+584
+250
+629
 global-search-strategy
 global-search-strategy
-"search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
+"search-strategy-default" "search-strategy-random" "search-strategy-symmetric"
 2
 
 SLIDER
@@ -551,7 +672,7 @@ minimum-separation
 minimum-separation
 0
 5
-1.25
+5.0
 0.25
 1
 patches
@@ -566,7 +687,7 @@ max-align-turn
 max-align-turn
 0
 20
-1.75
+0.0
 0.25
 1
 degrees
@@ -581,7 +702,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-5.0
+4.5
 0.1
 1
 degrees
@@ -592,7 +713,7 @@ TEXTBOX
 538
 441
 558
-search-strategy-flock
+search-strategy-default
 11
 0.0
 1
@@ -616,37 +737,37 @@ max-separate-turn
 max-separate-turn
 0
 20
-3.75
+2.25
 0.25
 1
 degrees
 HORIZONTAL
 
 SLIDER
-18
-441
-241
-474
+17
+448
+240
+481
 world-edge-threshold
 world-edge-threshold
-1
+0
 25
-5.5
+9.5
 0.5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-19
-478
-240
-511
+18
+485
+239
+518
 max-world-edge-turn
 max-world-edge-turn
-1
+0
 20
-15.0
+7.0
 0.5
 1
 NIL
@@ -664,29 +785,29 @@ UAVs & Swarms
 
 TEXTBOX
 20
-168
+171
 170
-186
+189
 Contaminant Plumes
 11
 0.0
 1
 
 TEXTBOX
-19
-386
-169
-404
+18
+393
+168
+411
 Misc.
 11
 0.0
 1
 
 TEXTBOX
-24
-522
-211
-550
+25
+565
+212
+593
 UAV Behavior & Search Strategy
 11
 0.0
@@ -694,14 +815,14 @@ UAV Behavior & Search Strategy
 
 SLIDER
 761
-564
+565
 1011
-597
+598
 symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-14.0
+20.0
 0.1
 1
 degrees
@@ -716,7 +837,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-0.0
+1.0
 0.1
 1
 NIL
