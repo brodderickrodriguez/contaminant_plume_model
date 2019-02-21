@@ -376,7 +376,10 @@ to turn-away [ new-heading max-turn ]
 end
 
 to turn-at-most [ turn max-turn ]
-  ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
+;  ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
+
+  plume-scala:turn-at-most turn max-turn
+
 
 
 end
@@ -473,7 +476,7 @@ population
 population
 0
 100
-13.0
+2.0
 1
 1
 UAVs per swarm
@@ -649,7 +652,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-47.0
+52.0
 1
 1
 NIL
@@ -664,7 +667,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-3.5
+2.0
 0.05
 1
 degrees

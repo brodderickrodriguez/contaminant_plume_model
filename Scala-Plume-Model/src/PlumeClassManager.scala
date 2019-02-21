@@ -27,6 +27,7 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("find-flockmates", new FindFlockmates)
         manager.addPrimitive("find-best-neighbor", new FindBestNeighbor)
         manager.addPrimitive("find-nearest-neighbor", new FindNearestNeighbor)
+        manager.addPrimitive("turn-at-most", new TurnAtMostReporter)
         
         // smp.uav_behavior
         manager.addPrimitive("uav-inside-bounds", new CheckTurtleInsideBounds)

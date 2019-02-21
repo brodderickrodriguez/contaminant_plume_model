@@ -12,9 +12,17 @@ import org.nlogo.agent.AgentSetBuilder
 import spm.helper.{Helper, MathHelper}
 
 
-
-
-
-class TurnTowards {
+object TurnTowards {
+    def go(): Unit = {
     
+    }
+}
+
+
+class TurnTowardsReporter extends Reporter {
+    override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(NumberType), ret = ListType)
+    
+    override def report(args: Array[Argument], context: Context): AnyRef = {
+        0.toLogoObject
+    }
 }

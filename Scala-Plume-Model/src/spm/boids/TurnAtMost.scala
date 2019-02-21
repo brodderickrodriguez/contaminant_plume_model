@@ -1,7 +1,6 @@
 
 package spm.boids
 
-
 // Brodderick Rodriguez
 // Auburn University - CSSE
 // 19 Feb. 2019
@@ -9,33 +8,28 @@ package spm.boids
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import org.nlogo.api._
-import org.nlogo.api.ScalaConversions._
-import org.nlogo.agent.AgentSetBuilder
-import spm.helper.{Helper, MathHelper}
+import spm.helper.Helper
 
 
-
-class TurnAtMost extends Command {
-    override def getSyntax: Syntax = commandSyntax(right = List(NumberType, NumberType))
-    
-    override def perform(args: Array[Argument], context: Context): Unit = {
-        val requestedTurn = Math.abs(Helper.getInput(args, 0).asInstanceOf[Double])
-        val maxTurnAllowed = Helper.getInput(args, 1).asInstanceOf[Double]
-        //val UAV = Helper.ContextHelper.getAgent(context)
-        //val currentHeading = Helper.TurtleHelper.getTurtleVariable()
-        //var thisTurn = 0
-        
-        if (requestedTurn > maxTurnAllowed) {
-        
-        } else {
-        
-        }
-        
-        
-    } // perform()
-    
+object TurnAtMost {
+    def go(uav: org.nlogo.agent.Turtle, requestedTurn: Double, maxTurnAllowed: Double): Unit = {
+        if (requestedTurn > maxTurnAllowed)
+            if (requestedTurn > 0) uav.turnRight(-maxTurnAllowed)
+            else uav.turnRight(-maxTurnAllowed)
+        else uav.turnRight(-requestedTurn)
+    } // go()
 } // TurnAtMost
 
 
-
-
+class TurnAtMostReporter extends Command {
+    override def getSyntax: Syntax = commandSyntax(right = List(NumberType, NumberType))
+    
+    override def perform(args: Array[Argument], context: Context): Unit = {
+        val uav = Helper.ContextHelper.getTurtle(context).asInstanceOf[org.nlogo.agent.Turtle]
+        val requestedTurn = Math.abs(Helper.getInput(args, 0).getDoubleValue)
+        val maxTurnAllowed = Helper.getInput(args, 1).getDoubleValue
+        
+        TurnAtMost.go(uav, requestedTurn, maxTurnAllowed)
+    } // perform()
+    
+} // TurnAtMostReporter
