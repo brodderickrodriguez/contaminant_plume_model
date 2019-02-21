@@ -131,52 +131,14 @@ to setup-UAVs
 end
 
 to update-UAVs
-;  if global-search-strategy = search-strategy-random [ update-search-strategy-random]
-
-  if global-search-strategy = search-strategy-random [
-    plume-scala:update-random-search
-    ask UAVs [ turn-UAV random-search-max-turn ]
-  ]
+  if global-search-strategy = search-strategy-random [ plume-scala:update-random-search ]
 
   ask UAVs [
     if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]; turn-UAV 0 ]
+;      if global-search-strategy = search-strategy-random [ update-search-strategy-random]
     if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric turn-UAV symmetric-search-max-turn ]
-
-
     get-reading
     fd 0.5
-  ]
-end
-
-
-to turn-UAV [ turn-allowed ]
-  ifelse plume-scala:uav-inside-world-bounds [
-    turn-towards desired-heading turn-allowed
-  ]
-  [
-    let ptx (world-width / 4) + (random (world-width / 2))
-    let pty (world-height / 4) + (random (world-height / 2))
-    set desired-heading plume-scala:compute-heading-towards-point ptx pty
-    turn-towards desired-heading max-world-edge-turn
-  ] ; if
-
-end
-
-
-
-
-
-
-
-
-
-to update-search-strategy-random
-  ask UAVs [
-    if ticks > random-search-time [
-      set random-search-time ticks + random random-search-max-heading-time
-      set desired-heading random 360
-    ] ; if ticks > random-time-for-heading
-    turn-UAV random-search-max-turn
   ]
 end
 
@@ -189,9 +151,6 @@ to get-reading
 end
 
 
-
-
-
 to-report UAV-inside-world-bounds-threashold
   report turtle-inside-bounds world-edge-threshold (list 0 0 world-width world-height)
 end
@@ -200,7 +159,6 @@ to-report turtle-inside-bounds [ threshhold region ]
   report not ((xcor - threshhold < (item 0 region)) or (ycor - threshhold < (item 1 region)) or
              (abs (xcor + threshhold) > (item 2 region)) or (abs (ycor + threshhold) > (item 3 region)))
 end
-
 
 
 ; --------------------------------------------------------------------------------
@@ -250,9 +208,6 @@ to update-search-strategy-flock
     [ align cohere ]
   ] ; if any? flockmates
 end
-
-
-
 
 ; -----------------------------------------------------------------------
 ; -- search-strategy-symmetric procedures --
@@ -362,15 +317,12 @@ to-report is-prime [ n ]
 end
 
 
-
 to-report pythagorean [ a b ]
   report sqrt (a ^ 2 + b ^ 2)
 end
 
 to turn-towards [ new-heading max-turn ]
-
-  plume-scala:turn-at-most (subtract-headings new-heading heading) max-turn
- ; turn-at-most (subtract-headings new-heading heading) max-turn
+  turn-at-most (subtract-headings new-heading heading) max-turn
 end
 
 to turn-away [ new-heading max-turn ]
@@ -378,12 +330,7 @@ to turn-away [ new-heading max-turn ]
 end
 
 to turn-at-most [ turn max-turn ]
-  ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
-
-
-
-
-
+  plume-scala:turn-at-most turn max-turn
 end
 
 
@@ -395,10 +342,36 @@ end
 
 
 to-report get-heading-towards-point [ x y ]
-
   report (atan (xcor - x) (ycor - y)) - 180
 end
 
+
+;to update-search-strategy-random
+;  ask UAVs [
+;    if ticks > random-search-time [
+;      set random-search-time ticks + random random-search-max-heading-time
+;      set desired-heading random 360
+;    ] ; if ticks > random-time-for-heading
+;    turn-UAV random-search-max-turn
+;  ]
+;end
+
+
+to turn-UAV [ turn-allowed ]
+  ifelse plume-scala:uav-inside-world-bounds [
+    turn-towards desired-heading turn-allowed
+  ]
+  [
+    let ptx (world-width / 4) + (random (world-width / 2))
+    let pty (world-height / 4) + (random (world-height / 2))
+    set desired-heading get-heading-towards-point ptx pty
+    turn-towards desired-heading max-world-edge-turn
+  ] ; if
+end
+
+;to turn-at-most [ turn max-turn ]
+;  ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
+;end
 
 
 ;to check-world-bounds
@@ -478,7 +451,7 @@ population
 population
 0
 100
-2.0
+9.0
 1
 1
 UAVs per swarm
@@ -654,7 +627,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-52.0
+23.0
 1
 1
 NIL
@@ -669,7 +642,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-1.4
+2.95
 0.05
 1
 degrees
@@ -774,7 +747,7 @@ world-edge-threshold
 world-edge-threshold
 0
 25
-25.0
+7.0
 0.5
 1
 NIL
@@ -789,7 +762,7 @@ max-world-edge-turn
 max-world-edge-turn
 0
 20
-20.0
+6.5
 0.5
 1
 NIL

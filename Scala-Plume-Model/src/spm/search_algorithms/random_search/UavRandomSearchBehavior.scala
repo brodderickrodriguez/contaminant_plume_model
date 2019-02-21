@@ -9,8 +9,8 @@ import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.commandSyntax
+
 import spm.helper.{Helper, MathHelper}
-import spm.uav_behavior.CheckBoundsUav
 
 
 object _UavRandomSearchBehavior {
@@ -18,7 +18,7 @@ object _UavRandomSearchBehavior {
         val randomSearchTime = Helper.BreedHelper.getBreedVariable(uav, "random-search-time").asInstanceOf[Double]
         val ticks = Helper.ContextHelper.getTicks(context)
         
-        if (CheckBoundsUav.uavInsideWorld(context, uav) && ticks > randomSearchTime) {
+        if (ticks > randomSearchTime) {
             val randomSearchMaxHeadingTime = Helper.ContextHelper.getObserverVariable(context, "random-search-max-heading-time").asInstanceOf[Double]
             val newSearchTime = Random.nextInt(randomSearchMaxHeadingTime.toInt) + ticks
             val newHeading = Random.nextInt(360) * MathHelper.random1()
@@ -30,17 +30,18 @@ object _UavRandomSearchBehavior {
 } // UavRandomBehavior()
 
 
-
 class UpdateRandomSearch extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())
     
     override def perform(args: Array[Argument], context: Context): Unit = {
         val world = Helper.ContextHelper.getWorld(context)
+        val maxTurn = Helper.ContextHelper.getObserverVariable(context, "random-search-max-turn").asInstanceOf[Double]
         val iter = world.getBreed("UAVS").iterator
         
         while (iter.hasNext) {
             val uav = iter.next().asInstanceOf[org.nlogo.agent.Turtle]
             spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
+            spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
         } // while
     } // perform()
 } // UpdateRandomSearch
@@ -55,6 +56,3 @@ class UpdateRandomSearchSingleUAV extends Command {
         spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
     } // perform()
 } // UpdateRandomSearch
-
-
-

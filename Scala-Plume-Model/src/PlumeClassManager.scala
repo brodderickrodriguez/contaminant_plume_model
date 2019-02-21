@@ -7,9 +7,9 @@ import org.nlogo.api._
 import spm._
 import boids.{FindFlockmates, FindBestNeighbor, FindNearestNeighbor}
 import uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds, ComputeHeading}
-import ComputeHeading.GetHeadingTowardsPoint.GetHeadingTowardsPointReporter
+import uav_behavior.GetHeadingTowardsPointReporter
 import search_algorithms.{random_search, symmetric_search}
-import random_search.{UpdateRandomSearch}
+
 import symmetric_search.{UAVRegionSetup, UavSymmetricSearchPaintSubregions, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
 import spm.boids._
 import spm.uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds}
@@ -28,6 +28,7 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("find-best-neighbor", new FindBestNeighbor)
         manager.addPrimitive("find-nearest-neighbor", new FindNearestNeighbor)
         manager.addPrimitive("turn-at-most", new TurnAtMostReporter)
+        manager.addPrimitive("turn-towards", new TurnTowardsReporter)
         
         // smp.uav_behavior
         manager.addPrimitive("uav-inside-bounds", new CheckTurtleInsideBounds)
@@ -37,7 +38,7 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("compute-heading-towards-point", new GetHeadingTowardsPointReporter)
         
         // smp.uav_behavior.TurnUav
-//        manager.addPrimitive("turn-uav", new uav_behavior.TurnUav)
+        manager.addPrimitive("turn-uav", new uav_behavior.TurnUavReporter)
         
 
         // spm.search_algorithms.random_search

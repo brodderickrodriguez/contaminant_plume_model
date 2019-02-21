@@ -7,22 +7,29 @@ package spm.boids
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import org.nlogo.api._
-import org.nlogo.api.ScalaConversions._
-import org.nlogo.agent.AgentSetBuilder
-import spm.helper.{Helper, MathHelper}
+
+import spm.helper.Helper
 
 
 object TurnTowards {
-    def go(): Unit = {
-    
-    }
-}
+    def go(uav: org.nlogo.agent.Turtle, newHeading: Double, maxTurn: Double): Unit = {
+        val currentHeading = Helper.TurtleHelper.getTurtleVariable(uav, "heading").asInstanceOf[Double]
+        val computedHeading = org.nlogo.agent.Turtle.subtractHeadings(currentHeading, newHeading)
+        
+        TurnAtMost.go(uav, computedHeading, maxTurn)
+    } // go()
+} // TurnTowards
 
 
-class TurnTowardsReporter extends Reporter {
-    override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(NumberType), ret = ListType)
+class TurnTowardsReporter extends Command {
+    override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(NumberType, NumberType), ret = ListType)
     
-    override def report(args: Array[Argument], context: Context): AnyRef = {
-        0.toLogoObject
-    }
-}
+    override def perform(args: Array[Argument], context: Context): Unit = {
+        val uav = Helper.ContextHelper.getTurtle(context)
+        val newHeading = Helper.getInput(args, 0).getDoubleValue
+        val maxTurn = Helper.getInput(args, 1).getDoubleValue
+    
+        TurnTowards.go(uav, newHeading, maxTurn)
+    } // perform()
+
+} // TurnTowardsReporter
