@@ -81,7 +81,7 @@ to setup-contaminant-plumes
   let plumey-range world-height / 2.0
 
   ; plume spread in patches
-  let psp (pythagorean world-width world-height) * plume-spread-radius / 2
+  let psp (sqrt world-width ^ 2 + world-height ^ 2) * plume-spread-radius / 2
 
   create-contaminant-plumes number-plumes [
     set shape "circle"
@@ -133,18 +133,12 @@ end
 
 to update-UAVs
   if global-search-strategy = search-strategy-random [ plume-scala:update-random-search ]
+  if global-search-strategy = search-strategy-symmetric [ plume-scala:update-symmetric-search ]
 
   ask UAVs [
-    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]; turn-UAV 0 ]
-;      if global-search-strategy = search-strategy-random [ update-search-strategy-random]
+    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]
+;    if global-search-strategy = search-strategy-random [ update-search-strategy-random]
 ;    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric  ]
-
-    if global-search-strategy = search-strategy-symmetric [
-    plume-scala:update-symmetric-search-single-uav
-;      update-search-strategy-symmetric
-;      plume-scala:turn-uav symmetric-search-max-turn
-;    turn-UAV symmetric-search-max-turn
-    ]
 
     get-reading
     fd 0.5
@@ -153,9 +147,7 @@ end
 
 
 to get-reading
-  ; puts measurement on coverage array
   set coverage-all lput plume-reading coverage-all
-  ; stores most recent measurement
   set plume-reading plume-density
 end
 
@@ -163,6 +155,7 @@ end
 to-report UAV-inside-world-bounds-threashold
   report turtle-inside-bounds world-edge-threshold (list 0 0 world-width world-height)
 end
+
 
 to-report turtle-inside-bounds [ threshhold region ]
   report not ((xcor - threshhold < (item 0 region)) or (ycor - threshhold < (item 1 region)) or
@@ -214,22 +207,6 @@ to update-search-strategy-flock
   ] ; if any? flockmates
 end
 
-; -----------------------------------------------------------------------
-; -- search-strategy-symmetric procedures --
-; -----------------------------------------------------------------------
-
-
-
-
-to update-search-strategy-symmetric
-  if not turtle-inside-bounds symmetric-search-region-threshold UAV-region [
-      let centerx ((item 2 UAV-region) + (item 0 UAV-region)) / 2
-      let centery ((item 3 UAV-region) + (item 1 UAV-region)) / 2
-      let ptx centerx - (centerx / 4) + (random (centerx / 2))
-      let pty centery - (centery / 4) + (random (centery / 2))
-      set desired-heading get-heading-towards-point ptx pty
-  ]
-end
 
 
 to find-flockmates
@@ -272,17 +249,6 @@ to-report average-heading-towards-flockmates
   ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
 end
 
-; HELPER PROCEDURES
-to-report is-prime [ n ]
-  let i 2
-  while [ i <= (n / 2)] [ if n mod i = 0 [ report False ] set i i + 1 ]
-  report True
-end
-
-
-to-report pythagorean [ a b ]
-  report sqrt (a ^ 2 + b ^ 2)
-end
 
 to turn-towards [ new-heading max-turn ]
   turn-at-most (subtract-headings new-heading heading) max-turn
@@ -295,98 +261,6 @@ end
 to turn-at-most [ turn max-turn ]
   plume-scala:turn-at-most turn max-turn
 end
-
-
-
-
-
-
-
-
-
-to-report get-heading-towards-point [ x y ]
-  report (atan (xcor - x) (ycor - y)) - 180
-end
-
-
-;to update-search-strategy-random
-;  ask UAVs [
-;    if ticks > random-search-time [
-;      set random-search-time ticks + random random-search-max-heading-time
-;      set desired-heading random 360
-;    ] ; if ticks > random-time-for-heading
-;    turn-UAV random-search-max-turn
-;  ]
-;end
-
-
-to turn-UAV [ turn-allowed ]
-  ifelse plume-scala:uav-inside-world-bounds [
-    turn-towards desired-heading turn-allowed
-  ]
-  [
-    let ptx (world-width / 4) + (random (world-width / 2))
-    let pty (world-height / 4) + (random (world-height / 2))
-    set desired-heading get-heading-towards-point ptx pty
-    turn-towards desired-heading max-world-edge-turn
-  ] ; if
-end
-
-;to turn-at-most [ turn max-turn ]
-;  ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
-;end
-
-
-;to check-world-bounds
-;  if not UAV-inside-world-bounds-threashold [
-;    let ptx (world-width / 4) + (random (world-width / 2))
-;    let pty (world-height / 4) + (random (world-height / 2))
-;    set desired-heading get-heading-towards-point ptx pty
-;    turn-towards desired-heading max-world-edge-turn
-;  ] ; if
-;end
-
-
-;to-report get-optimal-subregion-dimensions [ n ]
-;  let optimal (list 1 1 n)
-;  let y 1
-;  while [ y <= (n / 2) ] [
-;    if n mod y = 0 [
-;      let x n / y
-;      let cost abs(x - y)
-;      if cost < item 2 optimal [ set optimal (list x y cost) ]
-;    ] ; if UAVs mod h = 0
-;    set y y + 1
-;  ] ; while [ y < (n / 2) ]
-;  report optimal
-;end
-;
-;to setup-search-strategy-symmetric
-;  let nu population
-;  if is-prime nu [ set nu nu + 1 ]
-;  let x 0
-;  let y 0
-;  let configuration get-optimal-subregion-dimensions nu
-;  let region-width ceiling (world-width / (item 0 configuration))
-;  let region-height ceiling (world-height / (item 1 configuration))
-;
-;  while [ x < world-width ] [
-;    while [ y < world-height ] [
-;      let current-UAV one-of UAVs with [ UAV-region = 0 ]
-;      ask current-UAV [
-;        set desired-heading -1
-;
-;        set UAV-region (list x y (x + region-width) (y + region-height))
-;        ;setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
-;        ;ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor pcolor + [ color ] of myself ]
-;      ]
-;      set y y + region-height
-;    ] ; while [ y < world-height ]
-;    set y 0
-;    set x x + region-width
-;  ] ; while [ x < world-width ]
-;
-;end
 @#$#@#$#@
 GRAPHICS-WINDOW
 253
@@ -456,7 +330,7 @@ population
 population
 0
 100
-2.0
+10.0
 1
 1
 UAVs per swarm
@@ -752,7 +626,7 @@ world-edge-threshold
 world-edge-threshold
 0
 25
-15.5
+0.0
 0.5
 1
 NIL
