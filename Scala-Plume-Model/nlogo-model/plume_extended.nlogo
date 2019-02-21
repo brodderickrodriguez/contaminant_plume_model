@@ -63,6 +63,11 @@ to go
 end
 
 to calc-coverage
+  ask UAVs [
+    set coverage-all lput plume-reading coverage-all
+    set plume-reading plume-density
+  ]
+
   if ticks > coverage-data-decay [ repeat population [ set coverage-all butfirst coverage-all ] ]
   ;set coverage-std standard-deviation coverage-all
   set coverage-mean mean coverage-all
@@ -72,26 +77,8 @@ end
 ; -- start contaminant plume procedures --
 ; --------------------------------------------------------------------------------
 to setup-contaminant-plumes
-  ; set a lower bound to where the plume can spawn
-  let min-plume-xrange world-width * 0.25
-  let min-plume-yrange world-height * 0.25
-
-  ; set the acceptable range where the plume can spawn
-  let plumex-range world-width / 2.0
-  let plumey-range world-height / 2.0
-
-  ; plume spread in patches
-  let psp (sqrt world-width ^ 2 + world-height ^ 2) * plume-spread-radius / 2
-
-  create-contaminant-plumes number-plumes [
-    set shape "circle"
-    ;set color red
-    ht
-    set plume-spread-patches psp
-    set size plume-spread-patches * 2
-    setxy (random-float 1 * plumex-range) + min-plume-xrange (random-float 1 * plumey-range) + min-plume-yrange
-    set-plume-patch-density
-  ]
+  create-contaminant-plumes number-plumes
+  plume-scala:setup-contaminant-plumes
 end
 
 to update-contaminant-plumes
@@ -124,7 +111,7 @@ end
 to setup-UAVs
   create-UAVs population [
     set size 3
-    ;set shape "airplane"
+    set shape "airplane"
     set detection-time 0
     setxy random-xcor random-ycor
     pd
@@ -137,35 +124,11 @@ to update-UAVs
 
   ask UAVs [
     if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]
-;    if global-search-strategy = search-strategy-random [ update-search-strategy-random]
-;    if global-search-strategy = search-strategy-symmetric [ update-search-strategy-symmetric  ]
-
-    get-reading
     fd 0.5
   ]
 end
 
 
-to get-reading
-  set coverage-all lput plume-reading coverage-all
-  set plume-reading plume-density
-end
-
-
-to-report UAV-inside-world-bounds-threashold
-  report turtle-inside-bounds world-edge-threshold (list 0 0 world-width world-height)
-end
-
-
-to-report turtle-inside-bounds [ threshhold region ]
-  report not ((xcor - threshhold < (item 0 region)) or (ycor - threshhold < (item 1 region)) or
-             (abs (xcor + threshhold) > (item 2 region)) or (abs (ycor + threshhold) > (item 3 region)))
-end
-
-
-; --------------------------------------------------------------------------------
-; -- swarm procedures --
-; --------------------------------------------------------------------------------
 to setup-swarms
   create-swarms 1 [ hide-turtle ]
 end
@@ -193,9 +156,7 @@ to update-swarms
   ] ; ask swarms
 end
 
-; --------------------------------------------------------------------------------
-; -- search strategy procedures --
-; --------------------------------------------------------------------------------
+
 to update-search-strategy-flock
   find-flockmates
   if any? flockmates [
@@ -251,7 +212,8 @@ end
 
 
 to turn-towards [ new-heading max-turn ]
-  turn-at-most (subtract-headings new-heading heading) max-turn
+;  turn-at-most (subtract-headings new-heading heading) max-turn
+  plume-scala:turn-towards new-heading max-turn
 end
 
 to turn-away [ new-heading max-turn ]
@@ -315,7 +277,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.5
+0.31
 0.01
 1
 percent
@@ -362,7 +324,7 @@ number-plumes
 number-plumes
 0
 5
-0.0
+2.0
 1
 1
 NIL
@@ -440,7 +402,7 @@ plume-decay-rate
 plume-decay-rate
 0
 0.0001
-0.0
+1.0E-4
 0.00000000001
 1
 p/t
@@ -535,7 +497,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-2
+0
 
 SLIDER
 266

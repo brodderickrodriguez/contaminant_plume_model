@@ -41,5 +41,10 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
         manager.addPrimitive("update-symmetric-search-single-uav", new UavUpdateSymmetricSearchIndividual)
         
+        
+        
+        // spm.environment_behavior
+        manager.addPrimitive("setup-contaminant-plumes", new environment_behavior.SetupContaminantPlumes)
+        
     } // load()
 } // PlumeClassManager

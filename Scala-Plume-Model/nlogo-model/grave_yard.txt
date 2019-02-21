@@ -102,3 +102,42 @@
 ;      set desired-heading get-heading-towards-point ptx pty
 ;  ]
 ;end
+
+
+
+
+to-report UAV-inside-world-bounds-threashold
+  report turtle-inside-bounds world-edge-threshold (list 0 0 world-width world-height)
+end
+
+
+to-report turtle-inside-bounds [ threshhold region ]
+  report not ((xcor - threshhold < (item 0 region)) or (ycor - threshhold < (item 1 region)) or
+             (abs (xcor + threshhold) > (item 2 region)) or (abs (ycor + threshhold) > (item 3 region)))
+end
+
+
+
+to setup-contaminant-plumes
+
+;  ; set a lower bound to where the plume can spawn
+;  let min-plume-xrange world-width * 0.25
+;  let min-plume-yrange world-height * 0.25
+;
+;  ; set the acceptable range where the plume can spawn
+;  let plumex-range world-width / 2.0
+;  let plumey-range world-height / 2.0
+;
+;  ; plume spread in patches
+;  let psp world-width * (plume-spread-radius / 2)
+;
+;  create-contaminant-plumes number-plumes [
+;    set shape "circle"
+;    ;set color red
+;    ht
+;    set plume-spread-patches psp
+;    set size plume-spread-patches * 2
+;    setxy (random-float 1 * plumex-range) + min-plume-xrange (random-float 1 * plumey-range) + min-plume-yrange
+;    set-plume-patch-density
+;  ]
+end
