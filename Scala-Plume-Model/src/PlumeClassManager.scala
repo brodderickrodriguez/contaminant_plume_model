@@ -5,23 +5,14 @@
 import org.nlogo.api._
 
 import spm._
-import boids.{FindFlockmates, FindBestNeighbor, FindNearestNeighbor}
-import uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds, ComputeHeading}
-import uav_behavior.GetHeadingTowardsPointReporter
-import search_algorithms.{random_search, symmetric_search}
+import boids._
+import uav_behavior._
+import search_algorithms.random_search._
+import search_algorithms.symmetric_search._
 
-import symmetric_search.{UAVRegionSetup, UavSymmetricSearchPaintSubregions, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
-import spm.boids._
-import spm.uav_behavior.{CheckTurtleInsideBounds, CheckUavInsideWorldBounds}
-import spm.search_algorithms.random_search.{UpdateRandomSearch, UpdateRandomSearchSingleUAV}
-import spm.search_algorithms.symmetric_search.{UAVRegionSetup, UavUpdateSymmetricSearch, UavUpdateSymmetricSearchIndividual}
 
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager) {
-//        manager.addPrimitive("report-numbers", new TestReporter)
-//        manager.addPrimitive("calc-coverage",  new CalculateCoverage)
-//        manager.addPrimitive("is-prime", new spm.IsPrime)
-//        manager.addPrimitive("pythagorean", new spm.Pythagorean)
         
         // spm.boids
         manager.addPrimitive("find-flockmates", new FindFlockmates)
@@ -40,7 +31,6 @@ class PlumeClassManager extends DefaultClassManager {
         // smp.uav_behavior.TurnUav
         manager.addPrimitive("turn-uav", new uav_behavior.TurnUavReporter)
         
-
         // spm.search_algorithms.random_search
         manager.addPrimitive("update-random-search", new UpdateRandomSearch)
         manager.addPrimitive("update-random-search-single-uav", new UpdateRandomSearchSingleUAV)
@@ -48,11 +38,8 @@ class PlumeClassManager extends DefaultClassManager {
         // spm.search_algorithms.symmetric_search
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
         manager.addPrimitive("paint-subregions", new UavSymmetricSearchPaintSubregions)
-
-
         manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
         manager.addPrimitive("update-symmetric-search-single-uav", new UavUpdateSymmetricSearchIndividual)
-    
         
     } // load()
 } // PlumeClassManager

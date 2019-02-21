@@ -4,14 +4,16 @@ package spm.search_algorithms.symmetric_search
 // Auburn University - CSSE
 // 05 Feb. 2019
 
+import scala.collection.mutable.ListBuffer
 import org.nlogo.core.LogoList
 import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
+import spm.boids.TurnTowards
 import spm.helper.Helper
-import spm.uav_behavior.CheckBoundsUav
-import scala.collection.mutable.ListBuffer
+import spm.uav_behavior.{CheckBoundsUav, ComputeHeading}
+
 
 object _UAVSubregionGenerator {
     object OptimalSubregionDimensionsCompute {
@@ -60,64 +62,56 @@ class UAVRegionSetup extends Command {
             Helper.BreedHelper.setBreedVariable(uav, "UAV-region", subregion)
             regions.remove(0)
         } // while
-        
     } // perform()
     
 } // AssignUAVSubregions()
-
-
 
 
 object _UavUpdateSymmetricSearchIndividual {
     def behave(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
         val threshold = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-region-threshold").asInstanceOf[Double]
         val uavRegion = Helper.BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
-
-        if (CheckBoundsUav.uavInside(uav, threshold, uavRegion)) {
-
-        } else {
-
+        val maxTurn = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-max-turn").asInstanceOf[Double]
+    
+        if (CheckBoundsUav.uavInsideWorld(context, uav)) {
+            if (!spm.uav_behavior.CheckBoundsUav.uavInside(uav, threshold, uavRegion)) {
+                val (regionCenterX, regionCenterY) = ((uavRegion(2) + uavRegion.head) / 2, (uavRegion(3) + uavRegion(1)) / 2)
+                val newDesiredHeading = ComputeHeading.get(uav, regionCenterX, regionCenterY) - 180
+        
+                Helper.BreedHelper.setBreedVariable(uav, "desired-heading", newDesiredHeading.toLogoObject)
+            } else
+                spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
         }
         
+        spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
     } // behave()
-    
 } // _UavUpdateSymmetricSearch
-
-
 
 
 class UavUpdateSymmetricSearchIndividual extends Command {
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
     
     override def perform(args: Array[Argument], context: Context): Unit = {
+        val maxTurn = Helper.ContextHelper.getObserverVariable(context,"symmetric-search-max-turn").asInstanceOf[Double]
         val uav = Helper.ContextHelper.getTurtle(context)
         _UavUpdateSymmetricSearchIndividual.behave(context, uav)
+//        spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
     } // perform()
 } // UavUpdateSymmetricSearchIndividual
-
 
 
 class UavUpdateSymmetricSearch extends Command {
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
     
     override def perform(args: Array[Argument], context: Context): Unit = {
+        val maxTurn = Helper.ContextHelper.getObserverVariable(context,"symmetric-search-max-turn").asInstanceOf[Double]
         val it = Helper.ContextHelper.getWorld(context).getBreed("UAVS").iterator
         
         while (it.hasNext) {
             val uav = it.next().asInstanceOf[org.nlogo.agent.Turtle]
             _UavUpdateSymmetricSearchIndividual.behave(context, uav)
+//            spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
         } // while
         
     } // perform()
 } // UavUpdateSymmetricSearch
-
-
-
-
-
-
-
-
-
-
-

@@ -52,7 +52,9 @@ class UpdateRandomSearchSingleUAV extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())
     
     override def perform(args: Array[Argument], context: Context): Unit = {
+        val maxTurn = Helper.ContextHelper.getObserverVariable(context, "random-search-max-turn").asInstanceOf[Double]
         val uav = Helper.ContextHelper.getAgent(context).asInstanceOf[org.nlogo.agent.Turtle]
         spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
+        spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
     } // perform()
 } // UpdateRandomSearch

@@ -25,6 +25,7 @@ object TurnUav {
         } else {
             val ptx = (context.world.worldWidth / 4) + Random.nextInt(context.world.worldWidth / 2)
             val pty = (context.world.worldHeight / 4) + Random.nextInt(context.world.worldHeight / 2)
+            
             val newDesiredHeading = ComputeHeading.get(uav, ptx, pty) - 180
             val worldThreshold = Helper.ContextHelper.getObserverVariable(context, "max-world-edge-turn").asInstanceOf[Double]
             

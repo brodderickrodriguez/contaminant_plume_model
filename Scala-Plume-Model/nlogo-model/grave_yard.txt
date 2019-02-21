@@ -1,0 +1,104 @@
+;to-report get-heading-towards-point [ x y ]
+;  report (atan (xcor - x) (ycor - y)) - 180
+;end
+
+
+;to update-search-strategy-random
+;  ask UAVs [
+;    if ticks > random-search-time [
+;      set random-search-time ticks + random random-search-max-heading-time
+;      set desired-heading random 360
+;    ] ; if ticks > random-time-for-heading
+;    turn-UAV random-search-max-turn
+;  ]
+;end
+
+
+;to turn-UAV [ turn-allowed ]
+;  ifelse plume-scala:uav-inside-world-bounds [
+;    turn-towards desired-heading turn-allowed
+;  ]
+;  [
+;    let ptx (world-width / 4) + (random (world-width / 2))
+;    let pty (world-height / 4) + (random (world-height / 2))
+;    set desired-heading get-heading-towards-point ptx pty
+;    turn-towards desired-heading max-world-edge-turn
+;  ] ; if
+;end
+
+; HELPER PROCEDURES
+;to-report is-prime [ n ]
+;  let i 2
+;  while [ i <= (n / 2)] [ if n mod i = 0 [ report False ] set i i + 1 ]
+;  report True
+;end
+
+;to turn-at-most [ turn max-turn ]
+;  ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
+;end
+
+
+;to check-world-bounds
+;  if not UAV-inside-world-bounds-threashold [
+;    let ptx (world-width / 4) + (random (world-width / 2))
+;    let pty (world-height / 4) + (random (world-height / 2))
+;    set desired-heading get-heading-towards-point ptx pty
+;    turn-towards desired-heading max-world-edge-turn
+;  ] ; if
+;end
+
+
+;to-report get-optimal-subregion-dimensions [ n ]
+;  let optimal (list 1 1 n)
+;  let y 1
+;  while [ y <= (n / 2) ] [
+;    if n mod y = 0 [
+;      let x n / y
+;      let cost abs(x - y)
+;      if cost < item 2 optimal [ set optimal (list x y cost) ]
+;    ] ; if UAVs mod h = 0
+;    set y y + 1
+;  ] ; while [ y < (n / 2) ]
+;  report optimal
+;end
+;
+;to setup-search-strategy-symmetric
+;  let nu population
+;  if is-prime nu [ set nu nu + 1 ]
+;  let x 0
+;  let y 0
+;  let configuration get-optimal-subregion-dimensions nu
+;  let region-width ceiling (world-width / (item 0 configuration))
+;  let region-height ceiling (world-height / (item 1 configuration))
+;
+;  while [ x < world-width ] [
+;    while [ y < world-height ] [
+;      let current-UAV one-of UAVs with [ UAV-region = 0 ]
+;      ask current-UAV [
+;        set desired-heading -1
+;
+;        set UAV-region (list x y (x + region-width) (y + region-height))
+;        ;setxy (x + region-width / 2) - 1 (y + region-height / 2) - 1
+;        ;ask patches with [pxcor >= x and pxcor < x + region-width and pycor >= y and pycor < y + region-height] [ set pcolor pcolor + [ color ] of myself ]
+;      ]
+;      set y y + region-height
+;    ] ; while [ y < world-height ]
+;    set y 0
+;    set x x + region-width
+;  ] ; while [ x < world-width ]
+;
+;end
+
+;to-report pythagorean [ a b ]
+;  report sqrt (a ^ 2 + b ^ 2)
+;end
+
+;to update-search-strategy-symmetric
+;  if not turtle-inside-bounds symmetric-search-region-threshold UAV-region [
+;      let centerx ((item 2 UAV-region) + (item 0 UAV-region)) / 2
+;      let centery ((item 3 UAV-region) + (item 1 UAV-region)) / 2
+;      let ptx centerx - (centerx / 4) + (random (centerx / 2))
+;      let pty centery - (centery / 4) + (random (centery / 2))
+;      set desired-heading get-heading-towards-point ptx pty
+;  ]
+;end
