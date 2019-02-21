@@ -368,7 +368,9 @@ to-report pythagorean [ a b ]
 end
 
 to turn-towards [ new-heading max-turn ]
-  turn-at-most (subtract-headings new-heading heading) max-turn
+
+  plume-scala:turn-at-most (subtract-headings new-heading heading) max-turn
+ ; turn-at-most (subtract-headings new-heading heading) max-turn
 end
 
 to turn-away [ new-heading max-turn ]
@@ -376,9 +378,9 @@ to turn-away [ new-heading max-turn ]
 end
 
 to turn-at-most [ turn max-turn ]
-;  ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
+  ifelse abs turn > max-turn [ ifelse turn > 0 [ rt max-turn ] [ lt max-turn ] ] [ rt turn ]
 
-  plume-scala:turn-at-most turn max-turn
+
 
 
 
@@ -667,7 +669,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-2.0
+1.4
 0.05
 1
 degrees
