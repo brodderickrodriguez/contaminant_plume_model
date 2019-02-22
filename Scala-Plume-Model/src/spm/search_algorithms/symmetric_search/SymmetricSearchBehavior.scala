@@ -20,15 +20,14 @@ object UavUpdateSymmetricSearchRegionTime {
         val maxRegionTime = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-max-region-time").asInstanceOf[Double]
         val minRegionTime = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-min-region-time").asInstanceOf[Double]
         val ticks = Helper.ContextHelper.getTicks(context)
-        val range = math.abs(maxRegionTime).toInt
-        var newRegionTime = scala.util.Random.nextInt(range) + ticks
-        
-        if (newRegionTime > minRegionTime) newRegionTime = minRegionTime
+        val range = math.abs(maxRegionTime - minRegionTime).toInt
+        var newRegionTime = scala.util.Random.nextInt(range) + ticks + minRegionTime
+        if (newRegionTime < minRegionTime) newRegionTime = minRegionTime
         
         Helper.BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", 0.toLogoObject)
         Helper.BreedHelper.setBreedVariable(uav, "symmetric-search-region-time", newRegionTime.toLogoObject)
     }
-}
+} // UavUpdateSymmetricSearchRegionTime
 
 object MoveRegionsAccordingToWeather {
     def go(context: Context): Unit = {
@@ -137,10 +136,11 @@ object _UavUpdateSymmetricSearchIndividual {
                         }
                     } // while
     
-                    PaintRegionOfUAV.go(context, uav, true)
-                    val flockmateRegion = Helper.BreedHelper.getBreedVariable(bestNeighbor, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
-                    Helper.BreedHelper.setBreedVariable(uav, "UAV-region", flockmateRegion.toLogoList)
-    
+                    if (bestReading > regionReading) {
+                        PaintRegionOfUAV.go(context, uav, true)
+                        val flockmateRegion = Helper.BreedHelper.getBreedVariable(bestNeighbor, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
+                        Helper.BreedHelper.setBreedVariable(uav, "UAV-region", flockmateRegion.toLogoList)
+                    }
                 } // if flockmates
             } // if regionReading > 0
             

@@ -35,7 +35,6 @@ UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading my-swarm dete
            random-search-time UAV-region desired-heading
            symmetric-search-max-reading-region symmetric-search-region-time ]
 
-
 to setup
   clear-all
   reset-ticks
@@ -68,15 +67,11 @@ to calc-coverage
     set coverage-all lput plume-reading coverage-all
     set plume-reading plume-density
   ]
-
   if ticks > coverage-data-decay [ repeat population [ set coverage-all butfirst coverage-all ] ]
   ;set coverage-std standard-deviation coverage-all
   set coverage-mean mean coverage-all
 end
 
-; --------------------------------------------------------------------------------
-; -- start contaminant plume procedures --
-; --------------------------------------------------------------------------------
 to setup-contaminant-plumes
   create-contaminant-plumes number-plumes
   plume-scala:setup-contaminant-plumes
@@ -111,9 +106,6 @@ to set-plume-patch-density
   ]
 end
 
-; --------------------------------------------------------------------------------
-; -- start UAV procedures --
-; --------------------------------------------------------------------------------
 to setup-UAVs
   create-UAVs population [
     set size 3
@@ -132,7 +124,6 @@ to update-UAVs
     fd 0.5
   ]
 end
-
 
 to setup-swarms
   create-swarms 1 [ hide-turtle ]
@@ -160,7 +151,6 @@ to update-swarms
     ] ; mean-detection-time = 0
   ] ; ask swarms
 end
-
 
 to update-search-strategy-flock
   find-flockmates
@@ -294,7 +284,7 @@ population
 population
 0
 100
-18.0
+2.0
 1
 1
 UAVs per swarm
@@ -326,7 +316,7 @@ number-plumes
 number-plumes
 0
 5
-2.0
+1.0
 1
 1
 NIL
@@ -389,7 +379,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-47.0
+196.0
 0.5
 1
 patches
@@ -590,7 +580,7 @@ world-edge-threshold
 world-edge-threshold
 0
 25
-19.0
+4.0
 0.5
 1
 NIL
@@ -605,7 +595,7 @@ max-world-edge-turn
 max-world-edge-turn
 0
 20
-5.5
+20.0
 0.5
 1
 NIL
@@ -700,7 +690,7 @@ symmetric-search-min-region-time
 symmetric-search-min-region-time
 1
 1000
-1000.0
+414.0
 1
 1
 NIL
@@ -714,8 +704,8 @@ SLIDER
 symmetric-search-max-region-time
 symmetric-search-max-region-time
 100
-10000
-100.0
+5000
+1248.0
 1
 1
 NIL
