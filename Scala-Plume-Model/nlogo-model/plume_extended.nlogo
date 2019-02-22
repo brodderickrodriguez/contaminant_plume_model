@@ -32,7 +32,8 @@ contaminant-plumes-own [ plume-spead-radius plume-spread-patches ]
 swarms-own [ first-detection-time mean-detection-time ]
 
 UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading my-swarm detection-time
-           random-search-time UAV-region desired-heading ]
+           random-search-time UAV-region desired-heading
+           symmetric-search-max-reading-region symmetric-search-region-time ]
 
 
 to setup
@@ -77,8 +78,29 @@ end
 ; -- start contaminant plume procedures --
 ; --------------------------------------------------------------------------------
 to setup-contaminant-plumes
-  create-contaminant-plumes number-plumes
-  plume-scala:setup-contaminant-plumes
+  ; set a lower bound to where the plume can spawn
+  let min-plume-xrange world-width * 0.25
+  let min-plume-yrange world-height * 0.25
+
+  ; set the acceptable range where the plume can spawn
+  let plumex-range world-width / 2.0
+  let plumey-range world-height / 2.0
+
+  ; plume spread in patches
+  let psp (pythagorean world-width world-height) * plume-spread-radius / 2
+
+  create-contaminant-plumes number-plumes [
+    set shape "circle"
+    set color red
+    set plume-spread-patches psp
+    set size plume-spread-patches * 2
+    setxy (random-float 1 * plumex-range) + min-plume-xrange (random-float 1 * plumey-range) + min-plume-yrange
+    set-plume-patch-density
+  ]
+end
+
+to-report pythagorean [ a b ]
+  report sqrt (a ^ 2 + b ^ 2)
 end
 
 to update-contaminant-plumes
@@ -114,7 +136,6 @@ to setup-UAVs
     set shape "airplane"
     set detection-time 0
     setxy random-xcor random-ycor
-    pd
   ]
 end
 
@@ -168,8 +189,6 @@ to update-search-strategy-flock
   ] ; if any? flockmates
 end
 
-
-
 to find-flockmates
   set flockmates other UAVs in-radius UAV-vision
 end
@@ -210,10 +229,9 @@ to-report average-heading-towards-flockmates
   ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
 end
 
-
 to turn-towards [ new-heading max-turn ]
-;  turn-at-most (subtract-headings new-heading heading) max-turn
-  plume-scala:turn-towards new-heading max-turn
+  turn-at-most (subtract-headings new-heading heading) max-turn
+;  plume-scala:turn-towards new-heading max-turn
 end
 
 to turn-away [ new-heading max-turn ]
@@ -277,7 +295,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.31
+0.25
 0.01
 1
 percent
@@ -292,7 +310,7 @@ population
 population
 0
 100
-10.0
+18.0
 1
 1
 UAVs per swarm
@@ -339,7 +357,7 @@ wind-speed
 wind-speed
 0
 0.1
-0.0
+0.1
 0.0001
 1
 NIL
@@ -354,7 +372,7 @@ wind-heading
 wind-heading
 0
 360
-0.0
+50.0
 1
 1
 degrees
@@ -387,7 +405,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-196.0
+47.0
 0.5
 1
 patches
@@ -402,7 +420,7 @@ plume-decay-rate
 plume-decay-rate
 0
 0.0001
-1.0E-4
+1.0E-11
 0.00000000001
 1
 p/t
@@ -417,7 +435,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-0.0
+12.0
 1
 1
 NIL
@@ -468,7 +486,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-23.0
+38.0
 1
 1
 NIL
@@ -483,21 +501,21 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-2.95
+1.05
 0.05
 1
 degrees
 HORIZONTAL
 
 CHOOSER
-19
-584
-250
-629
+18
+555
+249
+600
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-0
+2
 
 SLIDER
 266
@@ -508,7 +526,7 @@ minimum-separation
 minimum-separation
 0
 5
-0.5
+1.75
 0.25
 1
 patches
@@ -538,7 +556,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-3.4
+0.0
 0.1
 1
 degrees
@@ -573,7 +591,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-3.25
+0.0
 0.25
 1
 degrees
@@ -588,7 +606,7 @@ world-edge-threshold
 world-edge-threshold
 0
 25
-0.0
+19.0
 0.5
 1
 NIL
@@ -603,7 +621,7 @@ max-world-edge-turn
 max-world-edge-turn
 0
 20
-10.5
+5.5
 0.5
 1
 NIL
@@ -640,10 +658,10 @@ Misc.
 1
 
 TEXTBOX
-25
-565
-212
-593
+24
+536
+211
+564
 UAV Behavior & Search Strategy
 11
 0.0
@@ -673,7 +691,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-6.8
+2.8
 0.1
 1
 NIL
@@ -688,6 +706,36 @@ search-strategy-symmetric
 11
 0.0
 1
+
+SLIDER
+759
+643
+1011
+676
+symmetric-search-min-region-time
+symmetric-search-min-region-time
+1
+1000
+355.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+758
+680
+1012
+713
+symmetric-search-max-region-time
+symmetric-search-max-region-time
+100
+10000
+1177.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
