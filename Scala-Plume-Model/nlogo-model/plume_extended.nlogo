@@ -78,25 +78,9 @@ end
 ; -- start contaminant plume procedures --
 ; --------------------------------------------------------------------------------
 to setup-contaminant-plumes
-  ; set a lower bound to where the plume can spawn
-  let min-plume-xrange world-width * 0.25
-  let min-plume-yrange world-height * 0.25
-
-  ; set the acceptable range where the plume can spawn
-  let plumex-range world-width / 2.0
-  let plumey-range world-height / 2.0
-
-  ; plume spread in patches
-  let psp (pythagorean world-width world-height) * plume-spread-radius / 2
-
-  create-contaminant-plumes number-plumes [
-    set shape "circle"
-    set color red
-    set plume-spread-patches psp
-    set size plume-spread-patches * 2
-    setxy (random-float 1 * plumex-range) + min-plume-xrange (random-float 1 * plumey-range) + min-plume-yrange
-    set-plume-patch-density
-  ]
+  create-contaminant-plumes number-plumes
+  plume-scala:setup-contaminant-plumes
+  update-contaminant-plumes
 end
 
 to-report pythagorean [ a b ]
@@ -357,7 +341,7 @@ wind-speed
 wind-speed
 0
 0.1
-0.1
+0.0
 0.0001
 1
 NIL
@@ -372,7 +356,7 @@ wind-heading
 wind-heading
 0
 360
-50.0
+0.0
 1
 1
 degrees
@@ -716,7 +700,7 @@ symmetric-search-min-region-time
 symmetric-search-min-region-time
 1
 1000
-355.0
+1000.0
 1
 1
 NIL
@@ -731,7 +715,7 @@ symmetric-search-max-region-time
 symmetric-search-max-region-time
 100
 10000
-1177.0
+100.0
 1
 1
 NIL

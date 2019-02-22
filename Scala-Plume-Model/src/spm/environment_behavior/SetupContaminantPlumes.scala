@@ -6,23 +6,12 @@ package spm.environment_behavior
 
 import scala.util.Random
 
-import org.nlogo.core.Syntax.ListType
 import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 
 import spm.helper.Helper
-import spm.boids._
-
-
-object SetContaminantPlumePatchDensity {
-    def set(context: Context, plume: org.nlogo.agent.Turtle): Unit = {
-    
-    } // set()
-} // SetContaminantPlumePatchDensity
-
-
 
 class SetupContaminantPlumes  extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())
@@ -47,7 +36,6 @@ class SetupContaminantPlumes  extends Command {
             Helper.TurtleHelper.setTurtleVariable(plume, "xcor", x.toLogoObject)
             Helper.TurtleHelper.setTurtleVariable(plume, "ycor", y.toLogoObject)
             Helper.BreedHelper.setBreedVariable(plume, "plume-spread-patches", plumeSpreadPatches.toLogoObject)
-            SetContaminantPlumePatchDensity.set(context, plume)
         }
     } // perform()
     

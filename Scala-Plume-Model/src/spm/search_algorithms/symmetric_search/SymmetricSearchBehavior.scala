@@ -12,14 +12,19 @@ import org.nlogo.core.Syntax._
 import spm.helper.Helper
 import spm.uav_behavior.{CheckBoundsUav, ComputeHeading}
 
+import scala.collection.mutable.ListBuffer
+
 
 object UavUpdateSymmetricSearchRegionTime {
     def go(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
         val maxRegionTime = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-max-region-time").asInstanceOf[Double]
         val minRegionTime = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-min-region-time").asInstanceOf[Double]
         val ticks = Helper.ContextHelper.getTicks(context)
-        val range = math.abs(maxRegionTime - minRegionTime + 1).toInt
-        val newRegionTime = scala.util.Random.nextInt(range) + ticks
+        val range = math.abs(maxRegionTime).toInt
+        var newRegionTime = scala.util.Random.nextInt(range) + ticks
+        
+        if (newRegionTime > minRegionTime) newRegionTime = minRegionTime
+        
         Helper.BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", 0.toLogoObject)
         Helper.BreedHelper.setBreedVariable(uav, "symmetric-search-region-time", newRegionTime.toLogoObject)
     }
@@ -46,47 +51,36 @@ object MoveRegionsAccordingToWeather {
     
     def moveSingleUavRegion(uav: org.nlogo.agent.Agent, xAddition: Double, yAddition: Double, worldWidth: Double, worldHeight: Double): Unit = {
         val region = Helper.BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
-        val newRegion = List(region.head + xAddition, region(1) + yAddition, region(2) + xAddition, region(3) + yAddition)
-        
-        if (newRegion.head < 0) {
-            newRegion(2) -= newRegion.head
-            newRegion(0) = 0
-        }
-        if (newRegion(2) > worldWidth) {
-            val dif = newRegion(2) - worldWidth
-            newRegion(2) -= dif
-            newRegion.head -= dif
-        }
-        if (newRegion(1) < 0) {
-            newRegion(3) -= newRegion(1)
-            newRegion(1) = 0
-        }
-        
+        var newRegion = List(region.head + xAddition, region(1) + yAddition, region(2) + xAddition, region(3) + yAddition)
         newRegion = adjustRegionForWorldBounds(newRegion, worldWidth, worldHeight)
-        
         Helper.BreedHelper.setBreedVariable(uav, "UAV-region", newRegion.toLogoList)
     } // moveSingleUavRegion()
     
     
     def adjustRegionForWorldBounds(region: List[Double], worldWidth: Double, worldHeight: Double): List[Double] = {
-        val newRegion = List() ++ region
+        val newRegion = (List() ++ region).to[ListBuffer]
     
         if (newRegion.head < 0) {
-            newRegion(2) -= newRegion.head
+            newRegion(2) = newRegion(2) - newRegion.head
             newRegion(0) = 0
         }
         if (newRegion(2) > worldWidth) {
             val dif = newRegion(2) - worldWidth
-            newRegion(2) -= dif
-            newRegion.head -= dif
+            newRegion(2) = newRegion(2) - dif
+            newRegion(0) = newRegion.head - dif
         }
         if (newRegion(1) < 0) {
-            newRegion(3) -= newRegion(1)
+            newRegion(3) = newRegion(3) - newRegion(1)
             newRegion(1) = 0
         }
-    
-    
-    }
+        if (newRegion(3) > worldHeight) {
+            val dif = newRegion(3) - worldHeight
+            newRegion(3) = newRegion(3) - dif
+            newRegion(1) = newRegion(1) - dif
+        }
+        
+        newRegion.toList
+    } // adjustRegionForWorldBounds()
     
 } // MoveRegionsAccordingToWeather
 
