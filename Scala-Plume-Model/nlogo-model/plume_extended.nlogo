@@ -284,7 +284,7 @@ population
 population
 0
 100
-2.0
+10.0
 1
 1
 UAVs per swarm

@@ -13,6 +13,7 @@ import spm.helper.Helper
 import spm.uav_behavior.{CheckBoundsUav, ComputeHeading}
 
 import scala.collection.mutable.ListBuffer
+import scala.util.Random
 
 
 object UavUpdateSymmetricSearchRegionTime {
@@ -21,7 +22,7 @@ object UavUpdateSymmetricSearchRegionTime {
         val minRegionTime = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-min-region-time").asInstanceOf[Double]
         val ticks = Helper.ContextHelper.getTicks(context)
         val range = math.abs(maxRegionTime - minRegionTime).toInt
-        var newRegionTime = scala.util.Random.nextInt(range) + ticks + minRegionTime
+        var newRegionTime = Random.nextInt(range) + ticks + minRegionTime
         if (newRegionTime < minRegionTime) newRegionTime = minRegionTime
         
         Helper.BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", 0.toLogoObject)
@@ -137,7 +138,7 @@ object _UavUpdateSymmetricSearchIndividual {
                     } // while
     
                     if (bestReading > regionReading) {
-                        PaintRegionOfUAV.go(context, uav, true)
+                        PaintRegionOfUAV.go(context, uav, black=true)
                         val flockmateRegion = Helper.BreedHelper.getBreedVariable(bestNeighbor, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
                         Helper.BreedHelper.setBreedVariable(uav, "UAV-region", flockmateRegion.toLogoList)
                     }
