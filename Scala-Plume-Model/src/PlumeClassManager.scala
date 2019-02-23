@@ -9,10 +9,14 @@ import boids._
 import uav_behavior._
 import search_algorithms.random_search._
 import search_algorithms.symmetric_search._
+import performance_metrics._
 
 
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager) {
+        
+        // spm.performance_metrics
+        manager.addPrimitive("compute-coverage-metrics", new ComputeCoverage)
         
         // spm.boids
        // manager.addPrimitive("find-flockmates", new FindFlockmates)
@@ -21,25 +25,26 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("turn-at-most", new TurnAtMostReporter)
         manager.addPrimitive("turn-towards", new TurnTowardsReporter)
         
-        // smp.uav_behavior
+        // spm.uav_behavior
+        manager.addPrimitive("update-uavs-sensor-reading", new UavsUpdateSensorReadingCommand)
+        
+        // spm.uav_behavior
         manager.addPrimitive("uav-inside-bounds", new CheckTurtleInsideBounds)
         manager.addPrimitive("uav-inside-world-bounds", new CheckUavInsideWorldBounds)
         
-        // smp.uav_behavior.ComputeHeading
+        // spm.uav_behavior.ComputeHeading
         manager.addPrimitive("compute-heading-towards-point", new GetHeadingTowardsPointReporter)
         
-        // smp.uav_behavior.TurnUav
+        // spm.uav_behavior.TurnUav
         manager.addPrimitive("turn-uav", new uav_behavior.TurnUavReporter)
         
         // spm.search_algorithms.random_search
         manager.addPrimitive("update-random-search", new UpdateRandomSearch)
-//        manager.addPrimitive("update-random-search-single-uav", new UpdateRandomSearchSingleUAV)
     
         // spm.search_algorithms.symmetric_search
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
         manager.addPrimitive("paint-subregions", new UavSymmetricSearchPaintSubregions)
         manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
-//        manager.addPrimitive("update-symmetric-search-single-uav", new UavUpdateSymmetricSearchIndividual)
     
     
         // spm.environment_behavior

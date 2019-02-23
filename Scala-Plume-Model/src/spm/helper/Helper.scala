@@ -33,6 +33,36 @@ object Helper {
         a
     } // getInput()
     
+    object PatchHelper {
+        def getVariableIndex(patch: org.nlogo.agent.Patch, variableName: String): Int = {
+            val vars = patch.variables
+            for (i <- vars.indices)
+              if (patch.variableName(i) == variableName)
+                  return i
+            -1
+        } // getVariableIndex()
+        
+        def getPatchVariable(patch: org.nlogo.agent.Patch, variableName: String): AnyRef = {
+            val idx = getVariableIndex(patch, variableName)
+            if (idx == -1) return None
+            patch.getVariable(idx)
+        } // getPatchVariable()
+    
+    
+        def setPatchVariable(patch: org.nlogo.agent.Patch, variableName: String, newValue: AnyRef): Unit = {
+            val idx = getVariableIndex(patch, variableName)
+            if (idx == -1) return
+            patch.setVariable(idx, newValue)
+        }
+        
+        
+        def getPatchVariableByIndex(patch: org.nlogo.agent.Patch, idx: Int): AnyRef = patch.getVariable(idx)
+        
+        
+        def setPatchVariableByIndex(patch: org.nlogo.agent.Patch, idx: Int, newValue: AnyRef): Unit = patch.setVariable(idx, newValue)
+        
+    } // PatchHelper
+    
     /**
       * ContextHelper should handle getting/setting context, observer, world variables/objects
       */

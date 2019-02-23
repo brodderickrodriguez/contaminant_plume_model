@@ -19,7 +19,7 @@
 extensions [ plume-scala ]
 
 globals [ search-strategy-flock search-strategy-random search-strategy-symmetric
-          coverage-all coverage-std coverage-mean ]
+          coverage-all coverage-std coverage-mean coverage-per-plume-density ]
 
 breed [ contaminant-plumes contaminant-plume ]
 breed [ UAVs UAV ]
@@ -29,7 +29,7 @@ patches-own [ plume-density ]
 
 contaminant-plumes-own [ plume-spead-radius plume-spread-patches ]
 
-swarms-own [ first-detection-time mean-detection-time ]
+swarms-own [ ]
 
 UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading my-swarm detection-time
            random-search-time UAV-region desired-heading
@@ -63,13 +63,13 @@ to go
 end
 
 to calc-coverage
-  ask UAVs [
-    set coverage-all lput plume-reading coverage-all
-    set plume-reading plume-density
-  ]
-  if ticks > coverage-data-decay [ repeat population [ set coverage-all butfirst coverage-all ] ]
+  ask UAVs [ set plume-reading plume-density ]
+
+  plume-scala:compute-coverage-metrics
+
+;  if ticks > coverage-data-decay [ repeat population [ set coverage-all butfirst coverage-all ] ]
   ;set coverage-std standard-deviation coverage-all
-  set coverage-mean mean coverage-all
+ ; set coverage-mean mean coverage-all
 end
 
 to setup-contaminant-plumes
@@ -130,26 +130,6 @@ to setup-swarms
 end
 
 to update-swarms
-  ask swarms [
-    if mean-detection-time = 0 [
-      let temp-first-detection-time first-detection-time
-      let temp-all-detection-times []
-      let all-UAVs-have-detected-plume true
-
-      ask UAVs [
-        if plume-reading > 0 [
-          if detection-time = 0 [ set detection-time ticks ]
-          if temp-first-detection-time = 0 [ set temp-first-detection-time ticks ]
-        ] ; if plume-reading > 0
-
-        set temp-all-detection-times lput detection-time temp-all-detection-times
-        if detection-time = 0 [ set all-UAVs-have-detected-plume false ]
-      ] ; ask my-UAVs
-
-      ; if all-UAVs-have-detected-plume
-      if all-UAVs-have-detected-plume = true and mean-detection-time = 0 [ set mean-detection-time mean temp-all-detection-times ]
-    ] ; mean-detection-time = 0
-  ] ; ask swarms
 end
 
 to update-search-strategy-flock
@@ -157,10 +137,8 @@ to update-search-strategy-flock
   if any? flockmates [
     find-best-neighbor
     find-nearest-neighbor
-    ifelse distance nearest-neighbor < minimum-separation
-    [ separate ]
-    [ align cohere ]
-  ] ; if any? flockmates
+    ifelse distance nearest-neighbor < minimum-separation [ separate ] [ align cohere ]
+  ]
 end
 
 to find-flockmates
@@ -424,7 +402,7 @@ coverage-std
 Ticks
 standard deviation
 0.0
-1.0
+0.3
 0.0
 0.3
 true
@@ -489,7 +467,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-2
+0
 
 SLIDER
 266
@@ -515,7 +493,7 @@ max-align-turn
 max-align-turn
 0
 20
-0.0
+1.25
 0.25
 1
 degrees
@@ -530,7 +508,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-0.0
+3.6
 0.1
 1
 degrees
@@ -565,7 +543,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-0.0
+2.0
 0.25
 1
 degrees
