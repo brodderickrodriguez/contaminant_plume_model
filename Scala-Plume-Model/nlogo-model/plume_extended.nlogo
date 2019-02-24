@@ -64,12 +64,7 @@ end
 
 to calc-coverage
   ask UAVs [ set plume-reading plume-density ]
-
   plume-scala:compute-coverage-metrics
-
-;  if ticks > coverage-data-decay [ repeat population [ set coverage-all butfirst coverage-all ] ]
-  ;set coverage-std standard-deviation coverage-all
- ; set coverage-mean mean coverage-all
 end
 
 to setup-contaminant-plumes
@@ -93,6 +88,7 @@ to update-contaminant-plumes
     set size plume-spread-patches * 2
     set heading wind-heading
     fd wind-speed
+
     set-plume-patch-density
   ]
 end
@@ -102,7 +98,7 @@ to set-plume-patch-density
   ask patches in-radius plume-spread-patches [
     let d distancexy [ xcor ] of myself [ ycor ] of myself
     set plume-density plume-density + 1 - (d / [ plume-spread-patches ] of myself)
-    set pcolor plume-density * 10 + 10
+
   ]
 end
 
@@ -262,7 +258,7 @@ population
 population
 0
 100
-10.0
+7.0
 1
 1
 UAVs per swarm
@@ -331,10 +327,10 @@ degrees
 HORIZONTAL
 
 PLOT
-1254
-14
-1877
-341
+1572
+10
+2195
+337
 plume detection map
 NIL
 NIL
@@ -478,7 +474,7 @@ minimum-separation
 minimum-separation
 0
 5
-1.75
+0.0
 0.25
 1
 patches
@@ -493,7 +489,7 @@ max-align-turn
 max-align-turn
 0
 20
-1.25
+0.0
 0.25
 1
 degrees
@@ -508,7 +504,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-3.6
+9.0
 0.1
 1
 degrees
@@ -543,7 +539,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-2.0
+0.0
 0.25
 1
 degrees
@@ -688,6 +684,24 @@ symmetric-search-max-region-time
 1
 NIL
 HORIZONTAL
+
+PLOT
+1330
+94
+1530
+244
+plot 1
+NIL
+NIL
+0.0
+1.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot coverage-per-plume-density"
 
 @#$#@#$#@
 ## WHAT IS IT?

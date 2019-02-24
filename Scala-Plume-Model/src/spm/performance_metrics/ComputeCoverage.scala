@@ -15,16 +15,17 @@ import spm.uav_behavior.{CheckBoundsUav, ComputeHeading}
 import scala.collection.mutable.ListBuffer
 
 
-
 object Coverage {
     def compute(context: Context): Unit = {
         val coverageAll = computeCoverageAll(context)
         val mean = computeCoverageMean(context, coverageAll)
         val std = computeCoverageStd(context, coverageAll, mean)
+        val coveragePerPlumeDensity = computeCoveragePerPlumeDensity(context, coverageAll)
     
         Helper.ContextHelper.setObserverVariable(context, "coverage-all", coverageAll.toLogoList)
         Helper.ContextHelper.setObserverVariable(context, "coverage-mean", mean.toLogoObject)
         Helper.ContextHelper.setObserverVariable(context, "coverage-std", std.toLogoObject)
+        Helper.ContextHelper.setObserverVariable(context, "coverage-per-plume-density", coveragePerPlumeDensity.toLogoObject)
     }
     
     def computeCoverageAll(context: Context): List[Double] = {
@@ -55,9 +56,22 @@ object Coverage {
         math.sqrt(coverageAll.map(a => math.pow(a - mean, 2)).sum / coverageAll.length)
     } // computeCoverageStd()
     
-    def computeCoveragePerPlumeDensity(context: Context): Unit = ???
-    
-    
+    def computeCoveragePerPlumeDensity(context: Context, coverageAll: List[Double]): Double = {
+        val world = Helper.ContextHelper.getWorld(context)
+        val plumes = world.getBreed("CONTAMINANT-PLUMES")
+        val iter = world.getBreed("CONTAMINANT-PLUMES").iterator
+        
+        if (iter.hasNext) {
+            val singlePlume = iter.next().asInstanceOf[org.nlogo.agent.Turtle]
+            val plumeSpreadPatches = Helper.BreedHelper.getBreedVariable(singlePlume, "plume-spread-patches").asInstanceOf[Double]
+            var accumulativePlumeDensity = math.Pi * math.pow(plumeSpreadPatches, 2) + math.Pi * plumeSpreadPatches
+            
+            accumulativePlumeDensity *= plumes.count
+            coverageAll.sum / accumulativePlumeDensity
+        }
+        else -1
+        
+    } // computeCoveragePerPlumeDensity()
     
 } // Coverage
 
