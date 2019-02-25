@@ -11,14 +11,14 @@ import turn_at_most._
 import uav_behavior._
 import search_algorithms.random_search._
 import search_algorithms.symmetric_search._
-import performance_metrics._
+import performance_metrics.compute_coverage.ComputeCoverageCommand
 
 
 class PlumeClassManager extends DefaultClassManager {
     def load(manager: PrimitiveManager): Unit = {
         
         // spm.performance_metrics
-        manager.addPrimitive("compute-coverage-metrics", new ComputeCoverage)
+        manager.addPrimitive("compute-coverage-metrics", new ComputeCoverageCommand)
         
         // spm.boids
         manager.addPrimitive("find-flockmates", new FindFlockmatesCommand)
