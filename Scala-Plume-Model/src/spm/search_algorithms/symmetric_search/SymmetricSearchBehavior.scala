@@ -106,7 +106,7 @@ object _UavUpdateSymmetricSearchIndividual {
     
                 uav.penMode(org.nlogo.agent.Turtle.PEN_DOWN)
                 BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", newMaxReading.toLogoObject)
-                spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
+                spm.search_algorithms.random_search.UpdateRandomSearch.behave(context, uav)
             }
         }
         checkFlockmatesDetection(context, uav)

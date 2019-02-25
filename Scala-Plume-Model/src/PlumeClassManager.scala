@@ -9,7 +9,7 @@ import boids._
 import find_flockmates._
 import turn_at_most._
 import uav_behavior._
-import search_algorithms.random_search._
+import search_algorithms.random_search.UpdateRandomSearchCommand
 import search_algorithms.symmetric_search._
 import performance_metrics.compute_coverage.ComputeCoverageCommand
 
@@ -35,7 +35,7 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("move-uav-inside-world-bounds", new MoveUavBackInsideWorldBoundsCommand)
         
         // spm.search_algorithms.random_search
-        manager.addPrimitive("update-random-search", new UpdateRandomSearch)
+        manager.addPrimitive("update-random-search", new UpdateRandomSearchCommand)
     
         // spm.search_algorithms.symmetric_search
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
