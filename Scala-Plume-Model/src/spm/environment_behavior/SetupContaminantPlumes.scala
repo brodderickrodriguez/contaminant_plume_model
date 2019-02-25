@@ -11,14 +11,14 @@ import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 
-import spm.helper.Helper
+import spm.helper.{ContextHelper, TurtleHelper, BreedHelper}
 
 class SetupContaminantPlumes  extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val world = Helper.ContextHelper.getWorld(context)
-        val plumeSpreadRadius = Helper.ContextHelper.getObserverVariable(context, "plume-spread-radius").asInstanceOf[Double]
+        val world = ContextHelper.getWorld(context)
+        val plumeSpreadRadius = ContextHelper.getObserverVariable(context, "plume-spread-radius").asInstanceOf[Double]
         val (wWidth, wHeight) = (world.worldWidth, world.worldHeight)
         val (xMin, yMin) = (wWidth * 0.25, wHeight * 0.25)
         val (xRange, yRange) = (wWidth / 2, wHeight / 2)
@@ -30,12 +30,12 @@ class SetupContaminantPlumes  extends Command {
             val x = (Random.nextFloat() * xRange) + xMin
             val y = (Random.nextFloat() * yRange) + yMin
             
-            Helper.TurtleHelper.setTurtleVariable(plume, "shape", "circle".toLogoObject)
-            Helper.TurtleHelper.setTurtleVariable(plume, "size", (plumeSpreadPatches * 2).toLogoObject)
-            Helper.TurtleHelper.setTurtleVariable(plume, "color", 15.toLogoObject)
-            Helper.TurtleHelper.setTurtleVariable(plume, "xcor", x.toLogoObject)
-            Helper.TurtleHelper.setTurtleVariable(plume, "ycor", y.toLogoObject)
-            Helper.BreedHelper.setBreedVariable(plume, "plume-spread-patches", plumeSpreadPatches.toLogoObject)
+            TurtleHelper.setTurtleVariable(plume, "shape", "circle".toLogoObject)
+            TurtleHelper.setTurtleVariable(plume, "size", (plumeSpreadPatches * 2).toLogoObject)
+            TurtleHelper.setTurtleVariable(plume, "color", 15.toLogoObject)
+            TurtleHelper.setTurtleVariable(plume, "xcor", x.toLogoObject)
+            TurtleHelper.setTurtleVariable(plume, "ycor", y.toLogoObject)
+            BreedHelper.setBreedVariable(plume, "plume-spread-patches", plumeSpreadPatches.toLogoObject)
         }
     } // perform()
     

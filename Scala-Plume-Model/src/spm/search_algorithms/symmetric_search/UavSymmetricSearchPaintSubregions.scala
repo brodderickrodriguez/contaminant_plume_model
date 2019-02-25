@@ -7,15 +7,15 @@ package spm.search_algorithms.symmetric_search
 import org.nlogo.api.{Argument, Command, Context}
 import org.nlogo.core.Syntax.ListType
 import org.nlogo.core.{LogoList, Syntax}
-import spm.helper.Helper
+import spm.helper.{ContextHelper, BreedHelper}
 
 
 object PaintRegionOfUAV {
     def go(context: Context, uav: org.nlogo.agent.Turtle, black: Boolean = false): Unit = {
         val uavColor = uav.color().asInstanceOf[Double] + 4
-        val region = Helper.BreedHelper.getBreedVariable(uav, "uav-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
+        val region = BreedHelper.getBreedVariable(uav, "uav-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
         val (rx1, ry1, rx2, ry2) = (region.head, region(1), region(2), region(3))
-        val patches = Helper.ContextHelper.getWorld(context).patches.iterator
+        val patches = ContextHelper.getWorld(context).patches.iterator
     
         while (patches.hasNext) {
             val patch = patches.next().asInstanceOf[org.nlogo.agent.Patch]
@@ -36,14 +36,14 @@ class UavSymmetricSearchPaintSubregions extends Command {
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val uavs = Helper.ContextHelper.getWorld(context).getBreed("UAVS").iterator
+        val uavs = ContextHelper.getWorld(context).getBreed("UAVS").iterator
     
         while (uavs.hasNext) {
             val uav = uavs.next().asInstanceOf[org.nlogo.agent.Turtle]
             val uavColor = uav.color().asInstanceOf[Double] + 4
-            val region = Helper.BreedHelper.getBreedVariable(uav, "uav-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
+            val region = BreedHelper.getBreedVariable(uav, "uav-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
             val (rx1, ry1, rx2, ry2) = (region.head, region(1), region(2), region(3))
-            val patches = Helper.ContextHelper.getWorld(context).patches.iterator
+            val patches = ContextHelper.getWorld(context).patches.iterator
             
             while (patches.hasNext) {
                 val patch = patches.next().asInstanceOf[org.nlogo.agent.Patch]

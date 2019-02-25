@@ -3,56 +3,36 @@ package spm.boids
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import org.nlogo.api._
-import org.nlogo.api.ScalaConversions._
 import org.nlogo.agent.AgentSetBuilder
-import spm.helper.{Helper, MathHelper}
+import spm.helper.{MathHelper, ContextHelper, TurtleHelper, BreedHelper}
 
 
 object FindFlockmates {
-    def go(context: Context): AgentSetBuilder = {
+    def perform(context: Context): AgentSetBuilder = _findFlockmates(context, ContextHelper.getTurtle(context))
+    
+    
+    def perform(context: Context, uav: org.nlogo.agent.Turtle): AgentSetBuilder = _findFlockmates(context, uav)
+    
+    
+    def _findFlockmates(context: Context, uav: org.nlogo.agent.Turtle): AgentSetBuilder = {
         val flockmates = new AgentSetBuilder(org.nlogo.core.AgentKind.Turtle)
-        val uavVision = Helper.ContextHelper.getObserverVariable(context, "uav-vision").asInstanceOf[Double]
-    
-        val thisUav = Helper.ContextHelper.getTurtle(context)
-        val thisUavCoor = Helper.TurtleHelper.getTurtleCoors(thisUav)
-    
-        val world = Helper.ContextHelper.getWorld(context)
+        val uavVision = ContextHelper.getObserverVariable(context, "uav-vision").asInstanceOf[Double]
+        val thisUavCoor = TurtleHelper.getTurtleCoors(uav)
+        val world = ContextHelper.getWorld(context)
         val iter = world.getBreed("UAVS").iterator
     
         while (iter.hasNext) {
             val otherUav = iter.next().asInstanceOf[org.nlogo.agent.Turtle]
-            val otherUavCoor = Helper.TurtleHelper.getTurtleCoors(otherUav)
-        
-            if (otherUav != thisUav && MathHelper.euclideanDistance(thisUavCoor, otherUavCoor) <= uavVision)
-                flockmates.add(otherUav)
-        } // while
-    
-        Helper.BreedHelper.setBreedVariable(thisUav, "flockmates", flockmates.build().toLogoObject)
-        flockmates
-    }
-    
-    def go2(context: Context, uav: org.nlogo.agent.Turtle): AgentSetBuilder = {
-        val flockmates = new AgentSetBuilder(org.nlogo.core.AgentKind.Turtle)
-        val uavVision = Helper.ContextHelper.getObserverVariable(context, "uav-vision").asInstanceOf[Double]
-    
-        val thisUavCoor = Helper.TurtleHelper.getTurtleCoors(uav)
-    
-        val world = Helper.ContextHelper.getWorld(context)
-        val iter = world.getBreed("UAVS").iterator
-    
-        while (iter.hasNext) {
-            val otherUav = iter.next().asInstanceOf[org.nlogo.agent.Turtle]
-            val otherUavCoor = Helper.TurtleHelper.getTurtleCoors(otherUav)
+            val otherUavCoor = TurtleHelper.getTurtleCoors(otherUav)
         
             if (otherUav != uav && MathHelper.euclideanDistance(thisUavCoor, otherUavCoor) <= uavVision)
                 flockmates.add(otherUav)
         } // while
     
-//        Helper.BreedHelper.setBreedVariable(thisUav, "flockmates", flockmates.build().toLogoObject)
         flockmates
-        
-    }
-}
+    } // _findFlockmates()
+    
+} // FindFlockmates
 
 
 class FindFlockmatesCommand extends Command {
@@ -60,7 +40,9 @@ class FindFlockmatesCommand extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        FindFlockmates.go(context)
+        val uav = ContextHelper.getTurtle(context)
+        val flockmates = FindFlockmates.perform(context, uav)
+        BreedHelper.setBreedVariable(uav, "flockmates", flockmates.build())
     } // perform()
     
 } // FindFlockmates

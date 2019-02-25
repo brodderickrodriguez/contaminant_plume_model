@@ -57,7 +57,6 @@ end
 to go
   update-contaminant-plumes
   update-UAVs
-  update-swarms
   calc-coverage
   tick
 end
@@ -125,9 +124,6 @@ to setup-swarms
   create-swarms 1 [ hide-turtle ]
 end
 
-to update-swarms
-end
-
 to update-search-strategy-flock
   ifelse plume-scala:uav-inside-world-bounds
   [ flock ]
@@ -135,16 +131,12 @@ to update-search-strategy-flock
 end
 
 to flock
-  find-flockmates
+  plume-scala:find-flockmates
   if any? flockmates [
     find-best-neighbor
     find-nearest-neighbor
     ifelse distance nearest-neighbor < minimum-separation [ separate ] [ align cohere ]
   ]
-end
-
-to find-flockmates
-  set flockmates other UAVs in-radius UAV-vision
 end
 
 to find-best-neighbor
@@ -249,7 +241,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.25
+0.12
 0.01
 1
 percent
@@ -264,7 +256,7 @@ population
 population
 0
 100
-100.0
+8.0
 1
 1
 UAVs per swarm
@@ -296,7 +288,7 @@ number-plumes
 number-plumes
 0
 5
-5.0
+1.0
 1
 1
 NIL
@@ -359,7 +351,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-10.5
+196.0
 0.5
 1
 patches
@@ -374,7 +366,7 @@ plume-decay-rate
 plume-decay-rate
 0
 0.0001
-1.0E-11
+0.0
 0.00000000001
 1
 p/t
@@ -389,7 +381,7 @@ coverage-data-decay
 coverage-data-decay
 1
 60
-12.0
+11.0
 1
 1
 NIL
@@ -440,7 +432,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-38.0
+21.0
 1
 1
 NIL
@@ -455,7 +447,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-1.05
+1.1
 0.05
 1
 degrees
@@ -480,7 +472,7 @@ minimum-separation
 minimum-separation
 0
 5
-0.0
+0.5
 0.25
 1
 patches
@@ -495,7 +487,7 @@ max-align-turn
 max-align-turn
 0
 20
-0.0
+0.75
 0.25
 1
 degrees
@@ -510,7 +502,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-9.0
+4.2
 0.1
 1
 degrees
@@ -545,7 +537,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-0.0
+0.25
 0.25
 1
 degrees
@@ -560,7 +552,7 @@ world-edge-threshold
 world-edge-threshold
 0
 25
-4.0
+10.5
 0.5
 1
 NIL
@@ -575,7 +567,7 @@ max-world-edge-turn
 max-world-edge-turn
 0
 20
-20.0
+7.5
 0.5
 1
 NIL
@@ -630,7 +622,7 @@ symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-7.8
+3.4
 0.1
 1
 degrees
@@ -645,7 +637,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 0
 25
-2.8
+4.1
 0.1
 1
 NIL
@@ -670,7 +662,7 @@ symmetric-search-min-region-time
 symmetric-search-min-region-time
 1
 1000
-414.0
+182.0
 1
 1
 NIL
@@ -685,7 +677,7 @@ symmetric-search-max-region-time
 symmetric-search-max-region-time
 100
 5000
-1248.0
+756.0
 1
 1
 NIL

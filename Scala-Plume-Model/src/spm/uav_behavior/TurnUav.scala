@@ -12,7 +12,7 @@ import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 
-import spm.helper.Helper
+import spm.helper.{InputHelper, ContextHelper, BreedHelper}
 import spm.boids._
 
 
@@ -22,16 +22,16 @@ object MoveUavBackInsideWorldBounds {
         val pty = (context.world.worldHeight / 4) + Random.nextInt(context.world.worldHeight / 2)
     
         val newDesiredHeading = ComputeHeading.get(uav, ptx, pty) - 180
-        val worldThreshold = Helper.ContextHelper.getObserverVariable(context, "max-world-edge-turn").asInstanceOf[Double]
+        val worldThreshold = ContextHelper.getObserverVariable(context, "max-world-edge-turn").asInstanceOf[Double]
     
-        Helper.BreedHelper.setBreedVariable(uav, "desired-heading", newDesiredHeading.toLogoObject)
+        BreedHelper.setBreedVariable(uav, "desired-heading", newDesiredHeading.toLogoObject)
         TurnTowards.go(uav, newDesiredHeading, worldThreshold)
     }
 }
 
 object TurnUav {
     def go(uav: org.nlogo.agent.Turtle, context: Context, turnAllowed: Double): Unit = {
-        val desiredHeading = Helper.BreedHelper.getBreedVariable(uav, "desired-heading").asInstanceOf[Double]
+        val desiredHeading = BreedHelper.getBreedVariable(uav, "desired-heading").asInstanceOf[Double]
         
         if (CheckBoundsUav.uavInsideWorld(context, uav)) {
             TurnTowards.go(uav, desiredHeading, turnAllowed)
@@ -46,8 +46,8 @@ class TurnUavReporter extends Command {
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(NumberType), ret = ListType)
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val uav = Helper.ContextHelper.getTurtle(context)
-        val turnAllowed = Helper.getInput(args, 0).getDoubleValue
+        val uav = ContextHelper.getTurtle(context)
+        val turnAllowed = InputHelper.getInput(args, 0).getDoubleValue
         
         TurnUav.go(uav, context, turnAllowed)
     } // perform()
@@ -58,7 +58,7 @@ class MoveUavBackInsideWorldBoundsCommand extends Command {
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val uav = Helper.ContextHelper.getTurtle(context)
+        val uav = ContextHelper.getTurtle(context)
         MoveUavBackInsideWorldBounds.go(uav, context)
     } // perform()
 }

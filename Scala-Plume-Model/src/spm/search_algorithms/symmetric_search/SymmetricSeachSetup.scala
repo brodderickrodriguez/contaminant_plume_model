@@ -8,7 +8,7 @@ import org.nlogo.api.{Argument, Command, Context}
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.ListType
 import org.nlogo.api.ScalaConversions._
-import spm.helper.Helper
+import spm.helper.{ContextHelper, BreedHelper}
 
 import scala.collection.mutable.ListBuffer
 
@@ -26,7 +26,7 @@ object _UAVSubregionGenerator {
     } // _OptimalSubregionDimensions
     
     def buildRegions(args: Array[Argument], context: Context): ListBuffer[List[Double]] = {
-        val population = Helper.ContextHelper.getObserverVariable(context, "population").asInstanceOf[Double].toInt
+        val population = ContextHelper.getObserverVariable(context, "population").asInstanceOf[Double].toInt
         val SubregionDimensions = OptimalSubregionDimensionsCompute.get(population)
         val (worldWidth, worldHeight): (Double, Double) = (context.world.worldWidth - 1, context.world.worldHeight - 1)
         val (regionWidth, regionHeight) = (worldWidth / SubregionDimensions._1, worldHeight / SubregionDimensions._2)
@@ -51,12 +51,12 @@ class UAVRegionSetup extends Command {
     
     override def perform(args: Array[Argument], context: Context): Unit = {
         val regions = _UAVSubregionGenerator.buildRegions(args, context)
-        val it = Helper.ContextHelper.getWorld(context).getBreed("UAVS").iterator
+        val it = ContextHelper.getWorld(context).getBreed("UAVS").iterator
         
         while (it.hasNext) {
             val uav = it.next().asInstanceOf[org.nlogo.agent.Turtle]
             val subregion = regions.head.toLogoList
-            Helper.BreedHelper.setBreedVariable(uav, "UAV-region", subregion)
+            BreedHelper.setBreedVariable(uav, "UAV-region", subregion)
             UavUpdateSymmetricSearchRegionTime.go(context, uav)
             regions.remove(0)
         } // while

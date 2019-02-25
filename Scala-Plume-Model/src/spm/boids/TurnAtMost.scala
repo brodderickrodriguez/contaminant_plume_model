@@ -7,8 +7,7 @@ package spm.boids
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import org.nlogo.api._
-
-import spm.helper.Helper
+import spm.helper.{InputHelper, ContextHelper}
 
 
 object TurnAtMost {
@@ -24,13 +23,13 @@ object TurnAtMost {
 } // TurnAtMost
 
 
-class TurnAtMostReporter extends Command {
+class TurnAtMostCommand extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List(NumberType, NumberType))
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val uav = Helper.ContextHelper.getTurtle(context)
-        val requestedTurn = Helper.getInput(args, 0).getDoubleValue
-        val maxTurnAllowed = Helper.getInput(args, 1).getDoubleValue
+        val uav = ContextHelper.getTurtle(context)
+        val requestedTurn = InputHelper.getInput(args, 0).getDoubleValue
+        val maxTurnAllowed = InputHelper.getInput(args, 1).getDoubleValue
         
         TurnAtMost.go(uav, requestedTurn, maxTurnAllowed)
     } // perform()

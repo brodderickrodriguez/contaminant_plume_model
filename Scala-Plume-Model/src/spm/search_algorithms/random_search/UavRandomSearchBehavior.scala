@@ -10,21 +10,21 @@ import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.commandSyntax
 
-import spm.helper.{Helper, MathHelper}
+import spm.helper.{MathHelper, ContextHelper, BreedHelper}
 
 
 object _UavRandomSearchBehavior {
     def behave(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
-        val randomSearchTime = Helper.BreedHelper.getBreedVariable(uav, "random-search-time").asInstanceOf[Double]
-        val ticks = Helper.ContextHelper.getTicks(context)
+        val randomSearchTime = BreedHelper.getBreedVariable(uav, "random-search-time").asInstanceOf[Double]
+        val ticks = ContextHelper.getTicks(context)
         
         if (ticks > randomSearchTime) {
-            val randomSearchMaxHeadingTime = Helper.ContextHelper.getObserverVariable(context, "random-search-max-heading-time").asInstanceOf[Double]
+            val randomSearchMaxHeadingTime = ContextHelper.getObserverVariable(context, "random-search-max-heading-time").asInstanceOf[Double]
             val newSearchTime = Random.nextInt(randomSearchMaxHeadingTime.toInt) + ticks
             val newHeading = Random.nextInt(360) * MathHelper.random1()
             
-            Helper.BreedHelper.setBreedVariable(uav, "random-search-time", newSearchTime.toLogoObject)
-            Helper.BreedHelper.setBreedVariable(uav, "desired-heading", newHeading.toLogoObject)
+            BreedHelper.setBreedVariable(uav, "random-search-time", newSearchTime.toLogoObject)
+            BreedHelper.setBreedVariable(uav, "desired-heading", newHeading.toLogoObject)
         } // if
     } // behave()
 } // UavRandomBehavior()
@@ -34,8 +34,8 @@ class UpdateRandomSearch extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List())
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val world = Helper.ContextHelper.getWorld(context)
-        val maxTurn = Helper.ContextHelper.getObserverVariable(context, "random-search-max-turn").asInstanceOf[Double]
+        val world = ContextHelper.getWorld(context)
+        val maxTurn = ContextHelper.getObserverVariable(context, "random-search-max-turn").asInstanceOf[Double]
         val iter = world.getBreed("UAVS").iterator
         
         while (iter.hasNext) {
@@ -45,15 +45,3 @@ class UpdateRandomSearch extends Command {
         } // while
     } // perform()
 } // UpdateRandomSearch
-
-
-//class UpdateRandomSearchSingleUAV extends Command {
-//    override def getSyntax: Syntax = commandSyntax(right = List())
-//
-//    override def perform(args: Array[Argument], context: Context): Unit = {
-//        val maxTurn = Helper.ContextHelper.getObserverVariable(context, "random-search-max-turn").asInstanceOf[Double]
-//        val uav = Helper.ContextHelper.getAgent(context).asInstanceOf[org.nlogo.agent.Turtle]
-//        spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
-//        spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
-//    } // perform()
-//} // UpdateRandomSearch

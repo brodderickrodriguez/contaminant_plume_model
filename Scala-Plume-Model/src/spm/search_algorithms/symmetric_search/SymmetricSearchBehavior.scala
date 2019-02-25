@@ -9,7 +9,7 @@ import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
-import spm.helper.Helper
+import spm.helper.{ContextHelper, BreedHelper}
 import spm.uav_behavior.{CheckBoundsUav, ComputeHeading}
 
 import scala.collection.mutable.ListBuffer
@@ -18,27 +18,27 @@ import scala.util.Random
 
 object UavUpdateSymmetricSearchRegionTime {
     def go(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
-        val maxRegionTime = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-max-region-time").asInstanceOf[Double]
-        val minRegionTime = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-min-region-time").asInstanceOf[Double]
-        val ticks = Helper.ContextHelper.getTicks(context)
+        val maxRegionTime = ContextHelper.getObserverVariable(context, "symmetric-search-max-region-time").asInstanceOf[Double]
+        val minRegionTime = ContextHelper.getObserverVariable(context, "symmetric-search-min-region-time").asInstanceOf[Double]
+        val ticks = ContextHelper.getTicks(context)
         val range = math.abs(maxRegionTime - minRegionTime).toInt
         var newRegionTime = Random.nextInt(range) + ticks + minRegionTime
         if (newRegionTime < minRegionTime) newRegionTime = minRegionTime
         
-        Helper.BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", 0.toLogoObject)
-        Helper.BreedHelper.setBreedVariable(uav, "symmetric-search-region-time", newRegionTime.toLogoObject)
+        BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", 0.toLogoObject)
+        BreedHelper.setBreedVariable(uav, "symmetric-search-region-time", newRegionTime.toLogoObject)
     }
 } // UavUpdateSymmetricSearchRegionTime
 
 object MoveRegionsAccordingToWeather {
     def go(context: Context): Unit = {
-        val windSpeed = Helper.ContextHelper.getObserverVariable(context, "wind-speed").asInstanceOf[Double]
-        val windDirection = Helper.ContextHelper.getObserverVariable(context, "wind-heading").asInstanceOf[Double]
+        val windSpeed = ContextHelper.getObserverVariable(context, "wind-speed").asInstanceOf[Double]
+        val windDirection = ContextHelper.getObserverVariable(context, "wind-heading").asInstanceOf[Double]
 
         val xAddition = math.sin(math.toRadians(windDirection)) * windSpeed
         val yAddition = math.cos(math.toRadians(windDirection)) * windSpeed
         
-        val world = Helper.ContextHelper.getWorld(context)
+        val world = ContextHelper.getWorld(context)
         val (worldWidth, worldHeight) = (world.worldWidth, world.worldHeight)
         val iter = world.getBreed("UAVS").iterator
     
@@ -50,10 +50,10 @@ object MoveRegionsAccordingToWeather {
     } // go()
     
     def moveSingleUavRegion(uav: org.nlogo.agent.Agent, xAddition: Double, yAddition: Double, worldWidth: Double, worldHeight: Double): Unit = {
-        val region = Helper.BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
+        val region = BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
         var newRegion = List(region.head + xAddition, region(1) + yAddition, region(2) + xAddition, region(3) + yAddition)
         newRegion = adjustRegionForWorldBounds(newRegion, worldWidth, worldHeight)
-        Helper.BreedHelper.setBreedVariable(uav, "UAV-region", newRegion.toLogoList)
+        BreedHelper.setBreedVariable(uav, "UAV-region", newRegion.toLogoList)
     } // moveSingleUavRegion()
     
     
@@ -87,9 +87,9 @@ object MoveRegionsAccordingToWeather {
 
 object _UavUpdateSymmetricSearchIndividual {
     def behave(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
-        val threshold = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-region-threshold").asInstanceOf[Double]
-        val uavRegion = Helper.BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
-        val maxTurn = Helper.ContextHelper.getObserverVariable(context, "symmetric-search-max-turn").asInstanceOf[Double]
+        val threshold = ContextHelper.getObserverVariable(context, "symmetric-search-region-threshold").asInstanceOf[Double]
+        val uavRegion = BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
+        val maxTurn = ContextHelper.getObserverVariable(context, "symmetric-search-max-turn").asInstanceOf[Double]
     
         if (CheckBoundsUav.uavInsideWorld(context, uav)) {
             if (!spm.uav_behavior.CheckBoundsUav.uavInside(uav, threshold, uavRegion)) {
@@ -97,14 +97,14 @@ object _UavUpdateSymmetricSearchIndividual {
                 val newDesiredHeading = ComputeHeading.get(uav, regionCenterX, regionCenterY) - 180
                 
                 uav.penMode(org.nlogo.agent.Turtle.PEN_UP)
-                Helper.BreedHelper.setBreedVariable(uav, "desired-heading", newDesiredHeading.toLogoObject)
+                BreedHelper.setBreedVariable(uav, "desired-heading", newDesiredHeading.toLogoObject)
             } else {
-                val maxReading = Helper.BreedHelper.getBreedVariable(uav, "symmetric-search-max-reading-region").asInstanceOf[Double]
-                val plumeReading = Helper.BreedHelper.getBreedVariable(uav, "plume-reading").asInstanceOf[Double]
+                val maxReading = BreedHelper.getBreedVariable(uav, "symmetric-search-max-reading-region").asInstanceOf[Double]
+                val plumeReading = BreedHelper.getBreedVariable(uav, "plume-reading").asInstanceOf[Double]
                 val newMaxReading = math.max(maxReading, plumeReading)
     
                 uav.penMode(org.nlogo.agent.Turtle.PEN_DOWN)
-                Helper.BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", newMaxReading.toLogoObject)
+                BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", newMaxReading.toLogoObject)
                 spm.search_algorithms.random_search._UavRandomSearchBehavior.behave(context, uav)
             }
         }
@@ -114,14 +114,14 @@ object _UavUpdateSymmetricSearchIndividual {
     
     
     def checkFlockmatesDetection(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
-        val regionTime = Helper.BreedHelper.getBreedVariable(uav, "symmetric-search-region-time").asInstanceOf[Double]
-        val ticks = Helper.ContextHelper.getTicks(context)
+        val regionTime = BreedHelper.getBreedVariable(uav, "symmetric-search-region-time").asInstanceOf[Double]
+        val ticks = ContextHelper.getTicks(context)
         
         if (regionTime < ticks) {
-            val regionReading = Helper.BreedHelper.getBreedVariable(uav, "symmetric-search-max-reading-region").asInstanceOf[Double]
+            val regionReading = BreedHelper.getBreedVariable(uav, "symmetric-search-max-reading-region").asInstanceOf[Double]
             
             if (regionReading == 0) {
-                val flockmates = spm.boids.FindFlockmates.go2(context, uav).build()
+                val flockmates = spm.boids.FindFlockmates.perform(context, uav).build()
             
                 if (flockmates.count > 0) {
                     val it = flockmates.iterator
@@ -130,7 +130,7 @@ object _UavUpdateSymmetricSearchIndividual {
     
                     while (it.hasNext) {
                         val flockmate = it.next().asInstanceOf[org.nlogo.agent.Turtle]
-                        val flockmateMaxReading = Helper.BreedHelper.getBreedVariable(flockmate, "symmetric-search-max-reading-region").asInstanceOf[Double]
+                        val flockmateMaxReading = BreedHelper.getBreedVariable(flockmate, "symmetric-search-max-reading-region").asInstanceOf[Double]
                         if (flockmateMaxReading > bestReading) {
                             bestNeighbor = flockmate
                             bestReading = flockmateMaxReading
@@ -139,8 +139,8 @@ object _UavUpdateSymmetricSearchIndividual {
     
                     if (bestReading > regionReading) {
                         PaintRegionOfUAV.go(context, uav, black=true)
-                        val flockmateRegion = Helper.BreedHelper.getBreedVariable(bestNeighbor, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
-                        Helper.BreedHelper.setBreedVariable(uav, "UAV-region", flockmateRegion.toLogoList)
+                        val flockmateRegion = BreedHelper.getBreedVariable(bestNeighbor, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
+                        BreedHelper.setBreedVariable(uav, "UAV-region", flockmateRegion.toLogoList)
                     }
                 } // if flockmates
             } // if regionReading > 0
@@ -156,7 +156,7 @@ class UavUpdateSymmetricSearch extends Command {
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
     
     override def perform(args: Array[Argument], context: Context): Unit = {
-        val it = Helper.ContextHelper.getWorld(context).getBreed("UAVS").iterator
+        val it = ContextHelper.getWorld(context).getBreed("UAVS").iterator
         
         while (it.hasNext) {
             val uav = it.next().asInstanceOf[org.nlogo.agent.Turtle]
@@ -167,13 +167,3 @@ class UavUpdateSymmetricSearch extends Command {
         
     } // perform()
 } // UavUpdateSymmetricSearch
-
-
-//class UavUpdateSymmetricSearchIndividual extends Command {
-//    override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
-//
-//    override def perform(args: Array[Argument], context: Context): Unit = {
-//        val uav = Helper.ContextHelper.getTurtle(context)
-//        _UavUpdateSymmetricSearchIndividual.behave(context, uav)
-//    } // perform()
-//} // UavUpdateSymmetricSearchIndividual

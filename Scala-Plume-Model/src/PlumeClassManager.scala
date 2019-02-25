@@ -13,24 +13,17 @@ import performance_metrics._
 
 
 class PlumeClassManager extends DefaultClassManager {
-    def load(manager: PrimitiveManager) {
+    def load(manager: PrimitiveManager): Unit = {
         
         // spm.performance_metrics
         manager.addPrimitive("compute-coverage-metrics", new ComputeCoverage)
         
         // spm.boids
-        // manager.addPrimitive("find-flockmates", new FindFlockmates)
-        manager.addPrimitive("find-best-neighbor", new FindBestNeighbor)
-        manager.addPrimitive("find-nearest-neighbor", new FindNearestNeighbor)
-        manager.addPrimitive("turn-at-most", new TurnAtMostReporter)
-        manager.addPrimitive("turn-towards", new TurnTowardsReporter)
+        manager.addPrimitive("find-flockmates", new FindFlockmatesCommand)
+        manager.addPrimitive("turn-at-most", new TurnAtMostCommand)
         
         // spm.uav_behavior
-        manager.addPrimitive("update-uavs-sensor-reading", new UavsUpdateSensorReadingCommand)
-        
-        // spm.uav_behavior
-        manager.addPrimitive("uav-inside-bounds", new CheckTurtleInsideBounds)
-        manager.addPrimitive("uav-inside-world-bounds", new CheckUavInsideWorldBounds)
+        manager.addPrimitive("uav-inside-world-bounds", new CheckUavInsideWorldBoundsReporter)
         
         // spm.uav_behavior.ComputeHeading
         manager.addPrimitive("compute-heading-towards-point", new GetHeadingTowardsPointReporter)
