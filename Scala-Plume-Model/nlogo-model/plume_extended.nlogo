@@ -258,7 +258,7 @@ population
 population
 0
 100
-7.0
+100.0
 1
 1
 UAVs per swarm
@@ -290,7 +290,7 @@ number-plumes
 number-plumes
 0
 5
-1.0
+5.0
 1
 1
 NIL
@@ -327,10 +327,10 @@ degrees
 HORIZONTAL
 
 PLOT
-1572
-10
-2195
-337
+1570
+91
+1869
+283
 plume detection map
 NIL
 NIL
@@ -353,7 +353,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-196.0
+47.0
 0.5
 1
 patches
@@ -390,10 +390,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1256
-351
-1567
-625
+1254
+297
+1565
+571
 coverage-std
 Ticks
 standard deviation
@@ -408,10 +408,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot coverage-std"
 
 PLOT
-1575
-352
-1875
-623
+1573
+298
+1873
+569
 coverage-mean
 ticks
 UAV coverage
@@ -463,7 +463,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-0
+2
 
 SLIDER
 266
@@ -686,17 +686,17 @@ NIL
 HORIZONTAL
 
 PLOT
-1330
-94
-1530
-244
+1252
+15
+1562
+287
 plot 1
 NIL
 NIL
 0.0
-1.0
 0.0
-1.0
+0.0
+0.3
 true
 false
 "" ""
