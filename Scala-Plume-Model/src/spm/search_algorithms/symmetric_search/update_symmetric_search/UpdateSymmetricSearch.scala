@@ -12,7 +12,8 @@ import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 
 import spm.helper.{BreedHelper, ContextHelper}
-import spm.uav_behavior.{CheckBoundsUav, ComputeHeading}
+import spm.uav_behavior.{CheckBoundsUav}
+import spm.uav_behavior.compute_heading.ComputeHeading
 import spm.boids.find_flockmates.FindFlockmates
 import spm.search_algorithms.symmetric_search.paint_subregions.PaintSubregions
 

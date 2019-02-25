@@ -9,6 +9,7 @@ import boids._
 import find_flockmates._
 import turn_at_most._
 import uav_behavior._
+import compute_heading.GetHeadingTowardsPointReporter
 import search_algorithms.random_search.UpdateRandomSearchCommand
 import search_algorithms.symmetric_search._
 import symmetric_search_setup._

@@ -14,6 +14,7 @@ import org.nlogo.core.Syntax._
 
 import spm.helper.{InputHelper, ContextHelper, BreedHelper}
 import spm.boids.turn_towards.TurnTowards
+import spm.uav_behavior.compute_heading.ComputeHeading
 
 
 object MoveUavBackInsideWorldBounds {
