@@ -9,6 +9,7 @@ import boids._
 import find_flockmates._
 import turn_at_most._
 import uav_behavior._
+import check_uav_bounds.check_uav_inside_world_bounds.CheckUavInsideWorldBoundsReporter
 import compute_heading.GetHeadingTowardsPointReporter
 import search_algorithms.random_search.UpdateRandomSearchCommand
 import search_algorithms.symmetric_search._
@@ -19,6 +20,7 @@ import performance_metrics.compute_coverage.ComputeCoverageCommand
 
 
 class PlumeClassManager extends DefaultClassManager {
+    
     def load(manager: PrimitiveManager): Unit = {
         
         // spm.performance_metrics
@@ -49,6 +51,6 @@ class PlumeClassManager extends DefaultClassManager {
         // spm.environment_behavior
         manager.addPrimitive("setup-contaminant-plumes", new environment_behavior.SetupContaminantPlumes)
         
-        
     } // load()
+    
 } // PlumeClassManager

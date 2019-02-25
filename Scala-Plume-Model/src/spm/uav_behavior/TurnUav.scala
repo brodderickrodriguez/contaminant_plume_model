@@ -15,6 +15,7 @@ import org.nlogo.core.Syntax._
 import spm.helper.{InputHelper, ContextHelper, BreedHelper}
 import spm.boids.turn_towards.TurnTowards
 import spm.uav_behavior.compute_heading.ComputeHeading
+import spm.uav_behavior.check_uav_bounds.check_uav_inside_world_bounds.CheckUavInsideWorldBounds
 
 
 object MoveUavBackInsideWorldBounds {
@@ -34,7 +35,7 @@ object TurnUav {
     def go(uav: org.nlogo.agent.Turtle, context: Context, turnAllowed: Double): Unit = {
         val desiredHeading = BreedHelper.getBreedVariable(uav, "desired-heading").asInstanceOf[Double]
         
-        if (CheckBoundsUav.uavInsideWorld(context, uav)) {
+        if (CheckUavInsideWorldBounds.perform(context, uav)) {
             TurnTowards.go(uav, desiredHeading, turnAllowed)
         } else {
             MoveUavBackInsideWorldBounds.go(uav, context)

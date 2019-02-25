@@ -12,10 +12,11 @@ import org.nlogo.api.ScalaConversions._
 import org.nlogo.api._
 
 import spm.helper.{BreedHelper, ContextHelper}
-import spm.uav_behavior.{CheckBoundsUav}
+import spm.uav_behavior.check_uav_bounds.check_uav_inside_bounds.CheckUavInsideBounds
 import spm.uav_behavior.compute_heading.ComputeHeading
 import spm.boids.find_flockmates.FindFlockmates
 import spm.search_algorithms.symmetric_search.paint_subregions.PaintSubregions
+import spm.uav_behavior.check_uav_bounds.check_uav_inside_world_bounds.CheckUavInsideWorldBounds
 
 
 object UpdateSymmetricSearch {
@@ -85,8 +86,8 @@ object UpdateSymmetricSearch {
         val uavRegion = BreedHelper.getBreedVariable(uav, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
         val maxTurn = ContextHelper.getObserverVariable(context, "symmetric-search-max-turn").asInstanceOf[Double]
     
-        if (CheckBoundsUav.uavInsideWorld(context, uav)) {
-            if (!spm.uav_behavior.CheckBoundsUav.uavInside(uav, threshold, uavRegion)) {
+        if (CheckUavInsideWorldBounds.perform(context, uav)) {
+            if (!CheckUavInsideBounds.perform(uav, threshold, uavRegion)) {
                 val (regionCenterX, regionCenterY) = ((uavRegion(2) + uavRegion.head) / 2, (uavRegion(3) + uavRegion(1)) / 2)
                 val newDesiredHeading = ComputeHeading.get(uav, regionCenterX, regionCenterY) - 180
             
