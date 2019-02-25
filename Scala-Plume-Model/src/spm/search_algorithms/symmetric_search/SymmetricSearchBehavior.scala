@@ -11,6 +11,7 @@ import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 import spm.helper.{ContextHelper, BreedHelper}
 import spm.uav_behavior.{CheckBoundsUav, ComputeHeading}
+import spm.boids.find_flockmates.FindFlockmates
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
@@ -121,7 +122,7 @@ object _UavUpdateSymmetricSearchIndividual {
             val regionReading = BreedHelper.getBreedVariable(uav, "symmetric-search-max-reading-region").asInstanceOf[Double]
             
             if (regionReading == 0) {
-                val flockmates = spm.boids.FindFlockmates.perform(context, uav).build()
+                val flockmates = FindFlockmates.perform(context, uav).build()
             
                 if (flockmates.count > 0) {
                     val it = flockmates.iterator

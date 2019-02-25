@@ -1,11 +1,12 @@
-package spm.boids
+package spm.boids.find_flockmates
 
-import org.nlogo.core.Syntax
-import org.nlogo.core.Syntax._
-import org.nlogo.api._
+// Brodderick Rodriguez
+// Auburn University - CSSE
+// 05 Feb. 2019
+
 import org.nlogo.agent.AgentSetBuilder
-import spm.helper.{MathHelper, ContextHelper, TurtleHelper, BreedHelper}
-
+import org.nlogo.api.Context
+import spm.helper.{ContextHelper, MathHelper, TurtleHelper}
 
 object FindFlockmates {
     def perform(context: Context): AgentSetBuilder = _findFlockmates(context, ContextHelper.getTurtle(context))
@@ -20,29 +21,16 @@ object FindFlockmates {
         val thisUavCoor = TurtleHelper.getTurtleCoors(uav)
         val world = ContextHelper.getWorld(context)
         val iter = world.getBreed("UAVS").iterator
-    
+        
         while (iter.hasNext) {
             val otherUav = iter.next().asInstanceOf[org.nlogo.agent.Turtle]
             val otherUavCoor = TurtleHelper.getTurtleCoors(otherUav)
-        
+            
             if (otherUav != uav && MathHelper.euclideanDistance(thisUavCoor, otherUavCoor) <= uavVision)
                 flockmates.add(otherUav)
         } // while
-    
+        
         flockmates
     } // _findFlockmates()
-    
-} // FindFlockmates
-
-
-class FindFlockmatesCommand extends Command {
-    
-    override def getSyntax: Syntax = commandSyntax(right = List())
-    
-    override def perform(args: Array[Argument], context: Context): Unit = {
-        val uav = ContextHelper.getTurtle(context)
-        val flockmates = FindFlockmates.perform(context, uav)
-        BreedHelper.setBreedVariable(uav, "flockmates", flockmates.build())
-    } // perform()
     
 } // FindFlockmates
