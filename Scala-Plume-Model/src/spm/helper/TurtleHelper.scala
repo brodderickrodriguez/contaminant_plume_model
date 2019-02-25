@@ -6,12 +6,14 @@ package spm.helper
 
 import org.nlogo.api.ScalaConversions._
 
+
 /**
   * Ability to set Turtle attributes
   */
 //TODO: make agent helper and turtle helper separate
 // TODO: add a distance function. need to convert to other agent type
 object TurtleHelper {
+    
     /**
       * Used to set a Turtle variable. This cannot be used to set a Breed's variable.
       * @param a the org.nlogo.agent.Ag we want to access
@@ -33,4 +35,5 @@ object TurtleHelper {
     
     
     def getTurtleCoors(a: org.nlogo.agent.Turtle): (Double, Double) = (a.xcor(), a.ycor())
+    
 } // TurtleHelper

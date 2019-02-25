@@ -6,9 +6,12 @@ package spm.boids.find_flockmates
 
 import org.nlogo.agent.AgentSetBuilder
 import org.nlogo.api.Context
+
 import spm.helper.{ContextHelper, MathHelper, TurtleHelper}
 
+
 object FindFlockmates {
+    
     def perform(context: Context): AgentSetBuilder = _findFlockmates(context, ContextHelper.getTurtle(context))
     
     

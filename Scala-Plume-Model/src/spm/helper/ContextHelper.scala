@@ -7,10 +7,12 @@ package spm.helper
 import org.nlogo.api.ScalaConversions._
 import org.nlogo.api.Context
 
+
 /**
   * ContextHelper should handle getting/setting context, observer, world variables/objects
   */
 object ContextHelper {
+    
     /**
       * Used to convert a org.nlogo.api.Agent to a org.nlogo.agent.Agent (which is more useful in the API)
       * @param context the org.nlogo.api.Context argument found in the
@@ -44,6 +46,7 @@ object ContextHelper {
         context.world.observer.getVariable(i)
     } // getObserverVariable()
     
+    
     /**
       * Can be used to set both global variables and GUI (model) parameters
       * @param context the org.nlogo.api.Context argument found in the
@@ -57,4 +60,5 @@ object ContextHelper {
         // context.world.observer.setVariable(i, newValue.toLogoObject)
         context.world.setObserverVariableByName(variableName.toUpperCase, newValue.toLogoObject)
     } // setObserverVariable()
+    
 } // ContextHelper

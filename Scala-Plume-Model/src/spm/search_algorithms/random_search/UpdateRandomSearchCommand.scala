@@ -7,10 +7,14 @@ package spm.search_algorithms.random_search
 import org.nlogo.api.{Argument, Command, Context}
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.commandSyntax
+
 import spm.helper.ContextHelper
 
+
 class UpdateRandomSearchCommand extends Command {
+    
     override def getSyntax: Syntax = commandSyntax(right = List())
+    
     
     override def perform(args: Array[Argument], context: Context): Unit = {
         val world = ContextHelper.getWorld(context)
@@ -23,4 +27,5 @@ class UpdateRandomSearchCommand extends Command {
             spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
         } // while
     } // perform()
+    
 } // UpdateRandomSearch

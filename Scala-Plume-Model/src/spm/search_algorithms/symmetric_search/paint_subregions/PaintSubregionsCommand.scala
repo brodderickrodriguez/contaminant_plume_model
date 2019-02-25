@@ -7,6 +7,7 @@ package spm.search_algorithms.symmetric_search.paint_subregions
 import org.nlogo.api.{Argument, Command, Context}
 import org.nlogo.core.{LogoList, Syntax}
 import org.nlogo.core.Syntax.ListType
+
 import spm.helper.{BreedHelper, ContextHelper}
 
 

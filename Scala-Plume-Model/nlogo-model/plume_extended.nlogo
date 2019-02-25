@@ -461,7 +461,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-0
+2
 
 SLIDER
 266

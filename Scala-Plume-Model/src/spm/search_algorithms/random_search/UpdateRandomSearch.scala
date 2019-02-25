@@ -12,6 +12,7 @@ import spm.helper.{MathHelper, ContextHelper, BreedHelper}
 
 
 object UpdateRandomSearch {
+    
     def behave(context: Context, uav: org.nlogo.agent.Turtle): Unit = {
         val randomSearchTime = BreedHelper.getBreedVariable(uav, "random-search-time").asInstanceOf[Double]
         val ticks = ContextHelper.getTicks(context)
@@ -25,4 +26,5 @@ object UpdateRandomSearch {
             BreedHelper.setBreedVariable(uav, "desired-heading", newHeading.toLogoObject)
         } // if
     } // behave()
+    
 } // UavRandomBehavior()

@@ -8,13 +8,16 @@ import org.nlogo.api.{Argument, Command, Context}
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.ListType
 import org.nlogo.api.ScalaConversions._
+
 import spm.helper.{ContextHelper, BreedHelper}
 
 import spm.search_algorithms.symmetric_search.update_symmetric_search.UpdateSymmetricSearch
 
 
 class UavRegionSetupCommand extends Command {
+    
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
+    
     
     override def perform(args: Array[Argument], context: Context): Unit = {
         val regions = UavRegionSetup.buildRegions(args, context)

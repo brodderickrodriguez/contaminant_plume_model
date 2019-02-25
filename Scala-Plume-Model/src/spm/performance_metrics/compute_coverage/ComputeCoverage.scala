@@ -13,6 +13,7 @@ import scala.collection.mutable.ListBuffer
 
 
 object ComputeCoverage {
+    
     def compute(context: Context): Unit = {
         val coverageAll = computeCoverageAll(context)
         val mean = computeCoverageMean(context, coverageAll)
@@ -23,7 +24,8 @@ object ComputeCoverage {
         ContextHelper.setObserverVariable(context, "coverage-mean", mean.toLogoObject)
         ContextHelper.setObserverVariable(context, "coverage-std", std.toLogoObject)
         ContextHelper.setObserverVariable(context, "coverage-per-plume-density", coveragePerPlumeDensity.toLogoObject)
-    }
+    } // compute()
+    
     
     def computeCoverageAll(context: Context): List[Double] = {
         val world = ContextHelper.getWorld(context)
@@ -46,12 +48,14 @@ object ComputeCoverage {
         coverageAll.toList
     } // computeCoverageAll()
     
+    
     def computeCoverageMean(context: Context, coverageAll: List[Double]): Double = coverageAll.sum / coverageAll.length
     
     
     def computeCoverageStd(context: Context, coverageAll: List[Double], mean: Double): Double = {
         math.sqrt(coverageAll.map(a => math.pow(a - mean, 2)).sum / coverageAll.length)
     } // computeCoverageStd()
+    
     
     def computeCoveragePerPlumeDensity(context: Context, coverageAll: List[Double]): Double = {
         val world = ContextHelper.getWorld(context)
@@ -67,7 +71,6 @@ object ComputeCoverage {
             coverageAll.sum / accumulativePlumeDensity
         }
         else -1
-        
     } // computeCoveragePerPlumeDensity()
     
 } // Coverage

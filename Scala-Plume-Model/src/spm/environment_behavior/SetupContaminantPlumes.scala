@@ -13,8 +13,11 @@ import org.nlogo.core.Syntax._
 
 import spm.helper.{ContextHelper, TurtleHelper, BreedHelper}
 
+
 class SetupContaminantPlumes  extends Command {
+    
     override def getSyntax: Syntax = commandSyntax(right = List())
+    
     
     override def perform(args: Array[Argument], context: Context): Unit = {
         val world = ContextHelper.getWorld(context)

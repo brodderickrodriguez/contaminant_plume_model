@@ -7,9 +7,12 @@ package spm.boids.turn_at_most
 import org.nlogo.api.{Argument, Command, Context}
 import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.{NumberType, commandSyntax}
+
 import spm.helper.{ContextHelper, InputHelper}
 
+
 class TurnAtMostCommand extends Command {
+    
     override def getSyntax: Syntax = commandSyntax(right = List(NumberType, NumberType))
     
     override def perform(args: Array[Argument], context: Context): Unit = {
@@ -19,4 +22,5 @@ class TurnAtMostCommand extends Command {
         
         TurnAtMost.go(uav, requestedTurn, maxTurnAllowed)
     } // perform()
+    
 } // TurnAtMostReporter

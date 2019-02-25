@@ -6,7 +6,9 @@ package spm.helper
 
 import org.nlogo.api.{Argument, ExtensionException, LogoException}
 
+
 object InputHelper {
+    
     /**
       * Safely gets an input in an argument array
       * @param args the array argument found in the org.nlogo.api.{Command.perform(), Reporter.report()} functions

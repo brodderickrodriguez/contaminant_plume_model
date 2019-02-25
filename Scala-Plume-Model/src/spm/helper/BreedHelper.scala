@@ -6,6 +6,7 @@ package spm.helper
 
 import org.nlogo.api.ScalaConversions._
 
+
 /**
   * BreedHelper has the ability to set both Turtle and Breed variables. Breed variables are those declared in
   * breeds-own [...] in a .nlogo file.
@@ -20,6 +21,7 @@ object BreedHelper {
     def setBreedVariable(a: org.nlogo.agent.Agent, variableName: String, newValue: Any): Unit =
         a.setBreedVariable(variableName.toUpperCase, newValue.toLogoObject)
     
+    
     /**
       * Used to get a Breed's variable
       * @param a the org.nlogo.agent.Agent we want to access
@@ -28,4 +30,5 @@ object BreedHelper {
       */
     def getBreedVariable(a: org.nlogo.agent.Agent, variableName: String): AnyRef =
         a.getBreedVariable(variableName.toUpperCase)
+    
 } // BreedHelper

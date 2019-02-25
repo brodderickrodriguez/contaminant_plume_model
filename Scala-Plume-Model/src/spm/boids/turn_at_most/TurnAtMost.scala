@@ -4,7 +4,9 @@ package spm.boids.turn_at_most
 // Auburn University - CSSE
 // 19 Feb. 2019
 
+
 object TurnAtMost {
+    
     def go(uav: org.nlogo.agent.Turtle, requestedTurn: Double, maxTurnAllowed: Double): Unit = {
         if (math.abs(requestedTurn) > maxTurnAllowed)
             if (requestedTurn > 0)
@@ -14,4 +16,5 @@ object TurnAtMost {
         else
             uav.turnRight(requestedTurn)
     } // go()
+    
 } // TurnAtMost

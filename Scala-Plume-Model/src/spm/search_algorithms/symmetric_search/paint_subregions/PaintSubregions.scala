@@ -6,6 +6,7 @@ package spm.search_algorithms.symmetric_search.paint_subregions
 
 import org.nlogo.api.Context
 import org.nlogo.core.LogoList
+
 import spm.helper.{ContextHelper, BreedHelper}
 
 
