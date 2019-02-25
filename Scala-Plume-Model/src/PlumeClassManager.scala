@@ -17,7 +17,8 @@ import symmetric_search_setup._
 import update_symmetric_search.UpdateSymmetricSearchCommand
 import paint_subregions.PaintSubregionsCommand
 import performance_metrics.compute_coverage.ComputeCoverageCommand
-
+import turn_uav.move_back_in_world_bounds.MoveBackInWorldBoundsCommand
+import turn_uav.turn.TurnUavCommand
 
 class PlumeClassManager extends DefaultClassManager {
     
@@ -37,8 +38,8 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("compute-heading-towards-point", new GetHeadingTowardsPointReporter)
         
         // spm.uav_behavior.TurnUav
-        manager.addPrimitive("turn-uav", new uav_behavior.TurnUavReporter)
-        manager.addPrimitive("move-uav-inside-world-bounds", new MoveUavBackInsideWorldBoundsCommand)
+        manager.addPrimitive("turn-uav", new TurnUavCommand)
+        manager.addPrimitive("move-uav-inside-world-bounds", new MoveBackInWorldBoundsCommand)
         
         // spm.search_algorithms.random_search
         manager.addPrimitive("update-random-search", new UpdateRandomSearchCommand)

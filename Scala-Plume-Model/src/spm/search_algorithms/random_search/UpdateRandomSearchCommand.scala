@@ -9,7 +9,7 @@ import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax.commandSyntax
 
 import spm.helper.ContextHelper
-
+import spm.uav_behavior.turn_uav.turn.TurnUav
 
 class UpdateRandomSearchCommand extends Command {
     
@@ -24,7 +24,7 @@ class UpdateRandomSearchCommand extends Command {
         while (iter.hasNext) {
             val uav = iter.next().asInstanceOf[org.nlogo.agent.Turtle]
             UpdateRandomSearch.behave(context, uav)
-            spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
+            TurnUav.perform(uav, context, maxTurn)
         } // while
     } // perform()
     

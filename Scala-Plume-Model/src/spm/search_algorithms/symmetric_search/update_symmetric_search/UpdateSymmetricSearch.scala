@@ -17,6 +17,7 @@ import spm.uav_behavior.compute_heading.ComputeHeading
 import spm.boids.find_flockmates.FindFlockmates
 import spm.search_algorithms.symmetric_search.paint_subregions.PaintSubregions
 import spm.uav_behavior.check_uav_bounds.check_uav_inside_world_bounds.CheckUavInsideWorldBounds
+import spm.uav_behavior.turn_uav.turn.TurnUav
 
 
 object UpdateSymmetricSearch {
@@ -104,7 +105,7 @@ object UpdateSymmetricSearch {
             }
         }
         checkFlockmatesDetection(context, uav)
-        spm.uav_behavior.TurnUav.go(uav, context, maxTurn)
+        TurnUav.perform(uav, context, maxTurn)
     } // updateSingleUav()
     
     
