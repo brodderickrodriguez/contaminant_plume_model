@@ -1,10 +1,11 @@
-package spm.boids
+package spm.boids.turn_towards
 
 // Brodderick Rodriguez
 // Auburn University - CSSE
 // 18 Feb. 2019
 
 import spm.helper.TurtleHelper
+import spm.boids.turn_at_most.TurnAtMost
 
 
 object TurnTowards {

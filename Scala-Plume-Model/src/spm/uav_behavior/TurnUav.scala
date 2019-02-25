@@ -13,7 +13,7 @@ import org.nlogo.core.Syntax
 import org.nlogo.core.Syntax._
 
 import spm.helper.{InputHelper, ContextHelper, BreedHelper}
-import spm.boids._
+import spm.boids.turn_towards.TurnTowards
 
 
 object MoveUavBackInsideWorldBounds {

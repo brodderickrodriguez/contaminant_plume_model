@@ -1,27 +1,13 @@
-package spm.boids
+package spm.boids.turn_at_most
 
 // Brodderick Rodriguez
 // Auburn University - CSSE
 // 19 Feb. 2019
 
+import org.nlogo.api.{Argument, Command, Context}
 import org.nlogo.core.Syntax
-import org.nlogo.core.Syntax._
-import org.nlogo.api._
-import spm.helper.{InputHelper, ContextHelper}
-
-
-object TurnAtMost {
-    def go(uav: org.nlogo.agent.Turtle, requestedTurn: Double, maxTurnAllowed: Double): Unit = {
-        if (math.abs(requestedTurn) > maxTurnAllowed)
-            if (requestedTurn > 0)
-                uav.turnRight(maxTurnAllowed)
-            else
-                uav.turnRight(-maxTurnAllowed)
-        else
-            uav.turnRight(requestedTurn)
-    } // go()
-} // TurnAtMost
-
+import org.nlogo.core.Syntax.{NumberType, commandSyntax}
+import spm.helper.{ContextHelper, InputHelper}
 
 class TurnAtMostCommand extends Command {
     override def getSyntax: Syntax = commandSyntax(right = List(NumberType, NumberType))
