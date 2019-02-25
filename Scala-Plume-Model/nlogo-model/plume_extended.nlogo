@@ -129,6 +129,12 @@ to update-swarms
 end
 
 to update-search-strategy-flock
+  ifelse plume-scala:uav-inside-world-bounds
+  [ flock ]
+  [ plume-scala:move-uav-inside-world-bounds ]
+end
+
+to flock
   find-flockmates
   if any? flockmates [
     find-best-neighbor
@@ -353,7 +359,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-47.0
+10.5
 0.5
 1
 patches
@@ -463,7 +469,7 @@ CHOOSER
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-2
+0
 
 SLIDER
 266

@@ -19,7 +19,7 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("compute-coverage-metrics", new ComputeCoverage)
         
         // spm.boids
-       // manager.addPrimitive("find-flockmates", new FindFlockmates)
+        // manager.addPrimitive("find-flockmates", new FindFlockmates)
         manager.addPrimitive("find-best-neighbor", new FindBestNeighbor)
         manager.addPrimitive("find-nearest-neighbor", new FindNearestNeighbor)
         manager.addPrimitive("turn-at-most", new TurnAtMostReporter)
@@ -37,6 +37,7 @@ class PlumeClassManager extends DefaultClassManager {
         
         // spm.uav_behavior.TurnUav
         manager.addPrimitive("turn-uav", new uav_behavior.TurnUavReporter)
+        manager.addPrimitive("move-uav-inside-world-bounds", new MoveUavBackInsideWorldBoundsCommand)
         
         // spm.search_algorithms.random_search
         manager.addPrimitive("update-random-search", new UpdateRandomSearch)
@@ -45,8 +46,7 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
         manager.addPrimitive("paint-subregions", new UavSymmetricSearchPaintSubregions)
         manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
-    
-    
+        
         // spm.environment_behavior
         manager.addPrimitive("setup-contaminant-plumes", new environment_behavior.SetupContaminantPlumes)
         
