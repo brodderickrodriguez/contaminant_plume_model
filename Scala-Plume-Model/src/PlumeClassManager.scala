@@ -11,6 +11,9 @@ import turn_at_most._
 import uav_behavior._
 import search_algorithms.random_search.UpdateRandomSearchCommand
 import search_algorithms.symmetric_search._
+import symmetric_search_setup._
+import update_symmetric_search.UpdateSymmetricSearchCommand
+import paint_subregions.PaintSubregionsCommand
 import performance_metrics.compute_coverage.ComputeCoverageCommand
 
 
@@ -38,9 +41,9 @@ class PlumeClassManager extends DefaultClassManager {
         manager.addPrimitive("update-random-search", new UpdateRandomSearchCommand)
     
         // spm.search_algorithms.symmetric_search
-        manager.addPrimitive("setup-uav-subregions", new UAVRegionSetup)
-        manager.addPrimitive("paint-subregions", new UavSymmetricSearchPaintSubregions)
-        manager.addPrimitive("update-symmetric-search", new UavUpdateSymmetricSearch)
+        manager.addPrimitive("setup-uav-subregions", new UavRegionSetupCommand)
+        manager.addPrimitive("paint-subregions", new PaintSubregionsCommand)
+        manager.addPrimitive("update-symmetric-search", new UpdateSymmetricSearchCommand)
         
         // spm.environment_behavior
         manager.addPrimitive("setup-contaminant-plumes", new environment_behavior.SetupContaminantPlumes)
