@@ -15,9 +15,10 @@ import spm.helper.{BreedHelper, ContextHelper}
 import spm.uav_behavior.check_uav_bounds.check_uav_inside_bounds.CheckUavInsideBounds
 import spm.uav_behavior.compute_heading.ComputeHeading
 import spm.boids.find_flockmates.FindFlockmates
-import spm.search_algorithms.symmetric_search.paint_subregions.PaintSubregions
+//import spm.search_algorithms.symmetric_search.paint_subregions.PaintSubregions
 import spm.uav_behavior.check_uav_bounds.check_uav_inside_world_bounds.CheckUavInsideWorldBounds
 import spm.uav_behavior.turn_uav.turn.TurnUav
+import spm.search_algorithms.random_search.UpdateRandomSearch
 
 
 object UpdateSymmetricSearch {
@@ -101,7 +102,7 @@ object UpdateSymmetricSearch {
             
                 uav.penMode(org.nlogo.agent.Turtle.PEN_DOWN)
                 BreedHelper.setBreedVariable(uav, "symmetric-search-max-reading-region", newMaxReading.toLogoObject)
-                spm.search_algorithms.random_search.UpdateRandomSearch.behave(context, uav)
+                UpdateRandomSearch.behave(context, uav)
             }
         }
         checkFlockmatesDetection(context, uav)
@@ -134,8 +135,8 @@ object UpdateSymmetricSearch {
                     } // while
                     
                     if (bestReading > regionReading) {
-                        PaintSubregions.paintSingleUavRegion(context, uav, black=true)
-                        PaintSubregions.paintSingleUavRegion(context, bestNeighbor.asInstanceOf[org.nlogo.agent.Turtle])
+//                        PaintSubregions.paintSingleUavRegion(context, uav, black=true)
+//                        PaintSubregions.paintSingleUavRegion(context, bestNeighbor.asInstanceOf[org.nlogo.agent.Turtle])
                         val flockmateRegion = BreedHelper.getBreedVariable(bestNeighbor, "UAV-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])
                         BreedHelper.setBreedVariable(uav, "UAV-region", flockmateRegion.toLogoList)
                     }
