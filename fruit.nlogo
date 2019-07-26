@@ -1,252 +1,46 @@
-; extended_plume.nlogo
-; Author: Brodderick Rodriguez
-; Created: Dec 18 2018
-;
-; Simulation of a contaminant plume and UAV behaviors which
-; cause the UAVs to map the contaminant plume
-; Extended by implementing searching algorithms outlined in:
-; Multi-Agent Control Algorithms for Chemical Cloud Detection and Mapping Using Unmanned Air Vehicles,
-; by Michael Kovacinal, Daniel Palmer, Guang Yang, Ravi Vaidyanathan
-; with additional environmental modifications
-;
-; Acknowledgements
-; Copyright 1998 Uri Wilensky.
-; See Info tab for full copyright and license.
-; Approximately X% of this program is barrowed from Uri Wilensky's Netlogo flocking progam
-; The Netlogo flocking program is based on Reynold's 1987 BOIDS program
-; Alex Madey March 2013
-
-extensions [ plume-scala ]
-
-globals [ search-strategy-flock search-strategy-random search-strategy-symmetric
-          coverage-all coverage-std coverage-mean coverage-per-plume-density percentage-coverage ]
-
-breed [ contaminant-plumes contaminant-plume ]
-breed [ UAVs UAV ]
-breed [ swarms swarm ]
-
-patches-own [ plume-density visited ]
-
-contaminant-plumes-own [ plume-spead-radius plume-spread-patches ]
-
-swarms-own [ ]
-
-UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading my-swarm detection-time
-           random-search-time UAV-region desired-heading
-           symmetric-search-max-reading-region symmetric-search-region-time ]
+globals [ ]
 
 to setup
-  clear-all
-  reset-ticks
-;  import-drawing "./resources/plume-bg.png"
-
-  setup-contaminant-plumes
-  setup-UAVs
-  setup-swarms
-
-  set search-strategy-flock "search-strategy-flock"
-  set search-strategy-random "search-strategy-random"
-  set search-strategy-symmetric "search-strategy-symmetric"
-  set coverage-all []
-
-  if global-search-strategy = search-strategy-symmetric [
-    plume-scala:setup-uav-subregions
-    plume-scala:paint-subregions
-  ]
+  ;set fruit "kiwi"
 end
 
 to go
-  update-contaminant-plumes
-  ; look for the uav locations and marked the corresponding patches visited as 1
-  calc-percentage
-  update-UAVs
-  calc-coverage
-  tick
-end
-
-to calc-coverage
-  ask UAVs [ set plume-reading plume-density ]
-  plume-scala:compute-coverage-metrics
-end
-
-; calculate percentage of the coverage
-to calc-percentage
-  let patches-in-plume 0
-  let patches-in-plume-visited 0
-
-  ask contaminant-plumes [
-
-    let curr-patches-in-plume patches in-radius plume-spread-patches
-    set patches-in-plume (count curr-patches-in-plume + patches-in-plume)
-
-    ask UAVs [
-      ask patch-here [
-        if member? self curr-patches-in-plume [set visited 1]
-      ]
-    ]
-
-    let curr-patches-in-plume-visited count curr-patches-in-plume with [visited = 1]
-    set patches-in-plume-visited (curr-patches-in-plume-visited + patches-in-plume-visited)
-  ]
-
-  set percentage-coverage (patches-in-plume-visited / patches-in-plume)
-end
-
-to setup-contaminant-plumes
-  create-contaminant-plumes number-plumes
-  plume-scala:setup-contaminant-plumes
-  update-contaminant-plumes
-end
-
-to-report pythagorean [ a b ]
-  report sqrt (a ^ 2 + b ^ 2)
-end
-
-to update-contaminant-plumes
-  ask contaminant-plumes [
-    ; reset previous patch plume-density to 0 before moving
-    ask patches in-radius plume-spread-patches [
-      set plume-density 0
-     ; set pcolor black
-    ]
-    set plume-spread-patches plume-spread-patches * (1 - plume-decay-rate)
-    set size plume-spread-patches * 2
-    set heading wind-heading
-    fd wind-speed
-
-    set-plume-patch-density
-  ]
-end
-
-to set-plume-patch-density
-  let this-plume self
-  ask patches in-radius plume-spread-patches [
-    let d distancexy [ xcor ] of myself [ ycor ] of myself
-    set plume-density plume-density + 1 - (d / [ plume-spread-patches ] of myself)
-
-  ]
-end
-
-to setup-UAVs
-  create-UAVs population [
-    set size 3
-    set shape "airplane"
-    set detection-time 0
-    setxy random-xcor random-ycor
-  ]
-end
-
-to update-UAVs
-  if global-search-strategy = search-strategy-random [ plume-scala:update-random-search ]
-  if global-search-strategy = search-strategy-symmetric [ plume-scala:update-symmetric-search ]
-
-  ask UAVs [
-    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]
-    fd 0.5
-  ]
-end
-
-to setup-swarms
-  create-swarms 1 [ hide-turtle ]
-end
-
-to update-search-strategy-flock
-  ifelse plume-scala:uav-inside-world-bounds
-  [ flock ]
-  [ plume-scala:move-uav-inside-world-bounds ]
-end
-
-to flock
-  plume-scala:find-flockmates
-  if any? flockmates [
-    find-best-neighbor
-    find-nearest-neighbor
-    ifelse distance nearest-neighbor < minimum-separation [ separate ] [ align cohere ]
-  ]
-end
-
-to find-best-neighbor
-  set best-neighbor max-one-of flockmates [ plume-reading ]
-end
-
-to find-nearest-neighbor
-  set nearest-neighbor min-one-of flockmates [ distance myself ]
-end
-
-to separate
-  turn-away ([ heading ] of nearest-neighbor) max-separate-turn
-end
-
-to align
-  if plume-reading < [ plume-reading ] of best-neighbor [ turn-towards average-flockmate-heading max-align-turn ]
-end
-
-to-report average-flockmate-heading
-  ; We can't just average the heading variables here. For example, the average of 1 and 359
-  ; should be 0, not 180.  So we have to use trigonometry.
-  let x-component sum [ dx ] of flockmates
-  let y-component sum [ dy ] of flockmates
-  ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
-end
-
-to cohere
-  if plume-reading < [ plume-reading ] of best-neighbor [ turn-towards average-heading-towards-flockmates max-cohere-turn ]
-end
-
-to-report average-heading-towards-flockmates
-  ; "towards myself" gives us the heading from the other turtle to me,
-  ; but we want the heading from me to the other turtle, so we add 180
-  let x-component [ sin (towards myself + 180) ] of best-neighbor
-  let y-component [ cos (towards myself + 180) ] of best-neighbor
-  ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
-end
-
-to turn-towards [ new-heading max-turn ]
-  turn-at-most (subtract-headings new-heading heading) max-turn
-;  plume-scala:turn-towards new-heading max-turn
-end
-
-to turn-away [ new-heading max-turn ]
-  turn-at-most (subtract-headings heading new-heading) max-turn
-end
-
-to turn-at-most [ turn max-turn ]
-  plume-scala:turn-at-most turn max-turn
+  ask patches [ set pcolor red ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-253
-13
-1241
-527
+210
+10
+647
+448
 -1
 -1
-5.0
+13.0
 1
 10
 1
 1
 1
 0
-0
-0
-1
-0
-195
-0
-100
 1
 1
+1
+-16
+16
+-16
+16
+0
+0
 1
 ticks
 30.0
 
 BUTTON
 35
-20
-125
-53
-NIL
+66
+108
+99
+setup
 setup
 NIL
 1
@@ -258,41 +52,11 @@ NIL
 NIL
 1
 
-SLIDER
-17
-231
-241
-264
-plume-spread-radius
-plume-spread-radius
-0
-1
-0.28
-0.01
-1
-percent
-HORIZONTAL
-
-SLIDER
-19
-89
-244
-122
-population
-population
-0
-100
-33.0
-1
-1
-UAVs per swarm
-HORIZONTAL
-
 BUTTON
-139
-20
-224
-53
+59
+129
+122
+162
 NIL
 go
 T
@@ -305,427 +69,41 @@ NIL
 NIL
 1
 
-SLIDER
-17
-191
-241
-224
-number-plumes
-number-plumes
-0
-5
-1.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-18
-307
-241
-340
-wind-speed
-wind-speed
-0
-0.1
-0.0178
-0.0001
-1
-NIL
-HORIZONTAL
-
-SLIDER
-17
-345
-241
-378
-wind-heading
-wind-heading
-0
-360
-177.0
-1
-1
-degrees
-HORIZONTAL
-
-PLOT
-1570
-91
-1869
-283
-plume detection map
-NIL
-NIL
-0.0
-195.0
-0.0
-100.0
-false
-false
-"" "  ask UAVs [\n    if plume-reading > 0 [\n      plotxy xcor ycor\n      plot-pen-down\n      set-plot-pen-color black\n      plotxy xcor ycor\n      plot-pen-up\n    ]  \n  ]"
-PENS
-"default" 1.0 0 -16777216 true "" ""
-
-SLIDER
-19
-127
-243
-160
-UAV-vision
-UAV-vision
-0
-world-width
-84.5
-0.5
-1
-patches
-HORIZONTAL
-
-SLIDER
-17
-270
-244
-303
-plume-decay-rate
-plume-decay-rate
-0
-0.0001
-0.0
-0.00000000001
-1
-p/t
-HORIZONTAL
-
-SLIDER
-17
-410
-240
-443
-coverage-data-decay
-coverage-data-decay
-1
-60
-11.0
-1
-1
-NIL
-HORIZONTAL
-
-PLOT
-1254
-297
-1565
-571
-coverage-std
-Ticks
-standard deviation
-0.0
-0.3
-0.0
-0.3
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot coverage-std"
-
-PLOT
-1573
-298
-1873
-569
-coverage-mean
-ticks
-UAV coverage
-0.0
-1.0
-0.0
-0.3
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot coverage-mean"
-
-SLIDER
-506
-565
-745
-598
-random-search-max-heading-time
-random-search-max-heading-time
-0
-100
-11.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-505
-604
-746
-637
-random-search-max-turn
-random-search-max-turn
-0
-5
-0.5
-0.05
-1
-degrees
-HORIZONTAL
-
 CHOOSER
-18
-555
-249
-600
-global-search-strategy
-global-search-strategy
-"search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
+31
+243
+169
+288
+fruit
+fruit
+"kiwi" "apple"
 0
 
-SLIDER
-266
-562
-492
-595
-minimum-separation
-minimum-separation
-0
-5
-1.75
-0.25
-1
-patches
-HORIZONTAL
-
-SLIDER
-266
-600
-492
-633
-max-align-turn
-max-align-turn
-0
-20
-2.25
-0.25
-1
-degrees
-HORIZONTAL
-
-SLIDER
-268
-641
-492
-674
-max-cohere-turn
-max-cohere-turn
-0
-10
-4.2
-0.1
-1
-degrees
-HORIZONTAL
-
-TEXTBOX
-274
-538
-441
-558
-search-strategy-flock
-11
-0.0
-1
-
-TEXTBOX
-513
-540
-680
-560
-search-strategy-random
-11
-0.0
-1
-
-SLIDER
-267
-680
-493
-713
-max-separate-turn
-max-separate-turn
-0
-20
-0.25
-0.25
-1
-degrees
-HORIZONTAL
-
-SLIDER
+MONITOR
+70
+326
+127
+371
+NIL
+fruit
 17
-448
-240
-481
-world-edge-threshold
-world-edge-threshold
-0
-25
-10.5
-0.5
 1
-NIL
-HORIZONTAL
+11
 
 SLIDER
-18
-485
-239
-518
-max-world-edge-turn
-max-world-edge-turn
-0
-20
-8.5
-0.5
-1
-NIL
-HORIZONTAL
-
-TEXTBOX
-20
-68
-170
-86
-UAVs & Swarms
-11
-0.0
-1
-
-TEXTBOX
-20
-171
-170
-189
-Contaminant Plumes
-11
-0.0
-1
-
-TEXTBOX
-18
-393
-168
-411
-Misc.
-11
-0.0
-1
-
-TEXTBOX
-24
-536
-211
-564
-UAV Behavior & Search Strategy
-11
-0.0
-1
-
-SLIDER
-761
-565
-1011
-598
-symmetric-search-max-turn
-symmetric-search-max-turn
-0
-20
-1.5
-0.1
-1
-degrees
-HORIZONTAL
-
-SLIDER
-761
-604
-1012
-637
-symmetric-search-region-threshold
-symmetric-search-region-threshold
-0
-25
-3.4
-0.1
-1
-NIL
-HORIZONTAL
-
-TEXTBOX
-764
-541
-914
-559
-search-strategy-symmetric
-11
-0.0
-1
-
-SLIDER
-759
-643
-1011
-676
-symmetric-search-min-region-time
-symmetric-search-min-region-time
-1
-1000
-191.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-758
-680
-1012
-713
-symmetric-search-max-region-time
-symmetric-search-max-region-time
+33
+192
+205
+225
+money
+money
+10
 100
-5000
-490.0
+50.0
 1
 1
 NIL
 HORIZONTAL
-
-PLOT
-1252
-15
-1562
-287
-percentage-coverage
-NIL
-NIL
-0.0
-0.0
-0.0
-1.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot percentage-coverage"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -773,23 +151,6 @@ airplane
 true
 0
 Polygon -7500403 true true 150 0 135 15 120 60 120 105 15 165 15 195 120 180 135 240 105 270 120 285 150 270 180 285 210 270 165 240 180 180 285 195 285 165 180 105 180 60 165 15
-
-airplane 2
-true
-0
-Polygon -7500403 true true 150 26 135 30 120 60 120 90 18 105 15 135 120 150 120 165 135 210 135 225 150 285 165 225 165 210 180 165 180 150 285 135 282 105 180 90 180 60 165 30
-Line -7500403 false 120 30 180 30
-Polygon -7500403 true true 105 255 120 240 180 240 195 255 180 270 120 270
-
-airplane1
-true
-0
-Polygon -7500403 true true 150 0 120 30 105 60 90 105 15 165 15 195 120 165 105 240 90 270 105 285 150 255 195 285 210 270 195 240 180 165 285 195 285 165 210 105 195 60 180 30
-
-airplane2
-true
-0
-Polygon -7500403 true true 150 0 135 15 120 60 120 105 60 210 75 240 120 210 135 240 105 270 120 285 150 270 180 285 195 270 165 240 180 210 225 240 240 210 180 105 180 60 165 15
 
 arrow
 true

@@ -46,7 +46,7 @@ to go
   ask turtles [ flock ]
   ask turtles [ get-reading ]
   calc-coverage
-  show ticks
+  ;;show ticks
   ask turtles [ fd 0.5 ]
   tick
 end
@@ -126,8 +126,7 @@ to-report average-heading-towards-flockmates  ;; turtle procedure
   let x-component [sin (towards myself + 180)] of best-neighbor
   let y-component [cos (towards myself + 180)] of best-neighbor
   ifelse x-component = 0 and y-component = 0
-    [ report heading
-      show heading ]
+    [ report heading ]
     [ report atan x-component y-component ]
 end
 

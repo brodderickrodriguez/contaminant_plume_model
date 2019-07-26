@@ -56,7 +56,7 @@ object ComputeCoverage {
         math.sqrt(coverageAll.map(a => math.pow(a - mean, 2)).sum / coverageAll.length)
     } // computeCoverageStd()
     
-    
+    // the uavs coverageAll / the total density of the plumes
     def computeCoveragePerPlumeDensity(context: Context, coverageAll: List[Double]): Double = {
         val world = ContextHelper.getWorld(context)
         val plumes = world.getBreed("CONTAMINANT-PLUMES")
