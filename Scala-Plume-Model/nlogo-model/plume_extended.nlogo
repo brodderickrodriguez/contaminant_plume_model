@@ -1,9 +1,8 @@
-; extended_plume.nlogo
+; plume_extended.nlogo
 ; Author: Brodderick Rodriguez
 ; Created: Dec 18 2018
 ;
-; Simulation of a contaminant plume and UAV behaviors which
-; cause the UAVs to map the contaminant plume
+; Simulation of a contaminant plume and UAV behaviors which cause the UAVs to map the contaminant plume
 ; Extended by implementing searching algorithms outlined in:
 ; Multi-Agent Control Algorithms for Chemical Cloud Detection and Mapping Using Unmanned Air Vehicles,
 ; by Michael Kovacinal, Daniel Palmer, Guang Yang, Ravi Vaidyanathan
@@ -12,148 +11,444 @@
 ; Acknowledgements
 ; Copyright 1998 Uri Wilensky.
 ; See Info tab for full copyright and license.
-; Approximately X% of this program is barrowed from Uri Wilensky's Netlogo flocking progam
+; Approximately 5% of this program is barrowed from Uri Wilensky's Netlogo flocking progam
 ; The Netlogo flocking program is based on Reynold's 1987 BOIDS program
 ; Alex Madey March 2013
 
+; model inputs:
+;   name:        Population
+;   category:    Swarm
+;   min value:   2
+;   max value:   100
+;   increment:   1
+;   unit:        UAVs
+;   description: The total number of UAVs in an episode and Swarm
+
+;   name:        UAV-vision
+;   category:    UAV
+;   min value:   0
+;   max value:   195
+;   increment:   0.5
+;   unit:        patches
+;   description: The radius around the UAV in which it can detect other UAVs
+
+;   name:        UAV-decontamination-strength
+;   category:    UAV
+;   min value:   0
+;   max value:   0.01
+;   increment:   1e-05
+;   unit:        patches
+;   description: The amount a single UAV can decontaminate (or decrease) the Contaminant Plume size in a single Tick
+
+;   name:        number-plumes
+;   category:    Plumes
+;   min value:   0
+;   max value:   5
+;   increment:   1
+;   unit:        Plumes
+;   description: The number of Plumes in the current episode
+
+;   name:        plume-spread-radius
+;   category:    Plumes
+;   min value:   0
+;   max value:   1
+;   increment:   0.01
+;   unit:        Environment Width
+;   description: A percentage of the Environment width which defines the radius of a Contaminant Plume
+
+;   name:        plume-decay-rate
+;   category:    Plumes
+;   min value:   0
+;   max value:   1E-03
+;   increment:   1E-11
+;   unit:        Patches / Tick
+;   description: The amount that a Contaminant Plume naturally decreases over a single Tick
+
+;   name:        plume-decontamination-threshold
+;   category:    Plumes
+;   min value:   0.01
+;   max value:   1
+;   increment:   0.01
+;   unit:        plume-spread-radius
+;   description: A percentage of a Contaminant Plume’s original size. When all Contaminant Plumes reach this size, the episode terminates
+		
+;   name:        wind-speed
+;   category:    Environment
+;   min value:   0
+;   max value:   0.1
+;   increment:   1E-03
+;   unit:        Patches
+;   description: The amount the Contaminant Plumes naturally shift due to wind in a single Tick
+
+;   name:        wind-heading
+;   category:    Environment
+;   min value:   0
+;   max value:   360
+;   increment:   1
+;   unit:        Degrees
+;   description: The angle which a Contaminant Plume naturally shifts due to wind in a single Tick
+
+;   name:        world-edge-threshold
+;   category:    Environment
+;   min value:   0
+;   max value:   25
+;   increment:   0.5
+;   unit:        Patches
+;   description: The minimum distance allowed between a UAV and the Environment edge before a UAV must turn
+
+;   name:        max-world-edge-turn
+;   category:    Environment
+;   min value:   0
+;   max value:   20
+;   increment:   0.5
+;   unit:        Degrees
+;   description: The maximum angle a UAV can turn away from the Environment edge when it enters the world-edge-threshold
+
+;   name:        coverage-data-decay
+;   category:    Performance Metric
+;   min value:   1
+;   max value:   60
+;   increment:   1
+;   unit:        Ticks
+;   description: A temporal threshold for calculating the standard deviation of the Swarm’s coverage
+
+;   name:        global-search-strategy
+;   category:    Swarm - Search
+;   min value:   N/A
+;   max value:   N/A
+;   increment:   N/A
+;   unit:        N/A
+;   description: The global search strategy type deployed by the Swarm
+
+;   name:        minimum-separation
+;   category:    Swarm - Search - Flock
+;   min value:   0
+;   max value:   5
+;   increment:   0.25
+;   unit:        Patches
+;   description: The minimum distance allowed between any two UAVs within the Swarm
+	
+;   name:        max-align-turn	
+;   category:    Swarm - Search - Flock
+;   min value:   0
+;   max value:   20
+;   increment:   0.25
+;   unit:        borrowed from BOIDs flocking model and is how agents align their heading with their neighbors
+;   description: Degrees
+
+;   name:        max-cohere-turn
+;   category:    Swarm - Search - Flock
+;   min value:   0
+;   max value:   10
+;   increment:   0.1
+;   unit:        Degrees
+;   description: borrowed from BOIDs flocking model and is how agents steer towards a group of neighbors
+
+;   name:        max-separate-turn
+;   category:    Swarm - Search - Flock
+;   min value:   0
+;   max value:   20
+;   increment:   0.25
+;   unit:        Degrees
+;   description: Degrees	borrowed from BOIDs flocking model and, on the contrary to alignment, is how agents steer away from their neighbors if they get too close
+
+;   name:        random-search-max-heading-time
+;   category:    Swarm - Search - Random
+;   min value:   0
+;   max value:   100
+;   increment:   1
+;   unit:        Ticks
+;   description: The maximum amount of time a UAV continues on its current trajectory before turning
+
+;   name:        random-search-max-turn
+;   category:    Swarm - Search - Random
+;   min value:   0
+;   max value:   5
+;   increment:   0.05
+;   unit:        Degrees
+;   description: The maximum angle a UAV can turn when the global search strategy is Random Search
+
+;   name:        symmetric-search-max-turn
+;   category:    Swarm - Search - Symmetric
+;   min value:   0
+;   max value:   20
+;   increment:   0.1
+;   unit:        Degrees
+;   description: Degrees	The maximum angle a UAV can turn when the global search strategy is Symmetric Search
+
+;   name:        symmetric-search-region-threshold
+;   category:    Swarm - Search - Symmetric
+;   min value:   -10
+;   max value:   25
+;   increment:   0.1
+;   unit:        patches
+;   description: The distance between a UAV and its region boarder where it is allowed to search
+
+;   name:        symmetric-search-min-region-time
+;   category:    Swarm - Search - Symmetric
+;   min value:   1
+;   max value:   1E+03
+;   increment:   1
+;   unit:        Ticks
+;   description: The minimum amount of time a UAV must spend in its initially assigned region before moving to another region
+
+;   name:        symmetric-search-max-region-time
+;   category:    Swarm - Search - Symmetric
+;   min value:   100
+;   max value:   5E+05
+;   increment:   1
+;   unit:        Ticks
+;   description: The maximum amount of time a UAV must spend in its initially assigned region before moving to another region
+
+
+; import our custom Plume Model extension
 extensions [ plume-scala ]
 
-globals [ search-strategy-flock search-strategy-random search-strategy-symmetric
-          coverage-all coverage-std coverage-mean coverage-per-plume-density percentage-coverage ]
+; globals:
+;  - search-strategy-flock - A string value to indicate the current search strategy is flock
+;  - search-strategy-random - A string value to indicate the current search strategy is random
+;  - search-strategy-symmetric - A string value to indicate the current search strategy is symmetric
+;
+;   performance metrics:
+;    - coverage-all - a list contaning all coverage readings from the UAVs over the coverage-data-decay period
+;    - coverage-std - the standard deviation of coverage-all
+;    - coverage-mean - the mean of coverage-all
+;    - percentage-coverage - the number of patches that contain contaminant and have been visited by a UAV DIVIDED BY the number of patches that contain contaminant
+globals [ search-strategy-flock search-strategy-random search-strategy-symmetric coverage-all coverage-std coverage-mean percentage-coverage ]
 
+; set up the breed types we are using
 breed [ contaminant-plumes contaminant-plume ]
 breed [ UAVs UAV ]
 breed [ swarms swarm ]
 
+; define variables to the patches for the contaminant plume and measuring performance
+;   plume-density - the density of the contaminant plume at this patch
+;   visited - if the plume-density is > 0 and this patch has been visited by a UAV then visited = 1
 patches-own [ plume-density visited ]
 
+; define variables for the contaminant plumes
+;   plume-spread-radius - the radius of the contaminant plume with respect to the world width
+;   plume-spread-patches - the radius of the contaminant plume in terms of patches
 contaminant-plumes-own [ plume-spead-radius plume-spread-patches ]
 
+; define no varialbes for the swarm
 swarms-own [ ]
 
-UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading my-swarm detection-time
-           random-search-time UAV-region desired-heading
-           symmetric-search-max-reading-region symmetric-search-region-time ]
+; define variables for the UAVs
+;   flockmates - the other UAVs in this UAVs vision
+;   nearest-neighbor - the nearest other UAV to this UAV
+;   best-neighbor - the flockmate of this UAV with the highest plume-reading
+;   plume-reading - the density of a contaminant plume at the UAVs current location
+;   my-swarm - the swarm which this UAV is a part of
+;   detection-time - the time when this UAV first detected a contaminant plume
+;   random-search-time - the number of thicks this UAV will continue on its current heading before turning when the search strategy is random
+;   UAV-region - the region (defined as a list) which this UAV is resonsible for searching when the search strategy is symmetric
+;   desired-heading - the heading this UAV is changing to over more than one tick. This allows a UAV to remember where to turn when a "*-max-turn" input limits the turning radius
+;   symmetric-search-max-reading-region - the maximum contaminant plume sensor reading this UAV has seen in its current region
+;   symmetric-search-region-time - the amount of time this UAV will stay in its current region before considering switching to another region
+UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading my-swarm detection-time random-search-time
+           UAV-region desired-heading symmetric-search-max-reading-region symmetric-search-region-time ]
 
+
+; called at the begining of an episode
 to setup
+  ; reset the environment
   clear-all
   reset-ticks
-;  import-drawing "./resources/plume-bg.png"
 
+  ; set a background image
+  import-drawing "./resources/plume-bg.png"
+
+  ; set up the contaminant plumes, UAVs, then Swarms
   setup-contaminant-plumes
   setup-UAVs
   setup-swarms
 
+  ; initialize strings to indicate which search strategy we are using in this episode
   set search-strategy-flock "search-strategy-flock"
   set search-strategy-random "search-strategy-random"
   set search-strategy-symmetric "search-strategy-symmetric"
+
+  ; initialize the coverage-all list
   set coverage-all []
 
+  ; if the seach strategy is symmetric search, then set up the environment accordingly. See Scala implementation for details.
   if global-search-strategy = search-strategy-symmetric [
     plume-scala:setup-uav-subregions
     plume-scala:paint-subregions
   ]
 end
 
+
+; called at each tick "forever" is set to True, indicating it continues to execute until the termination condition is met
 to go
+  ; run procedure to update the contaminant plumes. see the procedure below for details
   update-contaminant-plumes
-  ; look for the uav locations and marked the corresponding patches visited as 1
-  calc-percentage
+
+  ; call the procedure to update the UAVs. see the procedure below for details
   update-UAVs
+
+  ; call the procedure to calculate calc-percentage, coverage-all, coverage-mean and coverage-std
   calc-coverage
+
+  ; increments the timestep by 1
   tick
+
+  ; run the procedure to check if the termination condition is met, if it is, then terminate the episode
   if check-termination-condition [ stop ]
 end
 
-to calc-coverage
-  ask UAVs [ set plume-reading plume-density ]
-  plume-scala:compute-coverage-metrics
-end
 
-
+; a procedure which returns true if the termination condition is met, false otherwise
 to-report check-termination-condition
+  ; if there are no contaminant plumes, then return false
+  if number-plumes < 1 [ report false ]
+
+  ; a variable to check if all contaminant plumes are smaller than the threashold set by input plume-decontamination-threshold
   let all-plumes-decontaminated true
+
+  ; compute the original size of the contaminant plumes when the experiment began
   let original-plume-spread-patches plume-spread-radius * world-width / 2
+
+  ; compute the size of the contaminant plume when the episode will terminate
   let plume-decontamination-threshold-patches original-plume-spread-patches * plume-decontamination-threshold
 
+  ; for each contaminant plume, check if its size is less than the threshold
   ask contaminant-plumes [
+    ; if it is not, then set all-plumes-decontaminated = false
     if plume-spread-patches > plume-decontamination-threshold-patches [ set all-plumes-decontaminated false ]
   ]
 
+  ; return true if the termination condition is met, false otherwise
   report all-plumes-decontaminated
 end
 
-; calculate percentage of the coverage
-to calc-percentage
-  let patches-in-plume 0
-  let patches-in-plume-visited 0
 
+; a procedure to calcuate the performance metrics calc-percentage, coverage-all, coverage-mean and coverage-std
+to calc-coverage
+  ; update all the UAV's sensor reading value to the density of the contaminant plyme at its current location
+  ask UAVs [ set plume-reading plume-density ]
+
+  ; compute coverage-all, coverage-mean and coverage-std in the scala implementation
+  plume-scala:compute-coverage-metrics
+
+  ; initialize a variable to track how many patches have a contaminant plume density
+  let total-patches-in-plume 0
+
+  ; initialize a variable to track how many patches have a contaminant plume density and have been visited by a UAV
+  let total-patches-in-plume-visited 0
+
+  ; for each contaminant plume
   ask contaminant-plumes [
 
-    let curr-patches-in-plume patches in-radius plume-spread-patches
-    set patches-in-plume (count curr-patches-in-plume + patches-in-plume)
+    ; get the patches which this contaminant plume are currently over
+    let patches-in-this-plume patches in-radius plume-spread-patches
 
-    ask UAVs [
-      ask patch-here [
-        if member? self curr-patches-in-plume [set visited 1]
-      ]
-    ]
+    ; sum the total-patches-in-plume with the patches-in-this-plume
+    set total-patches-in-plume (count patches-in-this-plume + total-patches-in-plume)
 
-    let curr-patches-in-plume-visited count curr-patches-in-plume with [visited = 1]
-    set patches-in-plume-visited (curr-patches-in-plume-visited + patches-in-plume-visited)
+    ; if the patch at the UAVs current location is a part of patches-in-this-plume then set visited = 1
+    ask UAVs [ ask patch-here [ if member? self patches-in-this-plume [set visited 1] ] ]
+
+    ; count the number of patches that this contaminant plume cover which have visitied set to 1
+    let patches-in-this-plume-visited count patches-in-this-plume with [visited = 1]
+
+    ; sum the total-patches-in-plume-visited and patches-in-this-plume-visited
+    set total-patches-in-plume-visited (patches-in-this-plume-visited + total-patches-in-plume-visited)
   ]
 
-  set percentage-coverage (patches-in-plume-visited / patches-in-plume)
+  ; if the number of total patches with contaminant plume covering them is greater than 0
+  ; this checks for division by zero in the case that there are no contaminant plumes
+  ; or that the contaminant plumes have decreased to the point where they cover no patches
+  if total-patches-in-plume > 0 [
+    ; set the percent-coverage to the number of patches that contain contaminant and have been visited by a UAV
+    ; DIVIDED BY the number of patches that contain contaminant
+    set percentage-coverage (total-patches-in-plume-visited / total-patches-in-plume)
+  ]
+
 end
 
+
+; a procedure to set up the initial state of the contaminant plumes
 to setup-contaminant-plumes
+  ; create "number-plumes" number of plumes
   create-contaminant-plumes number-plumes
+
+  ; call the scala implementation to set up all the contaminant plumes
   plume-scala:setup-contaminant-plumes
+
+  ; call the procedure to update the contaminant plumes
   update-contaminant-plumes
 end
 
-to-report pythagorean [ a b ]
-  report sqrt (a ^ 2 + b ^ 2)
-end
 
+; a procedure to update the contaminant plumes
 to update-contaminant-plumes
+  ; for each contaminant plume
   ask contaminant-plumes [
+    ; if its plume-spread in patches is greater than zero
     if plume-spread-patches > 0 [
       ; reset previous patch plume-density to 0 before moving
-      ask patches in-radius plume-spread-patches [
-        set plume-density 0
-      ]
+      ask patches in-radius plume-spread-patches [ set plume-density 0 ]
+
+      ; update the plume-spread patches to decrease in size decided by the input parameter plume-decay-rate
       set plume-spread-patches plume-spread-patches * (1 - plume-decay-rate)
+
+      ; set the size to 2 times its radius
       set size plume-spread-patches * 2
+
+      ; set the contaminant plume heading to the heading of the wind
       set heading wind-heading
+
+      ; move the contaminant plume forward by "wind-speed" number of patches
       fd wind-speed
+
+      ; call the procedure to update plume patch density
       set-plume-patch-density
 
+      ; set a temporary variable to track the plume-spread-patches
+      ; in order to allow UAVs to decontaminate the plume
       let tmp-plume-spread-patches plume-spread-patches
 
+      ; for each UAV
       ask UAVs [
+        ; if the UAV is on the contaminant plume
         if distance myself <= ([plume-spread-patches] of myself) [
+          ; then decrease the size of the contaminant plume by "UAV-decontamination-strength" patches
           set tmp-plume-spread-patches tmp-plume-spread-patches - UAV-decontamination-strength
         ]
       ]
 
+      ; update the contaminant plume size
       set plume-spread-patches tmp-plume-spread-patches
 
     ]
   ]
 end
 
+
+; a procedure to linearly decrease the density of the contaminant plume the closer to the edges
 to set-plume-patch-density
+  ; set a local variable for the contaminant plume that called this procedure
   let this-plume self
+
+  ; for each patch that this contaminant plume covers
   ask patches in-radius plume-spread-patches [
+    ; compute the distance from the center of the contaminant plume to this patch
     let d distancexy [ xcor ] of myself [ ycor ] of myself
+
+    ; set the patch's plume density to 1 - (distance / plume radius)
     set plume-density plume-density + 1 - (d / [ plume-spread-patches ] of myself)
 
   ]
 end
 
+
+; a procedure to set up the initial state of the UAVs
 to setup-UAVs
+  ; create "population" number of UAvs
   create-UAVs population [
+    ; set their attributes
     set size 3
     set shape "airplane"
     set detection-time 0
@@ -161,26 +456,45 @@ to setup-UAVs
   ]
 end
 
+
+; a procedure to update the UAVs based on the global search strategy
 to update-UAVs
+  ; if the global search strategy is random, then call the scala implementation
   if global-search-strategy = search-strategy-random [ plume-scala:update-random-search ]
+
+  ; if the global search strategy is symmetric, then call the scala implementation
   if global-search-strategy = search-strategy-symmetric [ plume-scala:update-symmetric-search ]
 
+  ; for each UAV
   ask UAVs [
+    ; if the global search strategy is random, then call the procedure to update flock
     if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]
+
+    ; move each UAV forward
     fd 0.5
   ]
 end
 
+
+; a procedure to create the swarms
 to setup-swarms
+  ; create 1 swarm and hide it (dont show it on the GUI)
   create-swarms 1 [ hide-turtle ]
 end
 
+
+; a procedure to update the flock search strategy
 to update-search-strategy-flock
+  ; if the UAV is inside of the world bounds decided by the input parameter world-edge-threshold
+  ; then flock
+  ; otherwise, call the scala implementation to move the UAV back into the world
   ifelse plume-scala:uav-inside-world-bounds
   [ flock ]
   [ plume-scala:move-uav-inside-world-bounds ]
 end
 
+
+; a procedure to
 to flock
   plume-scala:find-flockmates
   if any? flockmates [
@@ -190,22 +504,32 @@ to flock
   ]
 end
 
+
+; a procedure to
 to find-best-neighbor
   set best-neighbor max-one-of flockmates [ plume-reading ]
 end
 
+
+; a procedure to
 to find-nearest-neighbor
   set nearest-neighbor min-one-of flockmates [ distance myself ]
 end
 
+
+; a procedure to
 to separate
   turn-away ([ heading ] of nearest-neighbor) max-separate-turn
 end
 
+
+; a procedure to
 to align
   if plume-reading < [ plume-reading ] of best-neighbor [ turn-towards average-flockmate-heading max-align-turn ]
 end
 
+
+; a procedure to
 to-report average-flockmate-heading
   ; We can't just average the heading variables here. For example, the average of 1 and 359
   ; should be 0, not 180.  So we have to use trigonometry.
@@ -214,10 +538,14 @@ to-report average-flockmate-heading
   ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
 end
 
+
+; a procedure to
 to cohere
   if plume-reading < [ plume-reading ] of best-neighbor [ turn-towards average-heading-towards-flockmates max-cohere-turn ]
 end
 
+
+; a procedure to
 to-report average-heading-towards-flockmates
   ; "towards myself" gives us the heading from the other turtle to me,
   ; but we want the heading from me to the other turtle, so we add 180
@@ -226,15 +554,21 @@ to-report average-heading-towards-flockmates
   ifelse x-component = 0 and y-component = 0 [ report heading ] [ report atan x-component y-component ]
 end
 
+
+; a procedure to
 to turn-towards [ new-heading max-turn ]
   turn-at-most (subtract-headings new-heading heading) max-turn
 ;  plume-scala:turn-towards new-heading max-turn
 end
 
+
+; a procedure to
 to turn-away [ new-heading max-turn ]
   turn-at-most (subtract-headings heading new-heading) max-turn
 end
 
+
+; a procedure to
 to turn-at-most [ turn max-turn ]
   plume-scala:turn-at-most turn max-turn
 end
@@ -292,7 +626,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.26
+0.5
 0.01
 1
 percent
@@ -307,7 +641,7 @@ population
 population
 0
 100
-16.0
+39.0
 1
 1
 UAVs per swarm
@@ -339,37 +673,37 @@ number-plumes
 number-plumes
 0
 5
-2.0
+1.0
 1
 1
-NIL
-HORIZONTAL
-
-SLIDER
-18
-353
-241
-386
-wind-speed
-wind-speed
-0
-0.1
-0.0
-0.0001
-1
-NIL
+plumes
 HORIZONTAL
 
 SLIDER
 17
-391
-241
-424
+403
+240
+436
+wind-speed
+wind-speed
+0
+0.1
+0.0135
+0.0001
+1
+patches
+HORIZONTAL
+
+SLIDER
+16
+441
+240
+474
 wind-heading
 wind-heading
 0
 360
-177.0
+270.0
 1
 1
 degrees
@@ -417,7 +751,7 @@ plume-decay-rate
 plume-decay-rate
 0
 0.0001
-1.0E-4
+0.0
 0.00000000001
 1
 p/t
@@ -435,7 +769,7 @@ coverage-data-decay
 11.0
 1
 1
-NIL
+ticks
 HORIZONTAL
 
 PLOT
@@ -475,10 +809,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot coverage-mean"
 
 SLIDER
-506
-565
+504
+564
 745
-598
+597
 random-search-max-heading-time
 random-search-max-heading-time
 0
@@ -486,7 +820,7 @@ random-search-max-heading-time
 11.0
 1
 1
-NIL
+Ticks
 HORIZONTAL
 
 SLIDER
@@ -595,7 +929,7 @@ degrees
 HORIZONTAL
 
 SLIDER
-17
+16
 539
 240
 572
@@ -603,16 +937,16 @@ world-edge-threshold
 world-edge-threshold
 0
 25
-10.5
+5.0
 0.5
 1
-NIL
+degrees
 HORIZONTAL
 
 SLIDER
-18
+17
 576
-239
+238
 609
 max-world-edge-turn
 max-world-edge-turn
@@ -621,7 +955,7 @@ max-world-edge-turn
 8.5
 0.5
 1
-NIL
+degrees
 HORIZONTAL
 
 TEXTBOX
@@ -667,13 +1001,13 @@ UAV Behavior & Search Strategy
 SLIDER
 761
 565
-1011
+1045
 598
 symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-1.5
+3.9
 0.1
 1
 degrees
@@ -682,16 +1016,16 @@ HORIZONTAL
 SLIDER
 761
 604
-1012
+1046
 637
 symmetric-search-region-threshold
 symmetric-search-region-threshold
-0
+-10
 25
-3.4
+-4.8
 0.1
 1
-NIL
+patches
 HORIZONTAL
 
 TEXTBOX
@@ -705,33 +1039,33 @@ search-strategy-symmetric
 1
 
 SLIDER
-759
+761
 643
-1011
+1046
 676
 symmetric-search-min-region-time
 symmetric-search-min-region-time
 1
 1000
-191.0
+28.0
 1
 1
-NIL
+Ticks
 HORIZONTAL
 
 SLIDER
-758
-680
-1012
-713
+761
+679
+1047
+712
 symmetric-search-max-region-time
 symmetric-search-max-region-time
 100
 5000
-490.0
+554.0
 1
 1
-NIL
+Ticks
 HORIZONTAL
 
 PLOT
@@ -755,28 +1089,28 @@ PENS
 SLIDER
 19
 170
-243
+244
 203
 UAV-decontamination-strength
 UAV-decontamination-strength
 0
 0.01
-0.0
+5.2E-4
 0.00001
 1
-NIL
+patches
 HORIZONTAL
 
 SLIDER
-18
-430
-241
-463
+19
+359
+242
+392
 plume-decontamination-threshold
 plume-decontamination-threshold
 0.01
 1
-0.0
+0.1
 0.01
 1
 NIL
