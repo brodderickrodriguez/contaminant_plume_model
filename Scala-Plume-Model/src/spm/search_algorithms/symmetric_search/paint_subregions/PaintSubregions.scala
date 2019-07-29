@@ -11,7 +11,7 @@ import spm.helper.{ContextHelper, BreedHelper}
 
 
 object PaintSubregions {
-    
+
     def paintSingleUavRegion(context: Context, uav: org.nlogo.agent.Turtle, black: Boolean = false): Unit = {
         val uavColor = uav.color().asInstanceOf[Double] + 4
         val region = BreedHelper.getBreedVariable(uav, "uav-region").asInstanceOf[LogoList].toList.map(_.asInstanceOf[Double])

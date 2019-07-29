@@ -14,8 +14,7 @@ import spm.helper.ContextHelper
 class UpdateSymmetricSearchCommand extends Command {
     
     override def getSyntax: Syntax = Syntax.reporterSyntax(right = List(), ret = ListType)
-    
-    
+
     override def perform(args: Array[Argument], context: Context): Unit = {
         val it = ContextHelper.getWorld(context).getBreed("UAVS").iterator
         
