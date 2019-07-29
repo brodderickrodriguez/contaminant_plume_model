@@ -307,7 +307,7 @@ population
 population
 0
 100
-100.0
+16.0
 1
 1
 UAVs per swarm
@@ -417,7 +417,7 @@ plume-decay-rate
 plume-decay-rate
 0
 0.0001
-0.0
+1.0E-4
 0.00000000001
 1
 p/t
@@ -761,7 +761,7 @@ UAV-decontamination-strength
 UAV-decontamination-strength
 0
 0.01
-0.01
+0.0
 0.00001
 1
 NIL
@@ -774,9 +774,9 @@ SLIDER
 463
 plume-decontamination-threshold
 plume-decontamination-threshold
-0
+0.01
 1
-0.64
+0.0
 0.01
 1
 NIL
