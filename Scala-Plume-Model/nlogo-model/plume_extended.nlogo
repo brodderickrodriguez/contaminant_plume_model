@@ -62,11 +62,25 @@ to go
   update-UAVs
   calc-coverage
   tick
+  if check-termination-condition [ stop ]
 end
 
 to calc-coverage
   ask UAVs [ set plume-reading plume-density ]
   plume-scala:compute-coverage-metrics
+end
+
+
+to-report check-termination-condition
+  let all-plumes-decontaminated true
+  let original-plume-spread-patches plume-spread-radius * world-width / 2
+  let plume-decontamination-threshold-patches original-plume-spread-patches * plume-decontamination-threshold
+
+  ask contaminant-plumes [
+    if plume-spread-patches > plume-decontamination-threshold-patches [ set all-plumes-decontaminated false ]
+  ]
+
+  report all-plumes-decontaminated
 end
 
 ; calculate percentage of the coverage
@@ -104,17 +118,28 @@ end
 
 to update-contaminant-plumes
   ask contaminant-plumes [
-    ; reset previous patch plume-density to 0 before moving
-    ask patches in-radius plume-spread-patches [
-      set plume-density 0
-     ; set pcolor black
-    ]
-    set plume-spread-patches plume-spread-patches * (1 - plume-decay-rate)
-    set size plume-spread-patches * 2
-    set heading wind-heading
-    fd wind-speed
+    if plume-spread-patches > 0 [
+      ; reset previous patch plume-density to 0 before moving
+      ask patches in-radius plume-spread-patches [
+        set plume-density 0
+      ]
+      set plume-spread-patches plume-spread-patches * (1 - plume-decay-rate)
+      set size plume-spread-patches * 2
+      set heading wind-heading
+      fd wind-speed
+      set-plume-patch-density
 
-    set-plume-patch-density
+      let tmp-plume-spread-patches plume-spread-patches
+
+      ask UAVs [
+        if distance myself <= ([plume-spread-patches] of myself) [
+          set tmp-plume-spread-patches tmp-plume-spread-patches - UAV-decontamination-strength
+        ]
+      ]
+
+      set plume-spread-patches tmp-plume-spread-patches
+
+    ]
   ]
 end
 
@@ -260,14 +285,14 @@ NIL
 
 SLIDER
 17
-231
+277
 241
-264
+310
 plume-spread-radius
 plume-spread-radius
 0
 1
-0.28
+0.26
 0.01
 1
 percent
@@ -282,7 +307,7 @@ population
 population
 0
 100
-33.0
+100.0
 1
 1
 UAVs per swarm
@@ -307,14 +332,14 @@ NIL
 
 SLIDER
 17
-191
+237
 241
-224
+270
 number-plumes
 number-plumes
 0
 5
-1.0
+2.0
 1
 1
 NIL
@@ -322,14 +347,14 @@ HORIZONTAL
 
 SLIDER
 18
-307
+353
 241
-340
+386
 wind-speed
 wind-speed
 0
 0.1
-0.0178
+0.0
 0.0001
 1
 NIL
@@ -337,9 +362,9 @@ HORIZONTAL
 
 SLIDER
 17
-345
+391
 241
-378
+424
 wind-heading
 wind-heading
 0
@@ -385,9 +410,9 @@ HORIZONTAL
 
 SLIDER
 17
-270
+316
 244
-303
+349
 plume-decay-rate
 plume-decay-rate
 0
@@ -400,9 +425,9 @@ HORIZONTAL
 
 SLIDER
 17
-410
+501
 240
-443
+534
 coverage-data-decay
 coverage-data-decay
 1
@@ -481,13 +506,13 @@ HORIZONTAL
 
 CHOOSER
 18
-555
+646
 249
-600
+691
 global-search-strategy
 global-search-strategy
 "search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
-0
+2
 
 SLIDER
 266
@@ -498,7 +523,7 @@ minimum-separation
 minimum-separation
 0
 5
-1.75
+0.0
 0.25
 1
 patches
@@ -513,7 +538,7 @@ max-align-turn
 max-align-turn
 0
 20
-2.25
+0.0
 0.25
 1
 degrees
@@ -528,7 +553,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-4.2
+0.0
 0.1
 1
 degrees
@@ -563,7 +588,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-0.25
+0.5
 0.25
 1
 degrees
@@ -571,9 +596,9 @@ HORIZONTAL
 
 SLIDER
 17
-448
+539
 240
-481
+572
 world-edge-threshold
 world-edge-threshold
 0
@@ -586,9 +611,9 @@ HORIZONTAL
 
 SLIDER
 18
-485
+576
 239
-518
+609
 max-world-edge-turn
 max-world-edge-turn
 0
@@ -611,9 +636,9 @@ UAVs & Swarms
 
 TEXTBOX
 20
-171
+217
 170
-189
+235
 Contaminant Plumes
 11
 0.0
@@ -621,9 +646,9 @@ Contaminant Plumes
 
 TEXTBOX
 18
-393
+484
 168
-411
+502
 Misc.
 11
 0.0
@@ -631,9 +656,9 @@ Misc.
 
 TEXTBOX
 24
-536
+627
 211
-564
+655
 UAV Behavior & Search Strategy
 11
 0.0
@@ -726,6 +751,36 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot percentage-coverage"
+
+SLIDER
+19
+170
+243
+203
+UAV-decontamination-strength
+UAV-decontamination-strength
+0
+0.01
+0.01
+0.00001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+18
+430
+241
+463
+plume-decontamination-threshold
+plume-decontamination-threshold
+0
+1
+0.64
+0.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
