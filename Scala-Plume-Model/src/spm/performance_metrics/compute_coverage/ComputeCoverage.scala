@@ -18,12 +18,10 @@ object ComputeCoverage {
         val coverageAll = computeCoverageAll(context)
         val mean = computeCoverageMean(context, coverageAll)
         val std = computeCoverageStd(context, coverageAll, mean)
-        val coveragePerPlumeDensity = computeCoveragePerPlumeDensity(context, coverageAll)
-        
+
         ContextHelper.setObserverVariable(context, "coverage-all", coverageAll.toLogoList)
         ContextHelper.setObserverVariable(context, "coverage-mean", mean.toLogoObject)
         ContextHelper.setObserverVariable(context, "coverage-std", std.toLogoObject)
-        ContextHelper.setObserverVariable(context, "coverage-per-plume-density", coveragePerPlumeDensity.toLogoObject)
     } // compute()
     
     
@@ -55,18 +53,18 @@ object ComputeCoverage {
     def computeCoverageStd(context: Context, coverageAll: List[Double], mean: Double): Double = {
         math.sqrt(coverageAll.map(a => math.pow(a - mean, 2)).sum / coverageAll.length)
     } // computeCoverageStd()
-    
+
     // the uavs coverageAll / the total density of the plumes
     def computeCoveragePerPlumeDensity(context: Context, coverageAll: List[Double]): Double = {
         val world = ContextHelper.getWorld(context)
         val plumes = world.getBreed("CONTAMINANT-PLUMES")
         val iter = world.getBreed("CONTAMINANT-PLUMES").iterator
-        
+
         if (iter.hasNext) {
             val singlePlume = iter.next().asInstanceOf[org.nlogo.agent.Turtle]
             val plumeSpreadPatches = BreedHelper.getBreedVariable(singlePlume, "plume-spread-patches").asInstanceOf[Double]
             var accumulativePlumeDensity = math.Pi * math.pow(plumeSpreadPatches, 2) + math.Pi * plumeSpreadPatches
-            
+
             accumulativePlumeDensity *= plumes.count
             coverageAll.sum / accumulativePlumeDensity
         }
