@@ -494,42 +494,59 @@ to update-search-strategy-flock
 end
 
 
-; a procedure to
+; a procedure to perform the flock search strategy
 to flock
+  ; call the scala implementation to find a UAVs flockmates. See scala implementation for details.
   plume-scala:find-flockmates
+
+  ; if this UAV has any flockmates
   if any? flockmates [
+    ; then call the procedure to set this UAVs best-neighbor (the UAV with the highest contaminant plume sensor reading)
     find-best-neighbor
+
+    ; call the procedure to set this UAVs nearest-neighbor
     find-nearest-neighbor
+
+    ; if the distance to the nearest-neighbor is less than the input parameter "minimum-separation"
+    ; then call the separate procedure
+    ; otherwise call the align procedure then the cohere procedure
     ifelse distance nearest-neighbor < minimum-separation [ separate ] [ align cohere ]
   ]
 end
 
 
-; a procedure to
+; a procedure to find a UAVs best neighbor
 to find-best-neighbor
+  ; se the best-neighbor to the flockmate which has the highest plume-reading
   set best-neighbor max-one-of flockmates [ plume-reading ]
 end
 
 
-; a procedure to
+; a procedure to set a UAVs nearest neighbor
 to find-nearest-neighbor
+  ; set the nearest-neighbor to the flockmate which is closest to the UAV which called this procedure
   set nearest-neighbor min-one-of flockmates [ distance myself ]
 end
 
 
-; a procedure to
+; a procedure to separate two UAVs
 to separate
+  ; call the turn away procedure using the direction of the nearest-neighbor and the input
+  ; parmeter "max-separate-turn"
   turn-away ([ heading ] of nearest-neighbor) max-separate-turn
 end
 
 
-; a procedure to
+; a procedure to align a UAV with the average heading of a UAVs flockmates
 to align
+  ; if the contaminant plume reading of this UAV is less than the contaminant plume reading of this UAVs best-neighbor
+  ; then turn towards the average heading of this UAVs flockmates
+  ; using the input parameter "max-align-turn"
   if plume-reading < [ plume-reading ] of best-neighbor [ turn-towards average-flockmate-heading max-align-turn ]
 end
 
 
-; a procedure to
+; a procedure to determine the average heading of the flockmates of the UAV which called this procedure
 to-report average-flockmate-heading
   ; We can't just average the heading variables here. For example, the average of 1 and 359
   ; should be 0, not 180.  So we have to use trigonometry.
@@ -539,8 +556,11 @@ to-report average-flockmate-heading
 end
 
 
-; a procedure to
+; a procedure to cohere the UAV that called this procedure
 to cohere
+  ; if the contaminant plume reading of this UAV is less than the contaminant plume reading of this UAVs best neighbor
+  ; then turn towards the average heading towards this UAVs flockmates
+  ; using the input parameter "max-cohere-turn"
   if plume-reading < [ plume-reading ] of best-neighbor [ turn-towards average-heading-towards-flockmates max-cohere-turn ]
 end
 
@@ -555,21 +575,29 @@ to-report average-heading-towards-flockmates
 end
 
 
-; a procedure to
+; a procedure to turn a UAV towards new-heading
 to turn-towards [ new-heading max-turn ]
+  ; call the turn-at-most procedure to limit the amount of turn allowed in a single time tick
+  ; using the difference in new-heading and the current heading and
+  ; the procedure parameter "max-turn"
   turn-at-most (subtract-headings new-heading heading) max-turn
 ;  plume-scala:turn-towards new-heading max-turn
 end
 
 
-; a procedure to
+; a procedure to turn a UVA away from new-heading
 to turn-away [ new-heading max-turn ]
+  ; call the turn-at-most procedure to limit the amount of turn allowed in a single time tick
+  ; using the difference in the current heading and new-heading and
+  ; the procedure parameter "max-turn"
   turn-at-most (subtract-headings heading new-heading) max-turn
 end
 
 
-; a procedure to
+; a procedure to turn a UAV a limited number of degrees
 to turn-at-most [ turn max-turn ]
+  ; call the scala implementation to turn a UAV in a new heading
+  ; this function limits the amount a UAV can turn in a single time tick
   plume-scala:turn-at-most turn max-turn
 end
 @#$#@#$#@
