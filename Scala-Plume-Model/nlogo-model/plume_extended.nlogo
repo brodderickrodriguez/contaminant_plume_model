@@ -239,15 +239,14 @@ swarms-own [ ]
 ;   nearest-neighbor - the nearest other UAV to this UAV
 ;   best-neighbor - the flockmate of this UAV with the highest plume-reading
 ;   plume-reading - the density of a contaminant plume at the UAVs current location
-;   my-swarm - the swarm which this UAV is a part of
 ;   detection-time - the time when this UAV first detected a contaminant plume
-;   random-search-time - the number of thicks this UAV will continue on its current heading before turning when the search strategy is random
+;   random-search-time - the number of ticks this UAV will continue on its current heading before turning when the search strategy is random
 ;   UAV-region - the region (defined as a list) which this UAV is resonsible for searching when the search strategy is symmetric
 ;   desired-heading - the heading this UAV is changing to over more than one tick. This allows a UAV to remember where to turn when a "*-max-turn" input limits the turning radius
-;   symmetric-search-max-reading-region - the maximum contaminant plume sensor reading this UAV has seen in its current region
+;   symmetric-search-max-region-reading - the maximum contaminant plume sensor reading this UAV has seen in its current region
 ;   symmetric-search-region-time - the amount of time this UAV will stay in its current region before considering switching to another region
-UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading my-swarm detection-time random-search-time
-           UAV-region desired-heading symmetric-search-max-reading-region symmetric-search-region-time ]
+UAVs-own [ flockmates nearest-neighbor best-neighbor plume-reading detection-time random-search-time
+           UAV-region desired-heading symmetric-search-max-region-reading symmetric-search-region-time ]
 
 
 ; called at the begining of an episode
@@ -885,7 +884,7 @@ minimum-separation
 minimum-separation
 0
 5
-0.0
+0.5
 0.25
 1
 patches
@@ -900,7 +899,7 @@ max-align-turn
 max-align-turn
 0
 20
-0.0
+4.25
 0.25
 1
 degrees
@@ -915,7 +914,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-0.0
+5.0
 0.1
 1
 degrees
