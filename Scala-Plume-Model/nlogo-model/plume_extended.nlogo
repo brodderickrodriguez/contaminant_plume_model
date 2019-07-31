@@ -1122,7 +1122,7 @@ UAV-decontamination-strength
 UAV-decontamination-strength
 0
 0.01
-0.0
+0.01
 0.00001
 1
 patches
