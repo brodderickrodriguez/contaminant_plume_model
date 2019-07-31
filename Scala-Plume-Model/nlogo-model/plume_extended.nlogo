@@ -213,8 +213,8 @@ extensions [ plume-scala ]
 ;    - coverage-all - a list contaning all coverage readings from the UAVs over the coverage-data-decay period
 ;    - coverage-std - the standard deviation of coverage-all
 ;    - coverage-mean - the mean of coverage-all
-;    - percentage-coverage - the number of patches that contain contaminant and have been visited by a UAV DIVIDED BY the number of patches that contain contaminant
-globals [ search-strategy-flock search-strategy-random search-strategy-symmetric coverage-all coverage-std coverage-mean percentage-coverage ]
+;    - coverage-percentage - the number of patches that contain contaminant and have been visited by a UAV DIVIDED BY the number of patches that contain contaminant
+globals [ search-strategy-flock search-strategy-random search-strategy-symmetric coverage-all coverage-std coverage-mean coverage-percentage ]
 
 ; set up the breed types we are using
 breed [ contaminant-plumes contaminant-plume ]
@@ -362,7 +362,7 @@ to calc-coverage
   if total-patches-in-plume > 0 [
     ; set the percent-coverage to the number of patches that contain contaminant and have been visited by a UAV
     ; DIVIDED BY the number of patches that contain contaminant
-    set percentage-coverage (total-patches-in-plume-visited / total-patches-in-plume)
+    set coverage-percentage (total-patches-in-plume-visited / total-patches-in-plume)
   ]
 
 end
@@ -715,7 +715,7 @@ wind-speed
 wind-speed
 0
 0.1
-0.0135
+0.0
 0.0001
 1
 patches
@@ -1034,7 +1034,7 @@ symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-3.9
+20.0
 0.1
 1
 degrees
@@ -1049,7 +1049,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 -10
 25
--4.8
+-2.9
 0.1
 1
 patches
@@ -1111,7 +1111,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot percentage-coverage"
+"default" 1.0 0 -16777216 true "" "plot coverage-percentage"
 
 SLIDER
 19
@@ -1122,7 +1122,7 @@ UAV-decontamination-strength
 UAV-decontamination-strength
 0
 0.01
-5.2E-4
+0.0
 0.00001
 1
 patches
