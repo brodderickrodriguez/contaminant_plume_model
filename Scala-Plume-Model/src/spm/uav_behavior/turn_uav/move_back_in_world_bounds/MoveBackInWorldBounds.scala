@@ -17,8 +17,11 @@ import spm.uav_behavior.compute_heading.ComputeHeading
 object MoveBackInWorldBounds {
     
     def perform(uav: org.nlogo.agent.Turtle, context: Context): Unit = {
-        val ptx = (context.world.worldWidth / 4) + Random.nextInt(context.world.worldWidth / 2)
-        val pty = (context.world.worldHeight / 4) + Random.nextInt(context.world.worldHeight / 2)
+//        val ptx = (context.world.worldWidth / 4) + Random.nextInt(context.world.worldWidth / 2)
+//        val pty = (context.world.worldHeight / 4) + Random.nextInt(context.world.worldHeight / 2)
+
+        val ptx = (context.world.worldWidth / 2) + (context.world.worldWidth / 4)
+        val pty = (context.world.worldHeight / 2) + (context.world.worldHeight / 4)
         
         val newDesiredHeading = ComputeHeading.get(uav, ptx, pty) - 180
         val worldThreshold = ContextHelper.getObserverVariable(context, "max-world-edge-turn").asInstanceOf[Double]
