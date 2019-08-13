@@ -214,12 +214,11 @@ extensions [ plume-scala ]
 ;    - coverage-std - the standard deviation of coverage-all
 ;    - coverage-mean - the mean of coverage-all
 ;    - coverage-percentage - the number of patches that contain contaminant and have been visited by a UAV DIVIDED BY the number of patches that contain contaminant
-globals [ search-strategy-flock search-strategy-random search-strategy-symmetric coverage-all coverage-std coverage-mean coverage-percentage ]
+globals [ random-search flock-search symmetric-search coverage-all coverage-std coverage-mean coverage-percentage ]
 
 ; set up the breed types we are using
 breed [ contaminant-plumes contaminant-plume ]
 breed [ UAVs UAV ]
-breed [ swarms swarm ]
 
 ; define variables to the patches for the contaminant plume and measuring performance
 ;   plume-density - the density of the contaminant plume at this patch
@@ -230,9 +229,6 @@ patches-own [ plume-density visited ]
 ;   plume-spread-radius - the radius of the contaminant plume with respect to the world width
 ;   plume-spread-patches - the radius of the contaminant plume in terms of patches
 contaminant-plumes-own [ plume-spead-radius plume-spread-patches ]
-
-; define no varialbes for the swarm
-swarms-own [ ]
 
 ; define variables for the UAVs
 ;   flockmates - the other UAVs in this UAVs vision
@@ -261,18 +257,17 @@ to setup
   ; set up the contaminant plumes, UAVs, then Swarms
   setup-contaminant-plumes
   setup-UAVs
-  setup-swarms
 
   ; initialize strings to indicate which search strategy we are using in this episode
-  set search-strategy-flock "search-strategy-flock"
-  set search-strategy-random "search-strategy-random"
-  set search-strategy-symmetric "search-strategy-symmetric"
+  set flock-search "flock-search"
+  set random-search "random-search"
+  set symmetric-search "symmetric-search"
 
   ; initialize the coverage-all list
   set coverage-all []
 
   ; if the seach strategy is symmetric search, then set up the environment accordingly. See Scala implementation for details.
-  if global-search-strategy = search-strategy-symmetric [
+  if global-search-policy = symmetric-search [
     plume-scala:setup-uav-subregions
     plume-scala:paint-subregions
   ]
@@ -437,8 +432,8 @@ to set-plume-patch-density
     let d distancexy [ xcor ] of myself [ ycor ] of myself
 
     ; set the patch's plume density to 1 - (distance / plume radius)
+    ; decreases linearly using the center as the most-dense location
     set plume-density plume-density + 1 - (d / [ plume-spread-patches ] of myself)
-
   ]
 end
 
@@ -449,6 +444,7 @@ to setup-UAVs
   create-UAVs population [
     ; set their attributes
     set size 3
+    set color blue
     set shape "airplane"
     set detection-time 0
     setxy random-xcor random-ycor
@@ -459,37 +455,25 @@ end
 ; a procedure to update the UAVs based on the global search strategy
 to update-UAVs
   ; if the global search strategy is random, then call the scala implementation
-  if global-search-strategy = search-strategy-random [ plume-scala:update-random-search ]
+  if global-search-policy = random-search [ plume-scala:update-random-search ]
 
   ; if the global search strategy is symmetric, then call the scala implementation
-  if global-search-strategy = search-strategy-symmetric [ plume-scala:update-symmetric-search ]
+  if global-search-policy = symmetric-search [ plume-scala:update-symmetric-search ]
 
-  ; for each UAV
-  ask UAVs [
-    ; if the global search strategy is random, then call the procedure to update flock
-    if global-search-strategy = search-strategy-flock [ update-search-strategy-flock ]
+  if global-search-policy = flock-search [ update-search-strategy-flock ]
 
-    ; move each UAV forward
-    fd 0.5
-  ]
-end
-
-
-; a procedure to create the swarms
-to setup-swarms
-  ; create 1 swarm and hide it (dont show it on the GUI)
-  create-swarms 1 [ hide-turtle ]
+  ; move each UAV forward
+  ask UAVs [ fd 0.5 ]
 end
 
 
 ; a procedure to update the flock search strategy
 to update-search-strategy-flock
-  ; if the UAV is inside of the world bounds decided by the input parameter world-edge-threshold
-  ; then flock
-  ; otherwise, call the scala implementation to move the UAV back into the world
-  ifelse plume-scala:uav-inside-world-bounds
-  [ flock ]
-  [ plume-scala:move-uav-inside-world-bounds ]
+  ask UAVs [
+    ; if the UAV is inside of the world bounds decided by the input parameter world-edge-threshold then flock
+    ; otherwise, call the scala implementation to move the UAV back into the world
+    ifelse plume-scala:uav-inside-world-bounds [ flock ] [ plume-scala:move-uav-inside-world-bounds ]
+  ]
 end
 
 
@@ -653,7 +637,7 @@ plume-spread-radius
 plume-spread-radius
 0
 1
-0.5
+0.19
 0.01
 1
 percent
@@ -668,7 +652,7 @@ population
 population
 0
 100
-39.0
+9.0
 1
 1
 UAVs per swarm
@@ -700,7 +684,7 @@ number-plumes
 number-plumes
 0
 5
-1.0
+3.0
 1
 1
 plumes
@@ -709,8 +693,8 @@ HORIZONTAL
 SLIDER
 17
 403
-240
-436
+243
+437
 wind-speed
 wind-speed
 0
@@ -724,13 +708,13 @@ HORIZONTAL
 SLIDER
 16
 441
-240
-474
+243
+475
 wind-heading
 wind-heading
 0
 360
-270.0
+0.0
 1
 1
 degrees
@@ -763,7 +747,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-84.5
+113.5
 0.5
 1
 patches
@@ -772,8 +756,8 @@ HORIZONTAL
 SLIDER
 17
 316
-244
-349
+242
+350
 plume-decay-rate
 plume-decay-rate
 0
@@ -787,13 +771,13 @@ HORIZONTAL
 SLIDER
 17
 501
-240
-534
+238
+535
 coverage-data-decay
 coverage-data-decay
 1
 60
-11.0
+2.0
 1
 1
 ticks
@@ -844,7 +828,7 @@ random-search-max-heading-time
 random-search-max-heading-time
 0
 100
-11.0
+26.0
 1
 1
 Ticks
@@ -859,7 +843,7 @@ random-search-max-turn
 random-search-max-turn
 0
 5
-0.5
+1.45
 0.05
 1
 degrees
@@ -868,11 +852,11 @@ HORIZONTAL
 CHOOSER
 18
 646
-249
-691
-global-search-strategy
-global-search-strategy
-"search-strategy-flock" "search-strategy-random" "search-strategy-symmetric"
+236
+692
+global-search-policy
+global-search-policy
+"random-search" "flock-search" "symmetric-search"
 2
 
 SLIDER
@@ -884,7 +868,7 @@ minimum-separation
 minimum-separation
 0
 5
-0.5
+0.75
 0.25
 1
 patches
@@ -899,7 +883,7 @@ max-align-turn
 max-align-turn
 0
 20
-4.25
+3.0
 0.25
 1
 degrees
@@ -914,7 +898,7 @@ max-cohere-turn
 max-cohere-turn
 0
 10
-5.0
+4.9
 0.1
 1
 degrees
@@ -925,7 +909,7 @@ TEXTBOX
 538
 441
 558
-search-strategy-flock
+Flock Policy
 11
 0.0
 1
@@ -935,7 +919,7 @@ TEXTBOX
 540
 680
 560
-search-strategy-random
+Random Policy
 11
 0.0
 1
@@ -949,7 +933,7 @@ max-separate-turn
 max-separate-turn
 0
 20
-0.5
+1.25
 0.25
 1
 degrees
@@ -958,13 +942,13 @@ HORIZONTAL
 SLIDER
 16
 539
-240
-572
+239
+573
 world-edge-threshold
 world-edge-threshold
 0
 25
-5.0
+11.0
 0.5
 1
 degrees
@@ -1020,7 +1004,7 @@ TEXTBOX
 627
 211
 655
-UAV Behavior & Search Strategy
+Search Policy
 11
 0.0
 1
@@ -1034,7 +1018,7 @@ symmetric-search-max-turn
 symmetric-search-max-turn
 0
 20
-20.0
+3.9
 0.1
 1
 degrees
@@ -1060,7 +1044,7 @@ TEXTBOX
 541
 914
 559
-search-strategy-symmetric
+Symmetric Policy
 11
 0.0
 1
@@ -1074,7 +1058,7 @@ symmetric-search-min-region-time
 symmetric-search-min-region-time
 1
 1000
-28.0
+138.0
 1
 1
 Ticks
@@ -1089,7 +1073,7 @@ symmetric-search-max-region-time
 symmetric-search-max-region-time
 100
 5000
-554.0
+1836.0
 1
 1
 Ticks
@@ -1117,15 +1101,15 @@ SLIDER
 19
 170
 244
-203
+204
 UAV-decontamination-strength
 UAV-decontamination-strength
 0
 0.01
-0.01
+0.0
 0.00001
 1
-patches
+NIL
 HORIZONTAL
 
 SLIDER
@@ -1137,7 +1121,7 @@ plume-decontamination-threshold
 plume-decontamination-threshold
 0.01
 1
-0.1
+0.01
 0.01
 1
 NIL
