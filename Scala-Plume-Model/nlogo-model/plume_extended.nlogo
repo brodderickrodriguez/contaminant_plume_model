@@ -112,13 +112,13 @@
 ;   unit:        Ticks
 ;   description: A temporal threshold for calculating the standard deviation of the Swarm’s coverage
 
-;   name:        global-search-strategy
+;   name:        global-search-policy
 ;   category:    Swarm - Search
 ;   min value:   N/A
 ;   max value:   N/A
 ;   increment:   N/A
 ;   unit:        N/A
-;   description: The global search strategy type deployed by the Swarm
+;   description: The global search policy type deployed by the Swarm
 
 ;   name:        minimum-separation
 ;   category:    Swarm - Search - Flock
@@ -166,7 +166,7 @@
 ;   max value:   5
 ;   increment:   0.05
 ;   unit:        Degrees
-;   description: The maximum angle a UAV can turn when the global search strategy is Random Search
+;   description: The maximum angle a UAV can turn when the global search policy is Random Search
 
 ;   name:        symmetric-search-max-turn
 ;   category:    Swarm - Search - Symmetric
@@ -174,7 +174,7 @@
 ;   max value:   20
 ;   increment:   0.1
 ;   unit:        Degrees
-;   description: Degrees	The maximum angle a UAV can turn when the global search strategy is Symmetric Search
+;   description: Degrees	The maximum angle a UAV can turn when the global search policy is Symmetric Search
 
 ;   name:        symmetric-search-region-threshold
 ;   category:    Swarm - Search - Symmetric
@@ -205,9 +205,9 @@
 extensions [ plume-scala ]
 
 ; globals:
-;  - search-strategy-flock - A string value to indicate the current search strategy is flock
-;  - search-strategy-random - A string value to indicate the current search strategy is random
-;  - search-strategy-symmetric - A string value to indicate the current search strategy is symmetric
+;  - random-search - A string value to indicate the current search policy is random
+;  - flock-search - A string value to indicate the current search policy is flock
+;  - symmetric-search - A string value to indicate the current search policy is symmetric
 ;
 ;   performance metrics:
 ;    - coverage-all - a list contaning all coverage readings from the UAVs over the coverage-data-decay period
@@ -236,8 +236,8 @@ contaminant-plumes-own [ plume-spead-radius plume-spread-patches ]
 ;   best-neighbor - the flockmate of this UAV with the highest plume-reading
 ;   plume-reading - the density of a contaminant plume at the UAVs current location
 ;   detection-time - the time when this UAV first detected a contaminant plume
-;   random-search-time - the number of ticks this UAV will continue on its current heading before turning when the search strategy is random
-;   UAV-region - the region (defined as a list) which this UAV is resonsible for searching when the search strategy is symmetric
+;   random-search-time - the number of ticks this UAV will continue on its current heading before turning when the search policy is random
+;   UAV-region - the region (defined as a list) which this UAV is resonsible for searching when the search policy is symmetric
 ;   desired-heading - the heading this UAV is changing to over more than one tick. This allows a UAV to remember where to turn when a "*-max-turn" input limits the turning radius
 ;   symmetric-search-max-region-reading - the maximum contaminant plume sensor reading this UAV has seen in its current region
 ;   symmetric-search-region-time - the amount of time this UAV will stay in its current region before considering switching to another region
@@ -258,7 +258,7 @@ to setup
   setup-contaminant-plumes
   setup-UAVs
 
-  ; initialize strings to indicate which search strategy we are using in this episode
+  ; initialize strings to indicate which search policy we are using in this episode
   set flock-search "flock-search"
   set random-search "random-search"
   set symmetric-search "symmetric-search"
@@ -266,7 +266,7 @@ to setup
   ; initialize the coverage-all list
   set coverage-all []
 
-  ; if the seach strategy is symmetric search, then set up the environment accordingly. See Scala implementation for details.
+  ; if the seach policy is symmetric search, then set up the environment accordingly. See Scala implementation for details.
   if global-search-policy = symmetric-search [
     plume-scala:setup-uav-subregions
     plume-scala:paint-subregions
@@ -452,23 +452,23 @@ to setup-UAVs
 end
 
 
-; a procedure to update the UAVs based on the global search strategy
+; a procedure to update the UAVs based on the global search policy
 to update-UAVs
-  ; if the global search strategy is random, then call the scala implementation
+  ; if the global search policy is random, then call the scala implementation
   if global-search-policy = random-search [ plume-scala:update-random-search ]
 
-  ; if the global search strategy is symmetric, then call the scala implementation
+  ; if the global search policy is symmetric, then call the scala implementation
   if global-search-policy = symmetric-search [ plume-scala:update-symmetric-search ]
 
-  if global-search-policy = flock-search [ update-search-strategy-flock ]
+  if global-search-policy = flock-search [ update-search-policy-flock ]
 
   ; move each UAV forward
   ask UAVs [ fd 0.5 ]
 end
 
 
-; a procedure to update the flock search strategy
-to update-search-strategy-flock
+; a procedure to update the flock search policy
+to update-search-policy-flock
   ask UAVs [
     ; if the UAV is inside of the world bounds decided by the input parameter world-edge-threshold then flock
     ; otherwise, call the scala implementation to move the UAV back into the world
@@ -477,7 +477,7 @@ to update-search-strategy-flock
 end
 
 
-; a procedure to perform the flock search strategy
+; a procedure to perform the flock search policy
 to flock
   ; call the scala implementation to find a UAVs flockmates. See scala implementation for details.
   plume-scala:find-flockmates
@@ -857,7 +857,7 @@ CHOOSER
 global-search-policy
 global-search-policy
 "random-search" "flock-search" "symmetric-search"
-2
+1
 
 SLIDER
 266
