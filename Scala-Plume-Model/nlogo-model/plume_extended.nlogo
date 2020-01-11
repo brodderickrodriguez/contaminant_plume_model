@@ -214,7 +214,7 @@ extensions [ plume-scala ]
 ;    - coverage-std - the standard deviation of coverage-all
 ;    - coverage-mean - the mean of coverage-all
 ;    - coverage-percentage - the number of patches that contain contaminant and have been visited by a UAV DIVIDED BY the number of patches that contain contaminant
-globals [ random-search flock-search symmetric-search coverage-all coverage-std coverage-mean coverage-percentage ]
+globals [ random-search flock-search symmetric-search coverage-all coverage-std coverage-mean coverage-percentage coverage-percentage-all ]
 
 ; set up the breed types we are using
 breed [ contaminant-plumes contaminant-plume ]
@@ -252,7 +252,7 @@ to setup
   reset-ticks
 
   ; set a background image
-  import-drawing "./resources/plume-bg.png"
+   import-drawing "./resources/plume-bg.png"
 
   ; set up the contaminant plumes, UAVs, then Swarms
   setup-contaminant-plumes
@@ -265,12 +265,14 @@ to setup
 
   ; initialize the coverage-all list
   set coverage-all []
+  set coverage-percentage-all []
 
   ; if the seach policy is symmetric search, then set up the environment accordingly. See Scala implementation for details.
   if global-search-policy = symmetric-search [
     plume-scala:setup-uav-subregions
     plume-scala:paint-subregions
   ]
+
 end
 
 
@@ -290,6 +292,8 @@ to go
 
   ; run the procedure to check if the termination condition is met, if it is, then terminate the episode
   if check-termination-condition [ stop ]
+
+  if ticks > 5000 [stop print coverage-percentage ]
 end
 
 
@@ -659,9 +663,9 @@ UAVs per swarm
 HORIZONTAL
 
 BUTTON
-139
+140
 20
-224
+225
 53
 NIL
 go
@@ -684,7 +688,7 @@ number-plumes
 number-plumes
 0
 5
-3.0
+1.0
 1
 1
 plumes
@@ -694,7 +698,7 @@ SLIDER
 17
 403
 243
-437
+436
 wind-speed
 wind-speed
 0
@@ -709,12 +713,12 @@ SLIDER
 16
 441
 243
-475
+474
 wind-heading
 wind-heading
 0
 360
-0.0
+254.0
 1
 1
 degrees
@@ -747,7 +751,7 @@ UAV-vision
 UAV-vision
 0
 world-width
-113.5
+75.0
 0.5
 1
 patches
@@ -757,7 +761,7 @@ SLIDER
 17
 316
 242
-350
+349
 plume-decay-rate
 plume-decay-rate
 0
@@ -772,7 +776,7 @@ SLIDER
 17
 501
 238
-535
+534
 coverage-data-decay
 coverage-data-decay
 1
@@ -853,7 +857,7 @@ CHOOSER
 18
 646
 236
-692
+691
 global-search-policy
 global-search-policy
 "random-search" "flock-search" "symmetric-search"
@@ -868,7 +872,7 @@ minimum-separation
 minimum-separation
 0
 5
-0.75
+0.0
 0.25
 1
 patches
@@ -943,7 +947,7 @@ SLIDER
 16
 539
 239
-573
+572
 world-edge-threshold
 world-edge-threshold
 0
@@ -1033,7 +1037,7 @@ symmetric-search-region-threshold
 symmetric-search-region-threshold
 -10
 25
--2.9
+-0.4
 0.1
 1
 patches
@@ -1058,7 +1062,7 @@ symmetric-search-min-region-time
 symmetric-search-min-region-time
 1
 1000
-138.0
+53.0
 1
 1
 Ticks
@@ -1101,7 +1105,7 @@ SLIDER
 19
 170
 244
-204
+203
 UAV-decontamination-strength
 UAV-decontamination-strength
 0
